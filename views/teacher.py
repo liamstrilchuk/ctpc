@@ -12,7 +12,7 @@ def teacher_required(func):
 		if not current_user.is_authenticated:
 			return redirect("/")
 
-		if not current_user.role == "teacher":
+		if not current_user.role == "teacher" and not current_user.role == "admin" or current_user.school is None:
 			return redirect("/")
 
 		return func(*args, **kwargs)
@@ -20,6 +20,12 @@ def teacher_required(func):
 	wrapper.__name__ = func.__name__
 	
 	return wrapper
+
+def teacher_controls(teacher, student):
+	if student is None or not student.school == teacher.school or not student.role == "student" or not teacher.role == "teacher":
+		return False
+
+	return True
 
 @teacher.route("/teacher")
 @teacher_required
@@ -86,18 +92,87 @@ def register_student():
 @teacher_required
 def assign_student(username):
 	user = User.query.filter_by(username=username).first()
-	if user is None or not user.school == current_user.school or not user.role == "student":
+	if not teacher_controls(current_user, user):
 		return redirect("/teacher")
+	
+	teams = Team.query.filter_by(school=current_user.school).all()
 
 	if request.method == "GET":
-		teams = Team.query.filter_by(school=current_user.school).all()
 		return render_template("assign-student.html", user=user, teams=teams)
 
 	team_id = request.form["team"]
 	if not team_id:
 		return redirect("/teacher")
+	
+	team = Team.query.filter_by(id=team_id).first()
+	if team is None or not team.school == current_user.school:
+		return redirect("/teacher")
+	
+	if len(team.members) >= 6:
+		return render_template("assign-student.html", user=user, teams=teams, error="That team is already full.")
 
 	user.team_id = team_id
+	db.session.commit()
+
+	return redirect("/teacher")
+
+@teacher.route("/teacher/unassign/<string:username>")
+@teacher_required
+def unassign_student(username):
+	user = User.query.filter_by(username=username).first()
+	if not teacher_controls(current_user, user):
+		return redirect("/teacher")
+
+	user.team_id = None
+	db.session.commit()
+
+	return redirect("/teacher")
+
+@teacher.route("/teacher/delete/<string:username>", methods=["GET", "POST"])
+@teacher_required
+def delete_student(username):
+	user = User.query.filter_by(username=username).first()
+	if not teacher_controls(current_user, user):
+		return redirect("/teacher")
+	
+	if request.method == "GET":
+		return render_template("confirm-delete.html", text=user.username, type="user")
+
+	db.session.delete(user)
+	db.session.commit()
+
+	return redirect("/teacher")
+
+@teacher.route("/teacher/reset-password/<string:username>", methods=["GET", "POST"])
+@teacher_required
+def reset_password(username):
+	user = User.query.filter_by(username=username).first()
+	if not teacher_controls(current_user, user):
+		return redirect("/teacher")
+
+	if request.method == "GET":
+		return render_template("confirm-reset.html", user=user)
+
+	random_password = generate_random_password()
+	user.password = bcrypt.generate_password_hash(random_password)
+	db.session.commit()
+
+	return render_template("user-created.html", username=username, password=random_password, text="Password reset successfully")
+
+@teacher.route("/teacher/delete-team/<int:team_id>", methods=["GET", "POST"])
+@teacher_required
+def delete_team(team_id):
+	team = Team.query.filter_by(id=team_id).first()
+	if team is None or not team.school == current_user.school:
+		return redirect("/teacher")
+
+	if request.method == "GET":
+		return render_template("confirm-delete.html", text=team.name, type="team")
+
+	for student in team.members:
+		student.team_id = None
+
+	db.session.delete(team)
 	db.session.commit()
 
 	return redirect("/teacher")

@@ -64,13 +64,12 @@ h1 {
 	margin-bottom: 20px;
 }
 
-.admin-controls a {
+.admin-controls * {
 	margin-right: 10px;
 }
 
 .admin-team-name {
-	font-size: 1.1em;
-	font-weight: bold;
+	font-size: 1.2em;
 	margin-bottom: 5px;
 	display: block;
 }

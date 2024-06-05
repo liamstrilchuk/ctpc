@@ -8,25 +8,52 @@
 	</div>
 	<p>You are a teacher for <b>{{ current_user.school.name }}</b> ({{ current_user.school.school_board.name }}).</p>
 	{% if unassigned %}
-		<p>You have {{ unassigned|length }} student(s) who are not assigned to teams:</p>
+		{% if unassigned|length == 1 %}
+			<p>You have 1 student who is not assigned to a team:</p>
+		{% else %}
+			<p>You have {{ unassigned|length }} students who are not assigned to teams:</p>
+		{% endif %}
 		<ul>
 			{% for student in unassigned %}
 				<li>
-					{{ student.username }} (<a href="/teacher/assign/{{ student.username }}">assign</a>)
+					{{ student.username }} (
+						<a href="/teacher/assign/{{ student.username }}">assign</a> |
+						<a href="/teacher/reset-password/{{ student.username }}">reset password</a> |
+						<a href="/teacher/delete/{{ student.username }}">delete</a>
+					)
 				</li>
 			{% endfor %}
 		</ul>
 	{% endif %}
+
+	{% if teams %}
+		<p>You have {{ teams|length }} team{% if teams|length != 1 %}s{% endif %} registered:</p>
+	{% else %}
+		<p>You do not currently have any teams registered. Click "create team" above to register a team.</p>
+	{% endif %}
+
 	{% for team in teams %}
 		<div class="admin-board">
-			<span class="admin-team-name">{{ team.name }}</span>
-			{% for member in team.members %}
-				<div class="student">
-					{{ member.username }} (<a href="/teacher/assign/{{ member.username }}">reassign</a>)
-				</div>
+			<span class="admin-team-name"><b>{{ team.name }}</b></span>
+			<div class="admin-controls">
+				<span>{{ 6 - team.members|length }} spot{% if team.members|length != 5 %}s{% endif %} remaining</span> <a href="/teacher/delete-team/{{ team.id }}">Delete team</a>
+			</div>
+			{% if team.members %}
+				<ul>
+					{% for member in team.members %}
+						<li class="student">
+							{{ member.username }} (
+								<a href="/teacher/assign/{{ member.username }}">reassign</a> |
+								<a href="/teacher/unassign/{{ member.username }}">unassign</a> |
+								<a href="/teacher/reset-password/{{ member.username }}">reset password</a> |
+								<a href="/teacher/delete/{{ member.username }}">delete</a>
+							)
+						</li>
+					{% endfor %}
+				</ul>
 			{% else %}
 				<p>No students are currently assigned to this team.</p>
-			{% endfor %}
+			{% endif %}
 		</div>
 	{% endfor %}
 {% endblock %}

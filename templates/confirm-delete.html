@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/teacher">&larr; Back to student management</a>
+	<h1>Confirm deletion</h1>
+	<p>Are you sure you want to delete the {{ type }} <b>{{ text }}</b>?</p>
+	<form method="post">
+		<input type="submit" value="Yes, delete this {{ type }}">
+	</form>
+{% endblock %}

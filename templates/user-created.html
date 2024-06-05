@@ -6,8 +6,8 @@
 	{% else %}
 		<a class="back" href="/teacher">&larr; Back to student management</a>
 	{% endif %}
-	<h1>User created</h1>
-	<p>A user has been created. Please keep these details for future reference; they will not be available after you close this tab.</p>
+	<h1>{{ text or "User created" }}</h1>
+	<p>{% if not text %}A user has been created.{% endif %} Please keep these details for future reference; they will not be available after you leave this tab.</p>
 	<ul>
 		<li><b>Username:</b> {{ username }}</li>
 		<li><b>Password:</b> {{ password }}</li>

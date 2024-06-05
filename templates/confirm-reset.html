@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/teacher">&larr; Back to student management</a>
+	<h1>Confirm password reset</h1>
+	<p>Are you sure you want to reset the password for the user <b>{{ user.username }}</b>?</p>
+	<form method="post">
+		<input type="submit" value="Yes, reset this user's password">
+	</form>
+{% endblock %}
