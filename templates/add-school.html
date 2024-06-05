@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/admin">&larr; Back to admin</a>
+	<h1>Add school</h1>
+	<form method="post">
+		<label for="board">School board</label>
+		<select name="board">
+			{% for board in boards %}
+				<option>{{ board.name }}</option>
+			{% endfor %}
+		</select>
+		<label for="name">School name</label>
+		<input name="name">
+		<input type="submit">
+	</form>
+	{% if error %}
+		<p>{{ error }}</p>
+	{% endif %}
+{% endblock %}

@@ -2,8 +2,10 @@ from flask import Flask
 from flask_migrate import Migrate
 
 from models import User, db
-from views.views import views
 from setup import bcrypt, login_manager
+from views.admin.admin import admin
+from views.api import api
+from views.views import views
 
 def setup_app():
 	app = Flask(__name__)
@@ -25,6 +27,8 @@ def setup_app():
 
 app = setup_app()
 app.register_blueprint(views)
+app.register_blueprint(api)
+app.register_blueprint(admin)
 
 @login_manager.user_loader
 def load_user(user_id):

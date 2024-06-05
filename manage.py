@@ -14,12 +14,23 @@ def deploy():
 	migrate()
 	upgrade()
 
-	from models import User
+	from models import User, School, SchoolBoard
 	from flask_bcrypt import Bcrypt
 
 	bcrypt = Bcrypt()
-	user = User(username="admin", password=bcrypt.generate_password_hash("admin"), school="admin", role="admin")
+	user = User(username="admin", password=bcrypt.generate_password_hash("admin"), role="admin")
 	db.session.add(user)
+
+	board = SchoolBoard(name="Waterloo Region District School Board")
+	db.session.add(board)
+	db.session.commit()
+
+	school = School(name="Preston High School", school_board_id=board.id)
+	db.session.add(school)
+
+	school = School(name="Waterloo Collegiate Institute", school_board_id=board.id)
+	db.session.add(school)
+
 	db.session.commit()
 
 deploy()
