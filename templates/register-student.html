@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/teacher">&larr; Back to student management</a>
+	<h1>Register student</h1>
+
+	<form method="post">
+		<label for="name">First name</label>
+		<input name="name" required>
+		<label for="surname">Last name</label>
+		<input name="surname" required>
+		<input type="submit">
+	</form>
+	{% if error %}
+		<p>{{ error }}</p>
+	{% endif %}
+{% endblock %}

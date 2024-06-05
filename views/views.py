@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask_login import login_required
 
-from . import index, login, register
+from . import index, login, teacher
 
 views = Blueprint("views", __name__, template_folder="templates")
 
@@ -18,6 +18,4 @@ def login_view():
 def logout_view():
 	return login.logout_view()
 
-@views.route("/register")
-def register_view():
-	return register.register_view()
+views.register_blueprint(teacher.teacher)

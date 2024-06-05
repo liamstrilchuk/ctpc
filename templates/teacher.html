@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Student management</h1>
+	<div class="admin-controls">
+		<a href="/teacher/create-team">Create team</a>
+		<a href="/teacher/register-student">Register student</a>
+	</div>
+	<p>You are a teacher for <b>{{ current_user.school.name }}</b> ({{ current_user.school.school_board.name }}).</p>
+	{% if unassigned %}
+		<p>You have {{ unassigned|length }} student(s) who are not assigned to teams:</p>
+		<ul>
+			{% for student in unassigned %}
+				<li>
+					{{ student.username }} (<a href="/teacher/assign/{{ student.username }}">assign</a>)
+				</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+	{% for team in teams %}
+		<div class="admin-board">
+			<span class="admin-team-name">{{ team.name }}</span>
+			{% for member in team.members %}
+				<div class="student">
+					{{ member.username }} (<a href="/teacher/assign/{{ member.username }}">reassign</a>)
+				</div>
+			{% else %}
+				<p>No students are currently assigned to this team.</p>
+			{% endfor %}
+		</div>
+	{% endfor %}
+{% endblock %}

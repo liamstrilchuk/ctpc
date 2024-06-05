@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/teacher">&larr; Back to student management</a>
+	<h1>Assign student</h1>
+	<p>Assign {{ user.username }} to a team:</p>
+	<form method="post">
+		<label for="team">Team</label>
+		<select name="team" required>
+			{% for team in teams %}
+				<option value="{{ team.id }}">{{ team.name }}</option>
+			{% endfor %}
+		</select>
+		<input type="submit">
+	</form>
+	{% if error %}
+		<p>{{ error }}</p>
+	{% endif %}
+{% endblock %}
