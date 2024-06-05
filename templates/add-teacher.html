@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block head %}
+	<script src="{{ url_for('static', filename='js/admin-add-teacher.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+	<a class="back" href="/admin">&larr; Back to admin</a>
+	<h1>Add teacher</h1>
+	<form method="post">
+		<label for="board">School board</label>
+		<select name="board"></select>
+		<label for="school">School</label>
+		<select name="school"></select>
+		<label for="name">Teacher name</label>
+		<input name="name" required>
+		<label for="username">Username</label>
+		<input name="username" required>
+		<input type="submit">
+	</form>
+	{% if error %}
+		<p>{{ error }}</p>
+	{% endif %}
+{% endblock %}

@@ -58,6 +58,7 @@ def complete_structure():
 		return error("You do not have permission to access this resource")
 	
 	boards = SchoolBoard.query.all()
+	teachers = User.query.filter_by(role="teacher").all()
 	json_data = []
 	
 	for board in boards:
@@ -69,8 +70,13 @@ def complete_structure():
 		for school in board.schools:
 			school_data = {
 				"name": school.name,
-				"teams": []
+				"teams": [],
+				"teachers": []
 			}
+
+			for teacher in teachers:
+				if teacher.school == school:
+					school_data["teachers"].append(teacher.username)
 
 			for team in school.teams:
 				team_data = {

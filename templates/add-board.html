@@ -5,7 +5,7 @@
 	<h1>Add school board</h1>
 	<form method="post">
 		<label for="name">Board name</label>
-		<input name="name">
+		<input name="name" required>
 		<input type="submit">
 		{% if error %}
 			<p>{{ error }}</p>

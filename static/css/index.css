@@ -43,6 +43,13 @@ h1 {
 	border-radius: 5px;
 }
 
+.admin-school {
+	margin: 10px 0;
+	background: #ddd;
+	padding: 10px;
+	border-radius: 5px;
+}
+
 .admin-board-name {
 	font-weight: bold;
 	font-size: 1.2em;
@@ -63,6 +70,10 @@ h1 {
 
 form * {
 	display: block;
+}
+
+form input, form select {
+	margin-bottom: 10px;
 }
 
 .back {
