@@ -65,7 +65,8 @@ def complete_structure():
 	for board in boards:
 		board_data = {
 			"name": board.name,
-			"schools": []
+			"schools": [],
+			"id": board.id
 		}
 
 		for school in board.schools:

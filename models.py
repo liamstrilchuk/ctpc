@@ -60,3 +60,35 @@ class Team(db.Model):
 	
 	def __repr__(self):
 		return f"<Team {self.name}>"
+	
+class Contest(db.Model):
+	__tablename__ = "contests"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	name = sa.Column(sa.String(100), nullable=False)
+	contest_type = sa.Column(sa.String(100), nullable=False)
+	
+	def __repr__(self):
+		return f"<Contest {self.name}>"
+	
+class Problem(db.Model):
+	__tablename__ = "problems"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	name = sa.Column(sa.String(100), nullable=False)
+	contest_id = sa.Column(sa.Integer, sa.ForeignKey("contests.id"), nullable=False)
+	
+	def __repr__(self):
+		return f"<Problem {self.name}>"
+	
+class Submission(db.Model):
+	__tablename__ = "submissions"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	user_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"), nullable=False)
+	problem_id = sa.Column(sa.Integer, sa.ForeignKey("problems.id"), nullable=False)
+	language = sa.Column(sa.String(10), nullable=False)
+	filename = sa.Column(sa.String(100), nullable=False)
+	
+	def __repr__(self):
+		return f"<Submission {self.id}>"
