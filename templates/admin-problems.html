@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/contests">&larr; Back to contest management</a>
+	<h1>Edit problems</h1>
+	<div class="admin-controls">
+		<a href="/admin/create-problem/{{ contest.id }}">Create problem</a>
+	</div>
+	<div>
+		{% for problem in contest.problems %}
+			<div class="admin-contest">
+				<span class="admin-contest-name"><b>{{ problem.name }}</b></span>
+				<div class="admin-controls">
+					<a href="/admin/edit-problem/{{ problem.id }}">Edit</a>
+					<a href="/admin/problems/{{ problem.id }}">Test cases</a>
+					<a href="/admin/delete-problem/{{ problem.id }}">Delete</a>
+				</div>
+				<p>{{ problem.test_cases|length }} test case{% if problem.test_cases|length != 1%}s{% endif %}</p>
+			</div>
+		{% else %}
+			<p>This contest does not currently have any problems.</p>
+		{% endfor %}
+	</div>
+{% endblock %}

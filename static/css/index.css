@@ -83,6 +83,17 @@ ul {
 	display: block;
 }
 
+.admin-contest {
+	padding: 10px 20px;
+	background: #eee;
+	border-radius: 5px;
+}
+
+.admin-contest-name {
+	display: block;
+	font-size: 1.2em;
+}
+
 form * {
 	display: block;
 }

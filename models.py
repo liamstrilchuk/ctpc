@@ -67,6 +67,9 @@ class Contest(db.Model):
 	id = sa.Column(sa.Integer, primary_key=True)
 	name = sa.Column(sa.String(100), nullable=False)
 	contest_type = sa.Column(sa.String(100), nullable=False)
+	problems = db.relationship("Problem", backref="contest", lazy=True)
+	start_date = sa.Column(sa.Integer, nullable=False)
+	end_date = sa.Column(sa.Integer, nullable=False)
 	
 	def __repr__(self):
 		return f"<Contest {self.name}>"
@@ -77,6 +80,8 @@ class Problem(db.Model):
 	id = sa.Column(sa.Integer, primary_key=True)
 	name = sa.Column(sa.String(100), nullable=False)
 	contest_id = sa.Column(sa.Integer, sa.ForeignKey("contests.id"), nullable=False)
+	test_cases = db.relationship("AbstractTestCase", backref="problem", lazy=True)
+	description = sa.Column(sa.Text)
 	
 	def __repr__(self):
 		return f"<Problem {self.name}>"
@@ -92,3 +97,27 @@ class Submission(db.Model):
 	
 	def __repr__(self):
 		return f"<Submission {self.id}>"
+	
+class TestCase(db.Model):
+	__tablename__ = "test_cases"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	output = sa.Column(sa.String(200), nullable=False)
+	abstract_test_case_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_cases.id"), nullable=False)
+	
+	def __repr__(self):
+		return f"<TestCase {self.id}>"
+	
+class AbstractTestCase(db.Model):
+	__tablename__ = "abstract_test_cases"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	problem_id = sa.Column(sa.Integer, sa.ForeignKey("problems.id"), nullable=False)
+	input = sa.Column(sa.Text, nullable=True)
+	expected_output = sa.Column(sa.Text, nullable=True)
+	point_value = sa.Column(sa.Integer)
+	test_cases = db.relationship("TestCase", backref="abstract_test_case", lazy=True)
+	is_sample = sa.Column(sa.Boolean, default=False)
+
+	def __repr__(self):
+		return f"<AbstractTestCase {self.id}>"

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/edit-problems/{{ contest.id }}">&larr; Back to problems</a>
+	<h1>{% if problem %}Edit{% else %}Create{% endif %} problem for {{ contest.name }}</h1>
+	<form method="post">
+		<label for="name">Problem name</label>
+		<input name="name" {% if problem %}value="{{ problem.name }}"{% endif %}>
+		<label for="description">Description (markdown format)</label>
+		<textarea name="description">{% if problem %}{{ problem.description }}{% endif %}</textarea>
+		<input type="submit">
+	</form>
+{% endblock %}
