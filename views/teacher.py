@@ -22,7 +22,7 @@ def teacher_required(func):
 	return wrapper
 
 def teacher_controls(teacher, student):
-	if student is None or not student.school == teacher.school or not student.role == "student" or not teacher.role == "teacher":
+	if student is None or not student.school == teacher.school or not student.role == "student" or not teacher.role in ("teacher", "admin"):
 		return False
 
 	return True

@@ -9,10 +9,13 @@ window.addEventListener("load", async () => {
 		let boardHTML = `<div class="admin-board"><div class="admin-board-controls"><span class="admin-board-name">${board.name}</span></div>`;
 
 		board.schools.forEach((school) => {
-			let schoolHTML = `<div class="admin-school"><span class="admin-school-name">${school.name}</span><div class="admin-school-teachers"><ul>`;
+			console.log(school);
+			let schoolHTML = `<div class="admin-school"><span class="admin-school-name"><b>${school.name}</b> (<a href="/admin/manage/${school.id}">manage</a>)</span><div class="admin-school-teachers">Teachers: `;
 
-			schoolHTML += school.teachers.map(t => `<li>${t}</li>`);
+			schoolHTML += school.teachers.map(t => `<a href="/user/${t}">${t}</a>`).join(", ");
 
+			schoolHTML += `</div><div class="admin-school-teams">Teams:<ul>`;
+			schoolHTML += school.teams.map(t => `<li>${t.name} (${t.members.length}/6 members)</li>`).join("");
 			schoolHTML += `</ul></div></div>`;
 
 			boardHTML += schoolHTML;

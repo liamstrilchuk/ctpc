@@ -111,3 +111,16 @@ def add_teacher():
 	db.session.commit()
 
 	return render_template("user-created.html", username=username, password=random_password, admin_created=True)
+
+@admin.route("/admin/manage/<int:school_id>")
+@admin_required
+def manage_school(school_id):
+	school = School.query.get(school_id)
+	
+	if school is None:
+		return redirect("/admin")
+	
+	current_user.school = school
+	db.session.commit()
+
+	return redirect("/teacher")

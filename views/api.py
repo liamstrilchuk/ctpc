@@ -46,7 +46,8 @@ def get_schools():
 	for school in schools:
 		json_data.append({
 			"name": school.name,
-			"board": school.school_board.name
+			"board": school.school_board.name,
+			"id": school.id
 		})
 
 	return { "schools": json_data }
@@ -71,7 +72,8 @@ def complete_structure():
 			school_data = {
 				"name": school.name,
 				"teams": [],
-				"teachers": []
+				"teachers": [],
+				"id": school.id
 			}
 
 			for teacher in teachers:
@@ -81,7 +83,8 @@ def complete_structure():
 			for team in school.teams:
 				team_data = {
 					"name": team.name,
-					"members": []
+					"members": [],
+					"id": team.id
 				}
 
 				for member in team.members:

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<ul>
+		<li>Username: {{ user.username }}</li>
+		<li>School: {{ user.school.name }} ({{ user.school.school_board.name }})</li>
+		<li>Role: {{ user.role }}</li>
+	</ul>
+{% endblock %}
