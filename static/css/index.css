@@ -107,3 +107,16 @@ form input, form select {
 	display: block;
 	margin-bottom: 5px;
 }
+
+tr:nth-child(even) {
+	background-color: #f1f1f1;
+}
+
+tr:nth-child(odd) {
+	background-color: #e2e2e2;
+}
+
+td, th {
+	padding: 8px 12px;
+	text-align: left;
+}

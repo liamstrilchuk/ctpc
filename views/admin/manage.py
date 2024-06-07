@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect
 from flask_login import current_user
 
 from models import User, School, SchoolBoard, db
-from util import admin_required, generate_random_password
+from util import admin_required, generate_random_password, check_object_exists
 from setup import bcrypt
 
 manage = Blueprint("manage", __name__, template_folder="templates")
@@ -100,12 +100,8 @@ def add_teacher():
 
 @manage.route("/admin/manage/<int:school_id>")
 @admin_required
-def manage_school(school_id):
-	school = School.query.get(school_id)
-	
-	if school is None:
-		return redirect("/admin")
-	
+@check_object_exists(School, "/admin")
+def manage_school(school):
 	current_user.school = school
 	db.session.commit()
 
@@ -113,12 +109,8 @@ def manage_school(school_id):
 
 @manage.route("/admin/delete-school/<int:school_id>", methods=["GET", "POST"])
 @admin_required
-def delete_school(school_id):
-	school = School.query.get(school_id)
-
-	if school is None:
-		return redirect("/admin")
-	
+@check_object_exists(School, "/admin")
+def delete_school(school):
 	if request.method == "GET":
 		return render_template("confirm-delete.html", type="school", text=school.name, extra_text="This will also delete all teachers and students in this school.")
 	
@@ -134,12 +126,8 @@ def delete_school(school_id):
 
 @manage.route("/admin/delete-board/<int:board_id>", methods=["GET", "POST"])
 @admin_required
-def delete_board(board_id):
-	board = SchoolBoard.query.get(board_id)
-
-	if board is None:
-		return redirect("/admin")
-	
+@check_object_exists(SchoolBoard, "/admin")
+def delete_board(board):
 	schools = School.query.filter_by(school_board=board).all()
 
 	if len(schools) > 0:

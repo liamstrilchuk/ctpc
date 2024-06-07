@@ -33,15 +33,17 @@ def admin_required(func):
 	
 	return wrapper
 
-def check_contest_exists(func):
-	def wrapper(contest_id):
-		contest = Contest.query.filter_by(id=contest_id).first()
+def check_object_exists(classtype, redir_to):
+	def decorator(func):
+		def wrapper(**kwargs):
+			contest = classtype.query.filter_by(id=kwargs[list(kwargs.keys())[0]]).first()
 
-		if not contest:
-			return redirect("/admin/contests")
+			if not contest:
+				return redirect(redir_to)
+			
+			return func(contest)
 		
-		return func(contest)
-	
-	wrapper.__name__ = func.__name__
+		wrapper.__name__ = func.__name__
+		return wrapper
 
-	return wrapper
+	return decorator

@@ -7,19 +7,30 @@
 		<a href="/admin/add-contest">Add contest</a>
 	</div>
 	<div id="adminContainer">
-		{% for contest in contests %}
-			<div class="admin-contest">
-				<span class="admin-contest-name"><b>{{ contest.name }}</b> ({{ contest.contest_type }})</span>
-				<div class="admin-controls">
-					<a href="/admin/edit-contest/{{ contest.id }}">Edit</a>
-					<a href="/admin/edit-problems/{{ contest.id }}">Problems</a>
-					<a href="/admin/delete-contest/{{ contest.id }}">Delete</a>
+		<table>
+			<tr>
+				<th>Contest name</th>
+				<th>Type</th>
+				<th>Actions</th>
+				<th>Start date</th>
+				<th>End date</th>
+				<th>Problems</th>
+			</tr>
+			{% for contest in contests %}
+				<tr>
+					<td>{{ contest.name }}</td>
+					<td>{{ contest.contest_type }}</td>
+					<td>
+						<a href="/admin/edit-contest/{{ contest.id }}">Edit</a> &bull;
+						<a href="/admin/edit-problems/{{ contest.id }}">Problems</a> &bull;
+						<a href="/admin/delete-contest/{{ contest.id }}">Delete</a>
+					</td>
+					<td class="unix-timestamp">{{ contest.start_date }}</td>
+					<td class="unix-timestamp">{{ contest.end_date }}</td>
+					<td>{{ contest.problems|length }} problem{% if contest.problems|length != 1 %}s{% endif %}</td>
 				</div>
-				<p><span class="unix-timestamp">{{ contest.start_date }}</span> to <span class="unix-timestamp">{{ contest.end_date }}</span></p>
-				<p>{{ contest.problems|length }} problem{% if contest.problems|length != 1 %}s{% endif %}</p>
-			</div>
-		{% else %}
-			<p>No contests found.</p>
-		{% endfor %}
+			{% endfor %}
+		</table>
+
 	</div>
 {% endblock %}

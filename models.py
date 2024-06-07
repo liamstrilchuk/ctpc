@@ -13,6 +13,7 @@ class User(UserMixin, db.Model):
 	role = sa.Column(sa.String(100), nullable=False)
 	team_id = sa.Column(sa.Integer, sa.ForeignKey("teams.id"), nullable=True)
 	school_id = sa.Column(sa.Integer, sa.ForeignKey("schools.id"), nullable=True)
+	submissions = db.relationship("Submission", backref="user", lazy=True)
 	
 	def __repr__(self):
 		return f"<User {self.username}>"
@@ -93,7 +94,8 @@ class Submission(db.Model):
 	user_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"), nullable=False)
 	problem_id = sa.Column(sa.Integer, sa.ForeignKey("problems.id"), nullable=False)
 	language = sa.Column(sa.String(10), nullable=False)
-	filename = sa.Column(sa.String(100), nullable=False)
+	code = sa.Column(sa.Text, nullable=False)
+	test_cases = db.relationship("TestCase", backref="submission", lazy=True)
 	
 	def __repr__(self):
 		return f"<Submission {self.id}>"
@@ -104,6 +106,7 @@ class TestCase(db.Model):
 	id = sa.Column(sa.Integer, primary_key=True)
 	output = sa.Column(sa.String(200), nullable=False)
 	abstract_test_case_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_cases.id"), nullable=False)
+	submission_id = sa.Column(sa.Integer, sa.ForeignKey("submissions.id"), nullable=False)
 	
 	def __repr__(self):
 		return f"<TestCase {self.id}>"
