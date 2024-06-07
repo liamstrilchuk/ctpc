@@ -10,7 +10,6 @@ window.addEventListener("load", async () => {
 		let boardHTML = `<div class="admin-board"><div class="admin-board-controls"><span class="admin-board-name">${board.name}</span>${deleteText}</div>`;
 
 		board.schools.forEach((school) => {
-			console.log(school);
 			let schoolHTML = `<div class="admin-school"><span class="admin-school-name"><b>${school.name}</b> (<a href="/admin/manage/${school.id}">manage</a> | <a href="/admin/delete-school/${school.id}">delete</a>)</span><div class="admin-school-teachers">Teachers: `;
 
 			schoolHTML += school.teachers.map(t => `<a href="/user/${t}">${t}</a> (<a href="/admin/delete-user/${t}">delete</a>)`).join(", ");

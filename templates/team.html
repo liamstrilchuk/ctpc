@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/">&larr; Back to home</a>
+	<h1>My team</h1>
+	{% if team %}
+		<p>Your team is registed to <b>{{ team.school.name }}</b> ({{ team.school.school_board.name }})</p>
+		<p>Your team (<b>{{ team.name }}</b>) has {{ team.members|length }} {% if team.members|length != 1 %}people{% else %}person{% endif %}:</p>
+		<ul>
+			{% for member in team.members %}
+				<li>{{ member.username }}</li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<p>You are registed to <b>{{ current_user.school.name }}</b> ({{ current_user.school.school_board.name }}).</p>
+		<p>You are not currently assigned to a team. Please have your teacher assign you.</p>
+	{% endif %}
+{% endblock %}

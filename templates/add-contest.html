@@ -12,8 +12,9 @@
 		<input name="end" type="datetime-local" required>
 		<label for="contest_type">Contest type</label>
 		<select name="contest_type">
-			<option value="individual">Individual</option>
-			<option value="team">Team</option>
+			{% for ctype in contest_types %}
+				<option value="{{ ctype.name }}">{{ ctype.name }}</option>
+			{% endfor %}
 		</select>
 		<input type="submit">
 		{% if error %}

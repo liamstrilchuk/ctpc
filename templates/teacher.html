@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-	{% if current_user.role == "admin" %}
+	{% if current_user.role,name == "admin" %}
 		<a class="back" href="/admin/manage">&larr; Back to user management</a>
 	{% endif %}
 	<h1>Student management</h1>

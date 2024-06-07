@@ -19,7 +19,7 @@
 			{% for contest in contests %}
 				<tr>
 					<td>{{ contest.name }}</td>
-					<td>{{ contest.contest_type }}</td>
+					<td>{{ contest.contest_type.name }}</td>
 					<td>
 						<a href="/admin/edit-contest/{{ contest.id }}">Edit</a> &bull;
 						<a href="/admin/edit-problems/{{ contest.id }}">Problems</a> &bull;

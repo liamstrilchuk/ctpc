@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, request
 from flask_login import current_user
 
-from models import Team, User, db
+from models import Team, User, UserRole, db
 from setup import bcrypt
 from util import generate_random_password
 
@@ -12,7 +12,7 @@ def teacher_required(func):
 		if not current_user.is_authenticated:
 			return redirect("/")
 
-		if not current_user.role == "teacher" and not current_user.role == "admin" or current_user.school is None:
+		if not current_user.role.name == "teacher" and not current_user.role.name == "admin" or current_user.school is None:
 			return redirect("/")
 
 		return func(*args, **kwargs)
@@ -22,7 +22,7 @@ def teacher_required(func):
 	return wrapper
 
 def teacher_controls(teacher, student):
-	if student is None or not student.school == teacher.school or not student.role == "student" or not teacher.role in ("teacher", "admin"):
+	if student is None or not student.school == teacher.school or not student.role.name == "student" or not teacher.role.name in ("teacher", "admin"):
 		return False
 
 	return True
@@ -31,7 +31,7 @@ def teacher_controls(teacher, student):
 @teacher_required
 def teacher_view():	
 	teams = Team.query.filter_by(school=current_user.school).all()
-	unassigned = User.query.filter_by(school=current_user.school, team_id=None, role="student").all()
+	unassigned = User.query.filter_by(school=current_user.school, team_id=None, role=UserRole.query.filter_by(name="student").first()).all()
 
 	return render_template("teacher.html", teams=teams, unassigned=unassigned)
 
@@ -81,7 +81,7 @@ def register_student():
 		username=username.lower(),
 		password=bcrypt.generate_password_hash(random_password),
 		school_id=current_user.school_id,
-		role="student"
+		role_id=UserRole.query.filter_by(name="student").first().id
 	)
 	db.session.add(user)
 	db.session.commit()

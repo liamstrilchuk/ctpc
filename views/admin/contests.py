@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
 
-from models import AbstractTestCase, Contest, Problem, db
+from models import AbstractTestCase, Contest, ContestType, Problem, db
 from util import admin_required, to_unix_timestamp, check_object_exists
 
 contests = Blueprint("contests", __name__, template_folder="templates")
@@ -15,8 +15,10 @@ def contests_view():
 @contests.route("/admin/add-contest", methods=["GET", "POST"])
 @admin_required
 def add_contest():
+	contest_types = ContestType.query.all()
+
 	if request.method == "GET":
-		return render_template("add-contest.html")
+		return render_template("add-contest.html", contest_types=contest_types)
 	
 	name = request.form["name"]
 	contest_type = request.form["contest_type"]
@@ -24,15 +26,21 @@ def add_contest():
 	end_date = to_unix_timestamp(request.form["end"])
 
 	if not start_date or not end_date or start_date >= end_date:
-		return render_template("add-contest.html", error="Invalid dates")
+		return render_template("add-contest.html", error="Invalid dates", contest_types=contest_types)
 	
-	if not contest_type in ("individual", "team"):
-		return render_template("add-contest.html", error="Invalid contest type")
+	ctype_obj = ContestType.query.filter_by(name=contest_type).first()
+	if not ctype_obj:
+		return render_template("add-contest.html", error="Invalid contest type", contest_types=contest_types)
 	
 	if not name:
-		return render_template("add-contest.html", error="Invalid name")
+		return render_template("add-contest.html", error="Invalid name", contest_types=contest_types)
 	
-	contest = Contest(name=name, contest_type=contest_type, start_date=start_date, end_date=end_date)
+	contest = Contest(
+		name=name,
+		contest_type_id=ctype_obj.id,
+		start_date=start_date,
+		end_date=end_date
+	)
 	db.session.add(contest)
 	db.session.commit()
 
@@ -42,8 +50,10 @@ def add_contest():
 @admin_required
 @check_object_exists(Contest, "/admin/contests")
 def edit_contest(contest):
+	contest_types = ContestType.query.all()
+
 	if request.method == "GET":
-		return render_template("add-contest.html", editing=True, name=contest.name)
+		return render_template("add-contest.html", editing=True, name=contest.name, contest_types=contest_types, contest=contest)
 	
 	name = request.form["name"]
 	contest_type = request.form["contest_type"]
@@ -51,16 +61,17 @@ def edit_contest(contest):
 	end_date = to_unix_timestamp(request.form["end"])
 
 	if not start_date or not end_date or start_date >= end_date:
-		return render_template("add-contest.html", error="Invalid dates")
+		return render_template("add-contest.html", error="Invalid dates", contest_types=contest_types, contest=contest)
 	
-	if not contest_type in ("individual", "team"):
-		return render_template("add-contest.html", error="Invalid contest type")
+	ctype_obj = ContestType.query.filter_by(name=contest_type).first()
+	if not ctype_obj:
+		return render_template("add-contest.html", error="Invalid contest type", contest_types=contest_types, contest=contest)
 	
 	if not name:
-		return render_template("add-contest.html", error="Invalid name")
+		return render_template("add-contest.html", error="Invalid name", contest_types=contest_types, contest=contest)
 	
 	contest.name = name
-	contest.contest_type = contest_type
+	contest.contest_type_id = ctype_obj.id
 	contest.start_date = start_date
 	contest.end_date = end_date
 

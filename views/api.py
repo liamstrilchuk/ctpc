@@ -1,7 +1,8 @@
 from flask import Blueprint
-from flask_login import current_user, login_required
+from flask_login import login_required
 
-from models import SchoolBoard, User, School, Team
+from models import SchoolBoard, User, School, UserRole
+from util import admin_required
 
 api = Blueprint("api", __name__)
 
@@ -9,11 +10,8 @@ def error(message):
 	return { "error": message }
 
 @api.route("/api/users")
-@login_required
+@admin_required
 def get_users():
-	if not current_user.role == "admin":
-		return error("You do not have permission to access this resource")
-	
 	users = User.query.all()
 	json_data = []
 
@@ -53,13 +51,10 @@ def get_schools():
 	return { "schools": json_data }
 
 @api.route("/api/complete-structure")
-@login_required
+@admin_required
 def complete_structure():
-	if not current_user.role == "admin":
-		return error("You do not have permission to access this resource")
-	
 	boards = SchoolBoard.query.all()
-	teachers = User.query.filter_by(role="teacher").all()
+	teachers = User.query.filter_by(role=UserRole.query.filter_by(name="teacher").first()).all()
 	json_data = []
 	
 	for board in boards:

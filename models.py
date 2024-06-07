@@ -10,13 +10,23 @@ class User(UserMixin, db.Model):
 	id = sa.Column(sa.Integer, primary_key=True)
 	username = sa.Column(sa.String(100), nullable=False, unique=True)
 	password = sa.Column(sa.String(100), nullable=False)
-	role = sa.Column(sa.String(100), nullable=False)
+	role_id = sa.Column(sa.Integer, sa.ForeignKey("user_roles.id"), nullable=False)
 	team_id = sa.Column(sa.Integer, sa.ForeignKey("teams.id"), nullable=True)
 	school_id = sa.Column(sa.Integer, sa.ForeignKey("schools.id"), nullable=True)
 	submissions = db.relationship("Submission", backref="user", lazy=True)
 	
 	def __repr__(self):
 		return f"<User {self.username}>"
+	
+class UserRole(db.Model):
+	__tablename__ = "user_roles"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	name = sa.Column(sa.String(100), nullable=False)
+	users = db.relationship("User", backref="role", lazy=True)
+	
+	def __repr__(self):
+		return f"<UserRole {self.name}>"
 	
 class School(db.Model):
 	__tablename__ = "schools"
@@ -62,12 +72,22 @@ class Team(db.Model):
 	def __repr__(self):
 		return f"<Team {self.name}>"
 	
+class ContestType(db.Model):
+	__tablename__ = "contest_types"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	name = sa.Column(sa.String(100), nullable=False)
+	contests = db.relationship("Contest", backref="contest_type", lazy=True)
+	
+	def __repr__(self):
+		return f"<ContestType {self.name}>"
+	
 class Contest(db.Model):
 	__tablename__ = "contests"
 
 	id = sa.Column(sa.Integer, primary_key=True)
 	name = sa.Column(sa.String(100), nullable=False)
-	contest_type = sa.Column(sa.String(100), nullable=False)
+	contest_type_id = sa.Column(sa.Integer, sa.ForeignKey("contest_types.id"), nullable=False)
 	problems = db.relationship("Problem", backref="contest", lazy=True)
 	start_date = sa.Column(sa.Integer, nullable=False)
 	end_date = sa.Column(sa.Integer, nullable=False)
@@ -83,6 +103,7 @@ class Problem(db.Model):
 	contest_id = sa.Column(sa.Integer, sa.ForeignKey("contests.id"), nullable=False)
 	test_cases = db.relationship("AbstractTestCase", backref="problem", lazy=True)
 	description = sa.Column(sa.Text)
+	show_test_cases = sa.Column(sa.Boolean, default=False)
 	
 	def __repr__(self):
 		return f"<Problem {self.name}>"
@@ -96,6 +117,8 @@ class Submission(db.Model):
 	language = sa.Column(sa.String(10), nullable=False)
 	code = sa.Column(sa.Text, nullable=False)
 	test_cases = db.relationship("TestCase", backref="submission", lazy=True)
+	timestamp = sa.Column(sa.Integer, nullable=False)
+	status_id = sa.Column(sa.Integer, sa.ForeignKey("submission_statuses.id"), nullable=False)
 	
 	def __repr__(self):
 		return f"<Submission {self.id}>"
@@ -107,6 +130,7 @@ class TestCase(db.Model):
 	output = sa.Column(sa.String(200), nullable=False)
 	abstract_test_case_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_cases.id"), nullable=False)
 	submission_id = sa.Column(sa.Integer, sa.ForeignKey("submissions.id"), nullable=False)
+	status_id = sa.Column(sa.Integer, sa.ForeignKey("test_case_statuses.id"), nullable=False)
 	
 	def __repr__(self):
 		return f"<TestCase {self.id}>"
@@ -121,6 +145,27 @@ class AbstractTestCase(db.Model):
 	point_value = sa.Column(sa.Integer)
 	test_cases = db.relationship("TestCase", backref="abstract_test_case", lazy=True)
 	is_sample = sa.Column(sa.Boolean, default=False)
+	explanation = sa.Column(sa.Text, nullable=True)
 
 	def __repr__(self):
 		return f"<AbstractTestCase {self.id}>"
+	
+class TestCaseStatus(db.Model):
+	__tablename__ = "test_case_statuses"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	name = sa.Column(sa.String(100), nullable=False)
+	test_cases = db.relationship("TestCase", backref="status", lazy=True)
+	
+	def __repr__(self):
+		return f"<TestCaseStatus {self.name}>"
+	
+class SubmissionStatus(db.Model):
+	__tablename__ = "submission_statuses"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	name = sa.Column(sa.String(100), nullable=False)
+	submissions = db.relationship("Submission", backref="status", lazy=True)
+	
+	def __repr__(self):
+		return f"<SubmissionStatus {self.name}>"

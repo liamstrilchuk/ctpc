@@ -98,7 +98,7 @@ form * {
 	display: block;
 }
 
-form input, form select {
+form input, form select, form textarea {
 	margin-bottom: 10px;
 }
 
@@ -119,4 +119,23 @@ tr:nth-child(odd) {
 td, th {
 	padding: 8px 12px;
 	text-align: left;
+}
+
+.contest {
+	padding: 10px 20px;
+	margin: 10px 0;
+	border-radius: 5px;
+	border: 1px solid #aaa;
+	background: #fafafa;
+	box-shadow: 3px 3px 2px #aaa;
+}
+
+.contest-title {
+	font-size: 1.2em;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.contest > span {
+	display: block;
 }

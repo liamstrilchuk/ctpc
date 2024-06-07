@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/contest/{{ problem.contest.id }}">&larr; Back to contest</a>
+	<h1>{{ problem.name }}</h1>
+	{{ problem.description }}
+{% endblock %}

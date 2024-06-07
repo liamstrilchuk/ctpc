@@ -17,14 +17,14 @@
 				<a href="/">Canadian Team Computing Competition</a>
 			</div>
 			<div id="navbar-right">
-				{% if current_user.role == "admin" %}
-					<a href="/admin">Admin</a>
-				{% elif current_user.role == "teacher" %}
-					<a href="/teacher">My students</a>
-				{% elif current_user.role == "student" %}
-					<a href="/team">My team</a>
-				{% endif %}
 				{% if current_user.is_authenticated %}
+					{% if current_user.role.name == "admin" %}
+						<a href="/admin">Admin</a>
+					{% elif current_user.role.name == "teacher" %}
+						<a href="/teacher">My students</a>
+					{% elif current_user.role.name == "student" %}
+						<a href="/team">My team</a>
+					{% endif %}
 					<a href="/logout">Logout</a>
 				{% else %}
 					<a href="/login">Login</a>

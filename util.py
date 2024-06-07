@@ -3,8 +3,6 @@ from flask import redirect
 from flask_login import current_user
 import random
 
-from models import Contest
-
 def generate_random_password():
 	characters = "1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm"
 	length = 12
@@ -24,7 +22,7 @@ def admin_required(func):
 		if not current_user.is_authenticated:
 			return redirect("/")
 
-		if not current_user.role == "admin":
+		if not current_user.role.name == "admin":
 			return redirect("/")
 
 		return func(*args, **kwargs)

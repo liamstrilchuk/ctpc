@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/">&larr; Back to home</a>
+	<h1>Contests</h1>
+	{% if contests %}
+		{% for contest in contests %}
+			<div class="contest">
+				<span class="contest-title">{{ contest.name }}</span>
+				<span>
+					<span class="unix-timestamp">{{ contest.start_date }}</span> to <span class="unix-timestamp">{{ contest.end_date }}</span>
+				</span>
+				{% if contest.start_date > current_time %}
+					<span class="contest-status">Starts in <span class="duration">{{ contest.start_date - current_time }}</span></span>
+				{% elif contest.end_date < current_time %}
+					<span class="contest-status">Complete</span>
+				{% else %}
+					<a class="contest-status" href="/contest/{{ contest.id }}">Enter (ends in <span class="duration">{{ contest.end_date - current_time }}</span>)</a>
+				{% endif %}
+			</div>
+		{% endfor %}
+	{% else %}
+		<p>There are no contests currently available.</p>
+	{% endif %}
+{% endblock %}

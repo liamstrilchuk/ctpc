@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect
 from flask_login import current_user
 
-from models import User, School, SchoolBoard, db
+from models import User, School, SchoolBoard, UserRole, db
 from util import admin_required, generate_random_password, check_object_exists
 from setup import bcrypt
 
@@ -90,7 +90,7 @@ def add_teacher():
 		username=username,
 		password=bcrypt.generate_password_hash(random_password),
 		school_id=school.id,
-		role="teacher"
+		role_id=UserRole.query.filter_by(role="teacher").first().id
 	)
 
 	db.session.add(user)
@@ -116,7 +116,7 @@ def delete_school(school):
 	
 	users = User.query.filter_by(school=school).all()
 	for user in users:
-		if user.role == "teacher" or user.role == "student":
+		if user.role.name == "teacher" or user.role.name == "student":
 			db.session.delete(user)
 	
 	db.session.delete(school)

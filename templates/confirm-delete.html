@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<a class="back" href="/{% if current_user.role == 'admin' %}admin{% else %}teacher{% endif %}">&larr; Back to {% if current_user.role == "teacher" %}student management{% else %}admin{% endif %}</a>
+	<a class="back" href="/{% if current_user.role == 'admin' %}admin{% else %}teacher{% endif %}">&larr; Back to {% if current_user.role.name == "teacher" %}student management{% else %}admin{% endif %}</a>
 	<h1>Confirm deletion</h1>
 	<p>Are you sure you want to delete the {{ type }} <b>{{ text }}</b>? {% if extra_text %}{{ extra_text }}{% endif %}</p>
 	<form method="post">

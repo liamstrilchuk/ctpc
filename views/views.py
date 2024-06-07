@@ -2,6 +2,7 @@ from flask import Blueprint
 from flask_login import login_required
 
 from . import index, login, teacher, profile
+from views.main.main import main
 
 views = Blueprint("views", __name__, template_folder="templates")
 
@@ -23,3 +24,4 @@ def logout_view():
 	return login.logout_view()
 
 views.register_blueprint(teacher.teacher)
+views.register_blueprint(main)

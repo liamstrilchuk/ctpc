@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/contests">&larr; Back to contests</a>
+	<h1>{{ contest.name }}</h1>
+	<table>
+		<tr>
+			<th>#</th>
+			<th>Problem</th>
+			<th>Points</th>
+			<th>Status</th>
+			<th>Points earned</th>
+		</tr>
+		{% for problem in contest.problems %}
+			<tr>
+				<td>{{ loop.index }}</td>
+				<td><a href="/problem/{{ problem.id }}">{{ problem.name }}</a></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock %}
