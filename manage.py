@@ -14,7 +14,7 @@ def deploy():
 	migrate()
 	upgrade()
 
-	from models import User, School, SchoolBoard, TestCaseStatus, UserRole, ContestType, SubmissionStatus
+	from models import User, School, SchoolBoard, TestCaseStatus, UserRole, ContestType, SubmissionStatus, LanguageType
 	from flask_bcrypt import Bcrypt
 
 	test_case_statuses = ["Pending", "Accepted", "Wrong Answer", "Time Limit Exceeded", "Memory Limit Exceeded", "Runtime Error", "Compilation Error", "Failed"]
@@ -40,6 +40,12 @@ def deploy():
 	for contest_type in contest_types:
 		ct = ContestType(name=contest_type)
 		db.session.add(ct)
+
+	language_types = [("Python", "py"), ("C++", "cpp"), ("Java", "java"), ("C", "c"), ("JavaScript", "js")]
+
+	for language_type in language_types:
+		lt = LanguageType(name=language_type[0], short_name=language_type[1])
+		db.session.add(lt)
 
 	db.session.commit()
 

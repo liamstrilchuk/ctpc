@@ -19,11 +19,11 @@ ul {
 
 #navbar {
 	padding: 10px;
-	height: 50px;
-	background: grey;
+	height: 60px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 #navbar > div {
@@ -32,12 +32,13 @@ ul {
 
 #navbar a {
 	text-decoration: none;
-	color: white;
+	color: black;
 	margin: 0 10px;
 }
 
 #content {
 	padding: 10px 30px;
+	margin: 0 10%;
 }
 
 .admin-board {
@@ -138,4 +139,53 @@ td, th {
 
 .contest > span {
 	display: block;
+}
+
+.sample-test-case {
+	border: 1px solid #ccc;
+	margin-bottom: 10px;
+}
+
+.sample-test-case > div {
+	background: #eee;
+	padding: 5px 15px;
+	border-bottom: 1px solid #ccc;
+}
+
+.sample-test-case > div:hover {
+	background: #dadada;
+}
+
+.sample-test-case > div:nth-child(odd) {
+	background: #ddd;
+}
+
+.sample-test-case > div:nth-child(odd):hover {
+	background: #cacaca;
+}
+
+.test-case-data > pre {
+	font-family: monospace;
+	font-size: 1.1em;
+}
+
+textarea {
+	font-family: monospace;
+	width: 300px;
+	height: 150px;
+}
+
+.submission-code {
+	font-family: monospace;
+	background: #ddd;
+	font-size: 1.1em;
+	padding: 10px;
+}
+
+.dark-row {
+	background: #e2e2e2 !important;
+}
+
+.light-row {
+	background: #f1f1f1 !important;
 }

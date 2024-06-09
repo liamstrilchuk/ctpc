@@ -4,26 +4,26 @@
 	<a class="back" href="/admin/edit-problems/{{ problem.contest.id }}">&larr; Back to contest management</a>
 	<h1>Test cases for {{ problem.name }}</h1>
 	<div class="admin-controls">
-		<a href="/admin/add-test-case/{{ problem.id }}">Add test case</a>
+		<a href="/admin/add-test-case-group/{{ problem.id }}">Add test case group</a>
 	</div>
-	{% if problem.test_cases %}
+	{% if problem.test_case_groups %}
 		<table>
-			<tr>
-				<th>Test case #</th>
-				<th>Point value</th>
-				<th>Actions</th>
-			</tr>
-			{% for tc in problem.test_cases %}
+			{% for tcg in problem.test_case_groups %}
 				<tr>
-					<td>{{ loop.index }}</td>
-					<td>{{ tc.point_value }}</td>
-					<td><a href="/admin/edit-test-case/{{ tc.id }}">Edit</a> &bull; <a href="/admin/delete-test-case/{{ tc.id }}">Delete</a></td>
+					<td><b>{% if tcg.is_sample %}Sample subtask{% else %}Subtask{% endif %} {{ loop.index }}</b></td>
+					<td><a href="/admin/add-test-case/{{ tcg.id }}">Add test case</a> &bull; <a href="/admin/edit-test-case-group/{{ tcg.id }}">Edit</a> &bull; <a href="/admin/delete-test-case-group/{{ tcg.id }}">Delete</a></td>
+					<td>{{ tcg.point_value }} point{% if tcg.point_value != 1 %}s{% endif %}</td>
 				</tr>
+				{% for tc in tcg.test_cases %}
+					<tr>
+						<td>Case {{ loop.index }}</td>
+						<td colspan="2"><a href="/admin/edit-test-case/{{ tc.id }}">Edit</a> &bull; <a href="/admin/delete-test-case/{{ tc.id }}">Delete</a></td>
+					</tr>
+				{% endfor %}
 			{% endfor %}
 			<tr>
-				<td><b>Total</b></td>
-				<td><b>{{ problem.test_cases | sum(attribute="point_value") }}</b></td>
-				<td></td>
+				<td colspan="2"><b>Total</b></td>
+				<td><b>{{ problem.test_case_groups | sum(attribute="point_value") }} points</b></td>
 			</tr>
 		</table>
 	{% else %}

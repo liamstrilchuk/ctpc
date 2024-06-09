@@ -101,9 +101,11 @@ class Problem(db.Model):
 	id = sa.Column(sa.Integer, primary_key=True)
 	name = sa.Column(sa.String(100), nullable=False)
 	contest_id = sa.Column(sa.Integer, sa.ForeignKey("contests.id"), nullable=False)
-	test_cases = db.relationship("AbstractTestCase", backref="problem", lazy=True)
+	test_case_groups = db.relationship("AbstractTestCaseGroup", backref="problem", lazy=True)
 	description = sa.Column(sa.Text)
 	show_test_cases = sa.Column(sa.Boolean, default=False)
+	point_value = sa.Column(sa.Integer, default=0)
+	submissions = db.relationship("Submission", backref="problem", lazy=True)
 	
 	def __repr__(self):
 		return f"<Problem {self.name}>"
@@ -114,11 +116,12 @@ class Submission(db.Model):
 	id = sa.Column(sa.Integer, primary_key=True)
 	user_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"), nullable=False)
 	problem_id = sa.Column(sa.Integer, sa.ForeignKey("problems.id"), nullable=False)
-	language = sa.Column(sa.String(10), nullable=False)
+	language_id = sa.Column(sa.Integer, sa.ForeignKey("language_types.id"), nullable=False)
 	code = sa.Column(sa.Text, nullable=False)
-	test_cases = db.relationship("TestCase", backref="submission", lazy=True)
+	test_case_groups = db.relationship("TestCaseGroup", backref="submission", lazy=True)
 	timestamp = sa.Column(sa.Integer, nullable=False)
 	status_id = sa.Column(sa.Integer, sa.ForeignKey("submission_statuses.id"), nullable=False)
+	points_earned = sa.Column(sa.Integer, default=0)
 	
 	def __repr__(self):
 		return f"<Submission {self.id}>"
@@ -127,25 +130,48 @@ class TestCase(db.Model):
 	__tablename__ = "test_cases"
 
 	id = sa.Column(sa.Integer, primary_key=True)
-	output = sa.Column(sa.String(200), nullable=False)
+	output = sa.Column(sa.String(200), default="")
 	abstract_test_case_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_cases.id"), nullable=False)
-	submission_id = sa.Column(sa.Integer, sa.ForeignKey("submissions.id"), nullable=False)
 	status_id = sa.Column(sa.Integer, sa.ForeignKey("test_case_statuses.id"), nullable=False)
+	group_id = sa.Column(sa.Integer, sa.ForeignKey("test_case_groups.id"), nullable=False)
 	
 	def __repr__(self):
 		return f"<TestCase {self.id}>"
+	
+class AbstractTestCaseGroup(db.Model):
+	__tablename__ = "abstract_test_case_groups"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	problem_id = sa.Column(sa.Integer, sa.ForeignKey("problems.id"), nullable=False)
+	test_cases = db.relationship("AbstractTestCase", backref="group", lazy=True)
+	groups = db.relationship("TestCaseGroup", backref="abstract_group", lazy=True)
+	point_value = sa.Column(sa.Integer, default=0)
+	is_sample = sa.Column(sa.Boolean, default=False)
+	
+	def __repr__(self):
+		return f"<AbstractTestCaseGroup {self.id}>"
+	
+class TestCaseGroup(db.Model):
+	__tablename__ = "test_case_groups"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	abstract_group_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_case_groups.id"), nullable=False)
+	test_cases = db.relationship("TestCase", backref="group", lazy=True)
+	points_earned = sa.Column(sa.Integer, default=0)
+	submission_id = sa.Column(sa.Integer, sa.ForeignKey("submissions.id"), nullable=False)
+	
+	def __repr__(self):
+		return f"<TestCaseGroup {self.id}>"
 	
 class AbstractTestCase(db.Model):
 	__tablename__ = "abstract_test_cases"
 
 	id = sa.Column(sa.Integer, primary_key=True)
-	problem_id = sa.Column(sa.Integer, sa.ForeignKey("problems.id"), nullable=False)
 	input = sa.Column(sa.Text, nullable=True)
 	expected_output = sa.Column(sa.Text, nullable=True)
-	point_value = sa.Column(sa.Integer)
 	test_cases = db.relationship("TestCase", backref="abstract_test_case", lazy=True)
-	is_sample = sa.Column(sa.Boolean, default=False)
 	explanation = sa.Column(sa.Text, nullable=True)
+	group_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_case_groups.id"), nullable=True)
 
 	def __repr__(self):
 		return f"<AbstractTestCase {self.id}>"
@@ -169,3 +195,14 @@ class SubmissionStatus(db.Model):
 	
 	def __repr__(self):
 		return f"<SubmissionStatus {self.name}>"
+	
+class LanguageType(db.Model):
+	__tablename__ = "language_types"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	name = sa.Column(sa.String(100), nullable=False)
+	short_name = sa.Column(sa.String(10), nullable=False)
+	submissions = db.relationship("Submission", backref="language", lazy=True)
+	
+	def __repr__(self):
+		return f"<LanguageType {self.name}>"

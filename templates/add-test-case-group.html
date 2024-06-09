@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/problems/{{ problem.id }}">&larr; Back to problem</a>
+	<h1>{% if group %}Edit{% else %}Add{% endif %} test case group</h1>
+	<form method="post">
+		<label for="point_value">Point value</label>
+		<input type="number" name="point_value" value="{% if group %}{{ group.point_value }}{% endif %}">
+		<label for="is_sample">Is sample test case group?</label>
+		<input type="checkbox" name="is_sample" {% if group and group.is_sample %}checked{% endif %}>
+		<input type="submit" value="{% if group %}Edit{% else %}Add{% endif %} group">
+	</form>
+	{% if error %}
+		<p>{{ error }}</p>
+	{% endif %}
+{% endblock %}

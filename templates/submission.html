@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/contest/{{ submission.problem.contest.id }}">&larr; Back to contest</a>
+	<h1>Submission to <a href="/problem/{{ submission.problem.id }}">{{ submission.problem.name }}</a></h1>
+	<p>Submitted by <b>{{ submission.user.username }}</b> <span class="duration">{{ current_time - submission.timestamp }}</span> ago</p>
+	<pre class="submission-code">{{ submission.code }}</pre>
+
+	<table>
+		{% for tcg in submission.test_case_groups %}
+			<tr class="dark-row">
+				<th>{% if tcg.abstract_group.is_sample %}Sample subtask{% else %}Subtask{% endif %} {{ loop.index }}</th>
+				<th>{{ tcg.points_earned }}/{{ tcg.abstract_group.point_value }}</th>
+			</tr>
+			{% for tc in tcg.test_cases %}
+				<tr class="light-row">
+					<td>Test case {{ loop.index }}</td>
+					<td>{{ tc.status.name }}</td>
+				</tr>
+			{% endfor %}
+		{% endfor %}
+	</table>
+{% endblock %}

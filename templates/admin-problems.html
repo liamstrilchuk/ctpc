@@ -16,14 +16,14 @@
 			</tr>
 			{% for problem in contest.problems %}
 				<tr class="admin-contest">
-					<td>{{ problem.name }}</td>
+					<td><a href="/problem/{{ problem.id }}">{{ problem.name }}</a></td>
 					<td>
 						<a href="/admin/edit-problem/{{ problem.id }}">Edit</a> &bull;
 						<a href="/admin/problems/{{ problem.id }}">Test cases</a> &bull;
 						<a href="/admin/delete-problem/{{ problem.id }}">Delete</a>
 					</td>
-					<td>{{ problem.test_cases|length }} test case{% if problem.test_cases|length != 1 %}s{% endif %}</td>
-					<td>{{ problem.test_cases|sum(attribute="point_value") }}</td>
+					<td>{{ problem.test_case_groups|length }} test case group{% if problem.test_case_groups|length != 1 %}s{% endif %}</td>
+					<td>{{ problem.test_case_groups|sum(attribute="point_value") }}</td>
 				</tr>
 			{% endfor %}
 		</table>

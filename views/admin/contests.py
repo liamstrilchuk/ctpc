@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
 
-from models import AbstractTestCase, Contest, ContestType, Problem, db
+from models import AbstractTestCase, AbstractTestCaseGroup, Contest, ContestType, Problem, db
 from util import admin_required, to_unix_timestamp, check_object_exists
 
 contests = Blueprint("contests", __name__, template_folder="templates")
@@ -161,43 +161,96 @@ def delete_problem(problem):
 def view_test_cases(problem):
 	return render_template("test-cases.html", problem=problem)
 
-@contests.route("/admin/add-test-case/<int:problem_id>", methods=["GET", "POST"])
+@contests.route("/admin/add-test-case-group/<int:problem_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(Problem, "/admin/contests")
-def add_test_case(problem):
+def add_test_case_group(problem):
 	if request.method == "GET":
-		return render_template("add-test-case.html", problem=problem)
+		return render_template("add-test-case-group.html", problem=problem)
 	
-	input_data = request.form["input"]
-	output_data = request.form["output"]
-	point_value = request.form["point_value"]
+	point_value = request.form.get("point_value")
+	is_sample = request.form.get("is_sample") == "on"
 
-	if not input_data or not output_data:
-		return render_template("add-test-case.html", problem=problem, error="Invalid input or output")
-
-	tc = AbstractTestCase(input=input_data, expected_output=output_data, problem_id=problem.id, point_value=point_value)
-	db.session.add(tc)
+	problem.point_value += int(point_value)
+	
+	group = AbstractTestCaseGroup(point_value=point_value, problem_id=problem.id, is_sample=is_sample)
+	db.session.add(group)
 	db.session.commit()
 
 	return redirect(f"/admin/problems/{problem.id}")
+
+@contests.route("/admin/edit-test-case-group/<int:group_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(AbstractTestCaseGroup, "/admin/contests")
+def edit_test_case_group(group):
+	if request.method == "GET":
+		return render_template("add-test-case-group.html", problem=group.problem, group=group)
+	
+	point_value = request.form.get("point_value")
+	is_sample = request.form.get("is_sample") == "on"
+
+	group.problem.point_value -= group.point_value
+	group.problem.point_value += int(point_value)
+
+	group.point_value = point_value
+	group.is_sample = is_sample
+
+	db.session.commit()
+
+	return redirect(f"/admin/problems/{group.problem.id}")
+
+@contests.route("/admin/delete-test-case-group/<int:group_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(AbstractTestCaseGroup, "/admin/contests")
+def delete_test_case_group(group):
+	if request.method == "GET":
+		return render_template("confirm-delete.html", type="test case group", text=group.id)
+	
+	problem_id = group.problem.id
+	group.problem.point_value -= group.point_value
+
+	for tc in group.test_cases:
+		db.session.delete(tc)
+	
+	db.session.delete(group)
+	db.session.commit()
+
+	return redirect(f"/admin/problems/{problem_id}")
+
+@contests.route("/admin/add-test-case/<int:group_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(AbstractTestCaseGroup, "/admin/contests")
+def add_test_case(group):
+	if request.method == "GET":
+		return render_template("add-test-case.html", problem=group.problem)
+	
+	input_data = request.form.get("input")
+	output_data = request.form.get("output")
+
+	if not input_data or not output_data:
+		return render_template("add-test-case.html", problem=group.problem, error="Invalid input or output")
+
+	tc = AbstractTestCase(input=input_data, expected_output=output_data, group_id=group.id)
+	db.session.add(tc)
+	db.session.commit()
+
+	return redirect(f"/admin/problems/{group.problem.id}")
 
 @contests.route("/admin/edit-test-case/<int:test_case_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(AbstractTestCase, "/admin/contests")
 def edit_test_case(test_case):
 	if request.method == "GET":
-		return render_template("add-test-case.html", problem=test_case.problem, test_case=test_case)
+		return render_template("add-test-case.html", problem=test_case.group.problem, test_case=test_case)
 	
-	input_data = request.form["input"]
-	output_data = request.form["output"]
-	point_value = request.form["point_value"]
+	input_data = request.form.get("input")
+	output_data = request.form.get("output")
 
 	if not input_data or not output_data:
-		return render_template("add-test-case.html", problem=test_case.problem, test_case=test_case, error="Invalid input or output")
+		return render_template("add-test-case.html", problem=test_case.group.problem, test_case=test_case, error="Invalid input or output")
 
 	test_case.input = input_data
 	test_case.expected_output = output_data
-	test_case.point_value = point_value
 
 	db.session.commit()
 
@@ -210,7 +263,7 @@ def delete_test_case(test_case):
 	if request.method == "GET":
 		return render_template("confirm-delete.html", type="test case", text=test_case.id)
 	
-	problem_id = test_case.problem.id
+	problem_id = test_case.group.problem.id
 
 	db.session.delete(test_case)
 	db.session.commit()

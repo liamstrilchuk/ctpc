@@ -7,7 +7,6 @@
 		<tr>
 			<th>#</th>
 			<th>Problem</th>
-			<th>Points</th>
 			<th>Status</th>
 			<th>Points earned</th>
 		</tr>
@@ -15,10 +14,40 @@
 			<tr>
 				<td>{{ loop.index }}</td>
 				<td><a href="/problem/{{ problem.id }}">{{ problem.name }}</a></td>
-				<td></td>
-				<td></td>
-				<td></td>
+				<td>
+					{% if not problem_dict[problem.id]["has_submission"] %}
+						Not attempted
+					{% elif problem_dict[problem.id]["points_earned"] == 0 %}
+						Attempted
+					{% elif problem_dict[problem.id]["points_earned"] < problem.point_value %}
+						<span style="color: #747800;">Partially complete</span>
+					{% else %}
+						<span style="color: #087300;">Complete</span>
+					{% endif %}
+				</td>
+				<td>{{ problem_dict[problem.id]["points_earned"] }}/{{ problem.point_value }}</td>
 			</tr>
 		{% endfor %}
 	</table>
+	<h2>Your submissions</h2>
+	{% if user_submissions %}
+		<table>
+			<tr>
+				<th>Problem</th>
+				<th>Submission time</th>
+				<th>Status</th>
+				<th>Points earned</th>
+			</tr>
+			{% for submission in user_submissions %}
+				<tr>
+					<td><a href="/problem/{{ submission.problem.id }}">{{ submission.problem.name }}</a></td>
+					<td><span class="duration">{{ current_time - submission.timestamp }}</span> ago</td>
+					<td><a href="/submission/{{ submission.id }}">{{ submission.status.name }}</a></td>
+					<td>{{ submission.points_earned }}/{{ submission.problem.point_value }}</td>
+				</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<p>You have not submitted any solutions yet.</p>
+	{% endif %}
 {% endblock %}

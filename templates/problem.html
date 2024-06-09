@@ -4,4 +4,33 @@
 	<a class="back" href="/contest/{{ problem.contest.id }}">&larr; Back to contest</a>
 	<h1>{{ problem.name }}</h1>
 	{{ problem.description }}
+	{% if sample_groups %}
+		<h2>Sample test cases</h2>
+		{% for tcg in sample_groups %}
+			{% for tc in tcg.test_cases %}
+				<div class="sample-test-case">
+					<div>Input</div>
+					<div class="test-case-data">
+						<pre>{{ tc.input }}</pre>
+					</div>
+					<div>Expected output</div>
+					<div class="test-case-data">
+						<pre>{{ tc.expected_output }}</pre>
+					</div>
+				</div>
+			{% endfor %}
+		{% endfor %}
+	{% endif %}
+	<h2>Submit solution</h2>
+	<form method="post" action="/submit/{{ problem.id }}">
+		<label for="code">Code</label>
+		<textarea id="code" name="code"></textarea>
+		<label for="language">Language</label>
+		<select name="language">
+			{% for lang in languages %}
+				<option value="{{ lang.short_name }}">{{ lang.name }}</option>
+			{% endfor %}
+		</select>
+		<input type="submit" value="Submit">
+	</form>
 {% endblock %}
