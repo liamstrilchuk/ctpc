@@ -1,4 +1,6 @@
+fastapi
 flask
 flask_login
 flask_migrate
 flask_bcrypt
+requests

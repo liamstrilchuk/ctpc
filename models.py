@@ -202,6 +202,7 @@ class LanguageType(db.Model):
 	id = sa.Column(sa.Integer, primary_key=True)
 	name = sa.Column(sa.String(100), nullable=False)
 	short_name = sa.Column(sa.String(10), nullable=False)
+	grader_id = sa.Column(sa.Integer, nullable=False)
 	submissions = db.relationship("Submission", backref="language", lazy=True)
 	
 	def __repr__(self):

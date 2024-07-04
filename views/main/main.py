@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, redirect, request
 from flask_login import login_required, current_user
 from time import time
+import requests
 
-from models import AbstractTestCase, AbstractTestCaseGroup, Contest, LanguageType, Problem, Submission, SubmissionStatus, TestCase, TestCaseGroup, TestCaseStatus, db
+from models import AbstractTestCaseGroup, Contest, LanguageType, Problem, Submission, SubmissionStatus, TestCase, TestCaseGroup, TestCaseStatus, db
 from util import check_object_exists
 
 main = Blueprint("main", __name__, template_folder="templates")
@@ -41,7 +42,7 @@ def contest_view(contest):
 		problem_dict[sub.problem.id]["has_submission"] = True
 		problem_dict[sub.problem.id]["points_earned"] = sub.points_earned
 
-	user_submissions = Submission.query.filter_by(user_id=current_user.id).all()
+	user_submissions = Submission.query.filter_by(user_id=current_user.id).order_by(Submission.timestamp.desc()).all()
 	return render_template("contest.html", contest=contest, current_time=time(), user_submissions=user_submissions, problem_dict=problem_dict)
 
 @main.route("/problem/<int:problem_id>")
@@ -83,6 +84,8 @@ def submit(problem):
 	db.session.add(submission)
 	db.session.commit()
 
+	all_testcases = []
+
 	for tcg in problem.test_case_groups:
 		test_case_group = TestCaseGroup(
 			abstract_group_id=tcg.id,
@@ -100,10 +103,29 @@ def submit(problem):
 			)
 
 			db.session.add(test_case)
+			all_testcases.append(test_case)
 
 		db.session.commit()
 
-	return redirect(f"/contest/{problem.contest.id}")
+	all_testcases = [
+		{
+			"input": tc.abstract_test_case.input,
+			"expected_output": tc.abstract_test_case.expected_output,
+			"id": tc.id
+		} for tc in all_testcases
+	]
+
+	json_to_grader = {
+		"code": submission.code,
+		"testcases": all_testcases,
+		"language": language.grader_id,
+		"submission_id": submission.id
+	}
+
+	response = requests.post("http://127.0.0.1:8000/create-submission", json=json_to_grader)
+	print(response)
+
+	return redirect(f"/submission/{submission.id}")
 
 @main.route("/submission/<int:submission_id>")
 @login_required
