@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, redirect, request
 from flask_login import login_required, current_user
 from time import time
-import requests
+import requests, markdown
 
-from models import AbstractTestCaseGroup, Contest, LanguageType, Problem, Submission, SubmissionStatus, TestCase, TestCaseGroup, TestCaseStatus, db
+from models import AbstractTestCaseGroup, Contest, ContestType, LanguageType, Problem, Submission, SubmissionStatus, Team, TestCase, TestCaseGroup, TestCaseStatus, User, db
 from util import check_object_exists
 
 main = Blueprint("main", __name__, template_folder="templates")
@@ -28,8 +28,21 @@ def contests_view():
 def contest_view(contest):
 	if time() < contest.start_date:
 		return redirect("/contests")
+
+	if contest.contest_type_id == ContestType.query.filter_by(name="individual").first().id or not current_user.team:
+		user_submissions = Submission.query \
+			.join(Problem, Submission.problem_id == Problem.id) \
+			.filter(Problem.contest_id == contest.id) \
+			.filter(Submission.user_id == current_user.id)
+	else:
+		user_submissions = Submission.query \
+			.join(Problem, Submission.problem_id == Problem.id) \
+			.filter(Problem.contest_id == contest.id) \
+			.join(User, Submission.user_id == User.id) \
+			.join(Team, User.team_id == Team.id) \
+			.filter(Team.id == current_user.team_id)
 	
-	ordered_submissions = Submission.query.filter_by(user_id=current_user.id).order_by(Submission.points_earned.desc()).all()
+	ordered_submissions = user_submissions.order_by(Submission.points_earned.desc()).all()
 	problem_dict = { problem.id: { "points_earned": 0, "has_submission": False } for problem in contest.problems }
 
 	for sub in ordered_submissions:
@@ -42,8 +55,13 @@ def contest_view(contest):
 		problem_dict[sub.problem.id]["has_submission"] = True
 		problem_dict[sub.problem.id]["points_earned"] = sub.points_earned
 
-	user_submissions = Submission.query.filter_by(user_id=current_user.id).order_by(Submission.timestamp.desc()).all()
-	return render_template("contest.html", contest=contest, current_time=time(), user_submissions=user_submissions, problem_dict=problem_dict)
+	return render_template(
+		"contest.html",
+		contest=contest,
+		current_time=time(),
+		user_submissions=user_submissions.order_by(Submission.timestamp.desc()).all(),
+		problem_dict=problem_dict
+	)
 
 @main.route("/problem/<int:problem_id>")
 @login_required
@@ -55,7 +73,9 @@ def problem_view(problem):
 	sample_groups = AbstractTestCaseGroup.query.filter_by(problem_id=problem.id, is_sample=True).all()
 	languages = LanguageType.query.all()
 
-	return render_template("problem.html", problem=problem, sample_groups=sample_groups, languages=languages)
+	html_content = markdown.markdown(problem.description)
+
+	return render_template("problem.html", problem=problem, problem_html=html_content, sample_groups=sample_groups, languages=languages)
 
 @main.route("/submit/<int:problem_id>", methods=["POST"])
 @login_required
@@ -123,7 +143,6 @@ def submit(problem):
 	}
 
 	response = requests.post("http://127.0.0.1:8000/create-submission", json=json_to_grader)
-	print(response)
 
 	return redirect(f"/submission/{submission.id}")
 
@@ -131,7 +150,7 @@ def submit(problem):
 @login_required
 @check_object_exists(Submission, "/contests")
 def submission_view(submission):
-	if not submission.user == current_user and not current_user.role.name == "admin":
+	if not submission.user == current_user and not current_user.role.name == "admin" and not (submission.problem.contest.contest_type.name == "team" and current_user.team and submission.user.team_id == current_user.team.id):
 		return redirect("/")
 
 	return render_template("submission.html", submission=submission, current_time=time())

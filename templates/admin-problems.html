@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<a class="back" href="/admin/contests">&larr; Back to contest management</a>
+	<a class="back" href="/admin/contests/{{ contest.competition.short_name }}">&larr; Back to contest management</a>
 	<h1>Edit problems</h1>
 	<div class="admin-controls">
+		<span>{{ contest.competition.name }} &bull; {{ contest.name }}</span>
 		<a href="/admin/create-problem/{{ contest.id }}">Create problem</a>
 	</div>
 	{% if contest.problems %}
@@ -26,6 +27,10 @@
 					<td>{{ problem.test_case_groups|sum(attribute="point_value") }}</td>
 				</tr>
 			{% endfor %}
+			<tr>
+				<th colspan="3">Total</th>
+				<th>{{ contest.problems|sum(attribute="point_value") }}</th>
+			</tr>
 		</table>
 	{% else %}
 		<p>No problems have been added to this contest yet. Click "Create problem" above to add one.</p>

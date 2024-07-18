@@ -147,7 +147,7 @@ def delete_student(username):
 @teacher_required
 def reset_password(username):
 	user = User.query.filter_by(username=username).first()
-	if not teacher_controls(current_user, user):
+	if not teacher_controls(current_user, user) and not current_user.role.name == "admin":
 		return redirect("/teacher")
 
 	if request.method == "GET":

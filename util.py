@@ -31,10 +31,11 @@ def admin_required(func):
 	
 	return wrapper
 
-def check_object_exists(classtype, redir_to):
+def check_object_exists(classtype, redir_to, key_name="id"):
 	def decorator(func):
 		def wrapper(**kwargs):
-			contest = classtype.query.filter_by(id=kwargs[list(kwargs.keys())[0]]).first()
+			kw_dict = { key_name: kwargs[list(kwargs.keys())[0]] }
+			contest = classtype.query.filter_by(**kw_dict).first()
 
 			if not contest:
 				return redirect(redir_to)

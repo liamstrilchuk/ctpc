@@ -1,24 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<a class="back" href="/admin">&larr; Back to admin</a>
+	<a class="back" href="/admin/competitions">&larr; Back to competition management</a>
 	<h1>Contest management</h1>
 	<div class="admin-controls">
-		<a href="/admin/add-contest">Add contest</a>
+		<span>{{ competition.name }}</span>
+		<a href="/admin/add-contest/{{ competition.short_name }}">Add contest</a>
 	</div>
 	<div id="adminContainer">
 		<table>
-			<tr>
+			<tr class="dark-row">
 				<th>Contest name</th>
 				<th>Type</th>
 				<th>Actions</th>
 				<th>Start date</th>
 				<th>End date</th>
 				<th>Problems</th>
+				<th>Points</th>
+				<th>Multiplier</th>
+				<th>Total points</th>
 			</tr>
-			{% for contest in contests %}
-				<tr>
-					<td>{{ contest.name }}</td>
+			{% for contest in competition.contests %}
+				<tr class="light-row">
+					<td><a href="/contest/{{ contest.id }}">{{ contest.name }}</a></td>
 					<td>{{ contest.contest_type.name }}</td>
 					<td>
 						<a href="/admin/edit-contest/{{ contest.id }}">Edit</a> &bull;
@@ -28,9 +32,15 @@
 					<td class="unix-timestamp">{{ contest.start_date }}</td>
 					<td class="unix-timestamp">{{ contest.end_date }}</td>
 					<td>{{ contest.problems|length }} problem{% if contest.problems|length != 1 %}s{% endif %}</td>
+					<td>{{ contest.problems|sum(attribute="point_value") }}</td>
+					<td>{{ contest.point_multiplier|round(2) }}</td>
+					<td>{{ contest.problems|sum(attribute="point_value") * contest.point_multiplier|round(2) }}</td>
 				</div>
 			{% endfor %}
+			<tr class="dark-row">
+				<th colspan="8">Total</th>
+				<th>{{ total_points|round(2) }}</th>
+			</tr>
 		</table>
-
 	</div>
 {% endblock %}

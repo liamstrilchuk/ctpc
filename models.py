@@ -28,6 +28,18 @@ class UserRole(db.Model):
 	def __repr__(self):
 		return f"<UserRole {self.name}>"
 	
+class Competition(db.Model):
+	__tablename__ = "competitions"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	name = sa.Column(sa.String(100), nullable=False)
+	short_name = sa.Column(sa.String(20), nullable=False)
+	contests = db.relationship("Contest", backref="competition", lazy=True)
+	schools = db.relationship("School", backref="competition", lazy=True)
+	
+	def __repr__(self):
+		return f"<Competition {self.name}>"
+
 class School(db.Model):
 	__tablename__ = "schools"
 
@@ -36,10 +48,7 @@ class School(db.Model):
 	school_board_id = sa.Column(sa.Integer, sa.ForeignKey("school_boards.id"), nullable=False)
 	teams = db.relationship("Team", backref="school", lazy=True)
 	members = db.relationship("User", backref="school", lazy=True)
-
-	def __init__(self, name, school_board_id):
-		self.name = name
-		self.school_board_id = school_board_id
+	competition_id = sa.Column(sa.Integer, sa.ForeignKey("competitions.id"), nullable=True)
 	
 	def __repr__(self):
 		return f"<School {self.name}>"
@@ -91,6 +100,9 @@ class Contest(db.Model):
 	problems = db.relationship("Problem", backref="contest", lazy=True)
 	start_date = sa.Column(sa.Integer, nullable=False)
 	end_date = sa.Column(sa.Integer, nullable=False)
+	competition_id = sa.Column(sa.Integer, sa.ForeignKey("competitions.id"), nullable=True)
+	point_multiplier = sa.Column(sa.Numeric, default=1)
+	hide_until_start = sa.Column(sa.Boolean, default=False)
 	
 	def __repr__(self):
 		return f"<Contest {self.name}>"

@@ -7,11 +7,6 @@ from setup import bcrypt
 
 manage = Blueprint("manage", __name__, template_folder="templates")
 
-@manage.route("/admin/manage")
-@admin_required
-def manage_users():
-	return render_template("manage-users.html")
-
 @manage.route("/admin/add-board", methods=["GET", "POST"])
 @admin_required
 def add_board():
@@ -29,54 +24,16 @@ def add_board():
 	
 	return redirect("/admin")
 
-@manage.route("/admin/add-school", methods=["GET", "POST"])
+@manage.route("/admin/add-teacher/<school_id>", methods=["GET", "POST"])
 @admin_required
-def add_school():
-	boards = SchoolBoard.query.all()
-
-	if request.method == "GET":
-		return render_template("add-school.html", boards=boards)
-	
-	board_name = request.form["board"]
-	school_name = request.form["name"]
-
-	board = SchoolBoard.query.filter_by(name=board_name).first()
-
-	if board is None:
-		return render_template("add-school.html", boards=boards, error="There is no board with that name")
-	
-	existing_school = School.query.filter_by(name=school_name, school_board=board).first()
-
-	if existing_school is not None:
-		return render_template("add-school.html", boards=boards, error="There is already a school in that board with that name")
-		
-	school = School(school_name, board.id)
-	db.session.add(school)
-	db.session.commit()
-
-	return redirect("/admin")
-
-@manage.route("/admin/add-teacher", methods=["GET", "POST"])
-@admin_required
-def add_teacher():
+@check_object_exists(School, "/admin")
+def add_teacher(school):
 	if request.method == "GET":
 		return render_template("add-teacher.html")
 	
-	board_name = request.form["board"]
-	school_name = request.form["school"]
 	teacher_name = request.form["name"]
 	username = request.form["username"]
 
-	board = SchoolBoard.query.filter_by(name=board_name).first()
-
-	if board is None:
-		return render_template("add-teacher.html", error="Board name not found")
-	
-	school = School.query.filter_by(name=school_name, school_board=board).first()
-
-	if school is None:
-		return render_template("add-teacher.html", error="School name not found")
-	
 	if not teacher_name or not username:
 		return render_template("add-teacher.html", error="Username and teacher name must be provided")
 	
@@ -90,7 +47,7 @@ def add_teacher():
 		username=username,
 		password=bcrypt.generate_password_hash(random_password),
 		school_id=school.id,
-		role_id=UserRole.query.filter_by(role="teacher").first().id
+		role_id=UserRole.query.filter_by(name="teacher").first().id
 	)
 
 	db.session.add(user)
@@ -114,6 +71,9 @@ def delete_school(school):
 	if request.method == "GET":
 		return render_template("confirm-delete.html", type="school", text=school.name, extra_text="This will also delete all teachers and students in this school.")
 	
+	for team in school.teams:
+		db.session.delete(team)
+
 	users = User.query.filter_by(school=school).all()
 	for user in users:
 		if user.role.name == "teacher" or user.role.name == "student":

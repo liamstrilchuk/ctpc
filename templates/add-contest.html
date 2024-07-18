@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<a class="back" href="/admin/contests">&larr; Back to contest management</a>
+	<a class="back" href="/admin/competitions">&larr; Back to competition management</a>
 	<h1>{% if editing %}Edit{% else %}Add{% endif %} contest</h1>
 	<form method="post">
 		<label for="name">Contest name</label>
@@ -16,6 +16,8 @@
 				<option value="{{ ctype.name }}">{{ ctype.name }}</option>
 			{% endfor %}
 		</select>
+		<label for="point_multiplier">Point multiplier</label>
+		<input name="point_multiplier" min="0" required {% if editing %}value="{{ point_multiplier|round(2) }}"{% else %}value="1.00"{% endif %}>
 		<input type="submit">
 		{% if error %}
 			<p>{{ error }}</p>

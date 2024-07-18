@@ -61,12 +61,6 @@ def deploy():
 	db.session.add(board)
 	db.session.commit()
 
-	school = School(name="Preston High School", school_board_id=board.id)
-	db.session.add(school)
-
-	school = School(name="Waterloo Collegiate Institute", school_board_id=board.id)
-	db.session.add(school)
-
 	db.session.commit()
 
 deploy()

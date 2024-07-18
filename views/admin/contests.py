@@ -1,20 +1,111 @@
 from flask import Blueprint, redirect, render_template, request
 
-from models import AbstractTestCase, AbstractTestCaseGroup, Contest, ContestType, Problem, db
+from models import AbstractTestCase, AbstractTestCaseGroup, Competition, Contest, ContestType, Problem, School, SchoolBoard, Submission, db
 from util import admin_required, to_unix_timestamp, check_object_exists
 
 contests = Blueprint("contests", __name__, template_folder="templates")
 
-@contests.route("/admin/contests")
+@contests.route("/admin/contests/<short_name>")
 @admin_required
-def contests_view():
-	contests = Contest.query.all()
+@check_object_exists(Competition, "/admin/competitions", key_name="short_name")
+def contests_view(competition):
+	total_points = 0
+	for contest in competition.contests:
+		for problem in contest.problems:
+			total_points += problem.point_value * contest.point_multiplier
 
-	return render_template("admin-contests.html", contests=contests)
+	return render_template("admin-contests.html", competition=competition, total_points=total_points)
 
-@contests.route("/admin/add-contest", methods=["GET", "POST"])
+@contests.route("/admin/competitions")
 @admin_required
-def add_contest():
+def competitions_view():
+	competitions = Competition.query.all()
+
+	return render_template("admin-competitions.html", competitions=competitions)
+
+@contests.route("/admin/schools/<short_name>")
+@admin_required
+@check_object_exists(Competition, "/admin/competitions", key_name="short_name")
+def schools_view(competition):
+	return render_template("admin-schools.html", competition=competition)
+
+@contests.route("/admin/add-school/<competition_short_name>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(Competition, "/admin/competitions", key_name="short_name")
+def add_school(competition):
+	boards = SchoolBoard.query.all()
+
+	if request.method == "GET":
+		return render_template("add-school.html", boards=boards)
+	
+	board_name = request.form["board"]
+	school_name = request.form["name"]
+
+	board = SchoolBoard.query.filter_by(name=board_name).first()
+
+	if board is None:
+		return render_template("add-school.html", boards=boards, error="There is no board with that name")
+	
+	existing_school = School.query.filter_by(name=school_name, school_board=board).first()
+
+	if existing_school is not None:
+		return render_template("add-school.html", boards=boards, error="There is already a school in that board with that name")
+		
+	school = School(name=school_name, school_board_id=board.id, competition_id=competition.id)
+	db.session.add(school)
+	db.session.commit()
+
+	return redirect("/admin")
+
+@contests.route("/admin/add-competition", methods=["GET", "POST"])
+@admin_required
+def add_competition():
+	if request.method == "GET":
+		return render_template("add-competition.html")
+	
+	name = request.form["name"]
+	short_name = request.form["short_name"]
+
+	if not name or not short_name:
+		return render_template("add-competition.html", error="Invalid name")
+	
+	existing_competition = Competition.query.filter_by(short_name=short_name).first()
+	if existing_competition:
+		return render_template("add-competition.html", error="Competition already exists")
+
+	competition = Competition(name=name, short_name=short_name)
+	db.session.add(competition)
+	db.session.commit()
+
+	return redirect("/admin/competitions")
+
+@contests.route("/admin/edit-competition/<int:competition_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(Competition, "/admin/contests")
+def edit_competition(competition):
+	if request.method == "GET":
+		return render_template("add-competition.html", editing=True, name=competition.name, short_name=competition.short_name, competition=competition)
+	
+	name = request.form["name"]
+	short_name = request.form["short_name"]
+
+	if not name or not short_name:
+		return render_template("add-competition.html", error="Invalid name", competition=competition)
+	
+	existing_competition = Competition.query.filter_by(short_name=short_name).first()
+	if existing_competition:
+		return render_template("add-competition.html", error="Competition already exists", competition=competition)
+
+	competition.name = name
+	competition.short_name = short_name
+
+	db.session.commit()
+	return redirect("/admin/competitions")
+
+@contests.route("/admin/add-contest/<competition_short_name>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(Competition, "/admin/competitions", key_name="short_name")
+def add_contest(competition):
 	contest_types = ContestType.query.all()
 
 	if request.method == "GET":
@@ -24,6 +115,7 @@ def add_contest():
 	contest_type = request.form["contest_type"]
 	start_date = to_unix_timestamp(request.form["start"])
 	end_date = to_unix_timestamp(request.form["end"])
+	point_multiplier = request.form["point_multiplier"]
 
 	if not start_date or not end_date or start_date >= end_date:
 		return render_template("add-contest.html", error="Invalid dates", contest_types=contest_types)
@@ -35,16 +127,21 @@ def add_contest():
 	if not name:
 		return render_template("add-contest.html", error="Invalid name", contest_types=contest_types)
 	
+	if not point_multiplier or not point_multiplier.isnumeric():
+		return render_template("add-contest.html", error="Invalid point multiplier", contest_types=contest_types)
+	
 	contest = Contest(
 		name=name,
 		contest_type_id=ctype_obj.id,
 		start_date=start_date,
-		end_date=end_date
+		end_date=end_date,
+		competition_id=competition.id,
+		point_multiplier=point_multiplier
 	)
 	db.session.add(contest)
 	db.session.commit()
 
-	return redirect("/admin/contests")
+	return redirect("/admin/competitions")
 
 @contests.route("/admin/edit-contest/<int:contest_id>", methods=["GET", "POST"])
 @admin_required
@@ -53,12 +150,13 @@ def edit_contest(contest):
 	contest_types = ContestType.query.all()
 
 	if request.method == "GET":
-		return render_template("add-contest.html", editing=True, name=contest.name, contest_types=contest_types, contest=contest)
+		return render_template("add-contest.html", editing=True, name=contest.name, contest_types=contest_types, contest=contest, point_multiplier=contest.point_multiplier)
 	
 	name = request.form["name"]
 	contest_type = request.form["contest_type"]
 	start_date = to_unix_timestamp(request.form["start"])
 	end_date = to_unix_timestamp(request.form["end"])
+	point_multiplier = request.form["point_multiplier"]
 
 	if not start_date or not end_date or start_date >= end_date:
 		return render_template("add-contest.html", error="Invalid dates", contest_types=contest_types, contest=contest)
@@ -74,9 +172,10 @@ def edit_contest(contest):
 	contest.contest_type_id = ctype_obj.id
 	contest.start_date = start_date
 	contest.end_date = end_date
+	contest.point_multiplier = point_multiplier
 
 	db.session.commit()
-	return redirect("/admin/contests")
+	return redirect(f"/admin/contests/{contest.competition.short_name}")
 
 @contests.route("/admin/delete-contest/<int:contest_id>", methods=["GET", "POST"])
 @admin_required
@@ -146,9 +245,23 @@ def delete_problem(problem):
 		return render_template("confirm-delete.html", type="problem", text=problem.name)
 
 	contest_id = problem.contest.id
+
+	problem_submissions = Submission.query.filter_by(problem_id=problem.id).all()
+
+	for ps in problem_submissions:
+		for tcg in ps.test_case_groups:
+			for tc in tcg.test_cases:
+				db.session.delete(tc)
+
+			db.session.delete(tcg)
+
+		db.session.delete(ps)
 	
-	for tc in problem.test_cases:
-		db.session.delete(tc)
+	for tcg in problem.test_case_groups:
+		for tc in tcg.test_cases:
+			db.session.delete(tc)
+
+		db.session.delete(tcg)
 	
 	db.session.delete(problem)
 	db.session.commit()

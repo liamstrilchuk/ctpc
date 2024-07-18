@@ -3,6 +3,9 @@
 {% block content %}
 	<a class="back" href="/contests">&larr; Back to contests</a>
 	<h1>{{ contest.name }}</h1>
+	{% if contest.contest_type.name == "team" and not current_user.team %}
+		<p>You are not registered to a team; however, you can still participate in this contest individually.</p>
+	{% endif %}
 	<table>
 		<tr>
 			<th>#</th>
@@ -20,21 +23,26 @@
 					{% elif problem_dict[problem.id]["points_earned"] == 0 %}
 						Attempted
 					{% elif problem_dict[problem.id]["points_earned"] < problem.point_value %}
-						<span style="color: #747800;">Partially complete</span>
+						<span style="color: #949900; font-weight: bold;">Partially complete</span>
 					{% else %}
-						<span style="color: #087300;">Complete</span>
+						<span style="color: #087300; font-weight: bold;">Complete</span>
 					{% endif %}
 				</td>
 				<td>{{ problem_dict[problem.id]["points_earned"] }}/{{ problem.point_value }}</td>
 			</tr>
 		{% endfor %}
+		<tr>
+			<td colspan="3"><b>Total</b></td>
+			<td><b>{{ problem_dict.values() | sum(attribute="points_earned") }}/{{ contest.problems | sum(attribute="point_value") }}</b></td>
+		</tr>
 	</table>
-	<h2>Your submissions</h2>
+	<h2>Your {% if contest.contest_type.name == "team" %}team's {% endif %}submissions</h2>
 	{% if user_submissions %}
 		<table>
 			<tr>
 				<th>Problem</th>
 				<th>Submission time</th>
+				{% if contest.contest_type.name == "team" %}<th>Submitted by</th>{% endif %}
 				<th>Status</th>
 				<th>Points earned</th>
 			</tr>
@@ -42,12 +50,13 @@
 				<tr>
 					<td><a href="/problem/{{ submission.problem.id }}">{{ submission.problem.name }}</a></td>
 					<td><span class="duration">{{ current_time - submission.timestamp }}</span> ago</td>
+					{% if contest.contest_type.name == "team" %}<td>{{ submission.user.username }}</td>{% endif %}
 					<td><a href="/submission/{{ submission.id }}">{{ submission.status.name }}</a></td>
 					<td>{{ submission.points_earned }}/{{ submission.problem.point_value }}</td>
 				</tr>
 			{% endfor %}
 		</table>
 	{% else %}
-		<p>You have not submitted any solutions yet.</p>
+		<p>{% if contest.contest_type.name == "team" %}Your team has not{% else %}You have not{% endif %} submitted any solutions yet.</p>
 	{% endif %}
 {% endblock %}

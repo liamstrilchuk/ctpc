@@ -18,6 +18,7 @@
 			</div>
 			<div id="navbar-right">
 				{% if current_user.is_authenticated %}
+					<a href="/contests">Contests</a>
 					{% if current_user.role.name == "admin" %}
 						<a href="/admin">Admin</a>
 					{% elif current_user.role.name == "teacher" %}

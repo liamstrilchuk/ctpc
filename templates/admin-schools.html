@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/competitions">&larr; Back to competition management</a>
+	<h1>School management</h1>
+	<div class="admin-controls">
+		<span>{{ competition.name }}</span>
+		<a href="/admin/add-school/{{ competition.short_name }}">Add school</a>
+		<a href="/admin/add-board">Add school board</a>
+	</div>
+	<div id="adminContainer">
+		<table>
+			<tr class="dark-row">
+				<th>School name</th>
+				<th>School board</th>
+				<th>Actions</th>
+				<th>Teachers</th>
+				<th># of teams registered</th>
+			</tr>
+			{% for school in competition.schools %}
+				<tr class="light-row">
+					<td>{{ school.name }}</td>
+					<td>{{ school.school_board.name }}</td>
+					<td>
+						<a href="/admin/add-teacher/{{ school.id }}">Add teacher</a> &bull;
+						<a href="/admin/manage/{{ school.id }}">Manage</a> &bull;
+						<a href="/admin/delete-school/{{ school.id }}">Delete</a>
+					</td>
+					<td>
+						{% for teacher in school.members %}
+							{% if teacher.role.name == "teacher" %}
+								<a href="/admin/manage/{{ teacher.id }}">{{ teacher.username }}</a> (<a href="/admin/delete-user/{{ teacher.username }}">delete</a> &bull; <a href="/teacher/reset-password/{{ teacher.username }}">reset password</a>)<br>
+							{% endif %}
+						{% endfor %}
+					</td>
+					<td>{{ school.teams|length }}</td>
+				</div>
+			{% endfor %}
+			<tr class="dark-row">
+				<th colspan="4">Total</th>
+				<th>{{ competition.schools|map(attribute="teams")|map("length")|sum }}</th>
+			</tr>
+		</table>
+	</div>
+{% endblock %}

@@ -17,23 +17,35 @@ def check_submissions():
 	}).json()
 
 	pending_status = TestCaseStatus.query.filter_by(name="Pending").first().id
+	accepted_status = TestCaseStatus.query.filter_by(name="Accepted").first().id
 
 	for ps in pending_submissions:
 		if not str(ps.id) in response:
 			continue
 
 		all_completed = True
+		total_points = 0
 		for tcg in ps.test_case_groups:
+			all_correct = True
+
 			for tc in tcg.test_cases:
 				if str(tc.id) in response[str(ps.id)]:
 					tc.status_id = TestCaseStatus.query.filter_by(name=response[str(ps.id)][str(tc.id)]["status"]).first().id
 					tc.output = response[str(ps.id)][str(tc.id)]["output"]
 
+				if not tc.status_id == accepted_status:
+					all_correct = False
+
 				if tc.status_id == pending_status:
 					all_completed = False
 
+			if all_correct:
+				total_points += tcg.abstract_group.point_value
+				tcg.points_earned = tcg.abstract_group.point_value
+
 		if all_completed:
 			ps.status_id = SubmissionStatus.query.filter_by(name="Completed").first().id
+			ps.points_earned = total_points
 
 	db.session.commit()
 

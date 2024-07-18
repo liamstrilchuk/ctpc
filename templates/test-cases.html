@@ -9,19 +9,19 @@
 	{% if problem.test_case_groups %}
 		<table>
 			{% for tcg in problem.test_case_groups %}
-				<tr>
+				<tr class="dark-row">
 					<td><b>{% if tcg.is_sample %}Sample subtask{% else %}Subtask{% endif %} {{ loop.index }}</b></td>
 					<td><a href="/admin/add-test-case/{{ tcg.id }}">Add test case</a> &bull; <a href="/admin/edit-test-case-group/{{ tcg.id }}">Edit</a> &bull; <a href="/admin/delete-test-case-group/{{ tcg.id }}">Delete</a></td>
 					<td>{{ tcg.point_value }} point{% if tcg.point_value != 1 %}s{% endif %}</td>
 				</tr>
 				{% for tc in tcg.test_cases %}
-					<tr>
+					<tr class="light-row">
 						<td>Case {{ loop.index }}</td>
 						<td colspan="2"><a href="/admin/edit-test-case/{{ tc.id }}">Edit</a> &bull; <a href="/admin/delete-test-case/{{ tc.id }}">Delete</a></td>
 					</tr>
 				{% endfor %}
 			{% endfor %}
-			<tr>
+			<tr class="dark-row">
 				<td colspan="2"><b>Total</b></td>
 				<td><b>{{ problem.test_case_groups | sum(attribute="point_value") }} points</b></td>
 			</tr>

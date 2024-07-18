@@ -3,7 +3,7 @@
 {% block content %}
 	<a class="back" href="/contest/{{ problem.contest.id }}">&larr; Back to contest</a>
 	<h1>{{ problem.name }}</h1>
-	{{ problem.description }}
+	{{ problem_html|safe }}
 	{% if sample_groups %}
 		<h2>Sample test cases</h2>
 		{% for tcg in sample_groups %}

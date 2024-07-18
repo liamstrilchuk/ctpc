@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/competitions">&larr; Back to competition management</a>
+	<h1>{% if editing %}Edit{% else %}Add{% endif %} competition</h1>
+	<form method="post">
+		<label for="name">Competition name</label>
+		<input name="name" required {% if editing %}value="{{ name }}"{% endif %}>
+		<label for="short_name">Short name</label>
+		<input name="short_name" required {% if editing %}value="{{ short_name }}"{% endif %}>
+		<input type="submit">
+		{% if error %}
+			<p>{{ error }}</p>
+		{% endif %}
+	</form>
+{% endblock %}
