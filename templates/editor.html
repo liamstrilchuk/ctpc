@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block head %}
+	<script src="{{ url_for('static', filename='js/ace.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/ext-language_tools.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/mode-python.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
+{% endblock %}
+
+{% block content %}
+	<div class="editor-container">
+		<div id="code-editor"></div>
+		<div id="editor-controls">
+			<div id="editor-controls-top">
+				<div>
+					<select id="problem-selector" autocomplete="off">
+						<option value="" selected="selected">Select a problem</option>
+						{% for problem in problems %}
+							<option value="{{ problem.id }}">{{ problem.name }}</option>
+						{% endfor %}
+					</select>
+					<select id="language-selector">
+						{% for language in languages %}
+							<option value="{{ language.short_name }}">{{ language.name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div>
+					<button class="run-button">Run</button>
+					<button class="submit-button">Submit</button>
+				</div>
+			</div>
+			<div id="test-case-container">
+				
+			</div>
+			<div id="test-case-editor">
+				<button>Add custom test case</button>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -35,12 +35,12 @@ def check_object_exists(classtype, redir_to, key_name="id"):
 	def decorator(func):
 		def wrapper(**kwargs):
 			kw_dict = { key_name: kwargs[list(kwargs.keys())[0]] }
-			contest = classtype.query.filter_by(**kw_dict).first()
+			obj = classtype.query.filter_by(**kw_dict).first()
 
-			if not contest:
+			if not obj:
 				return redirect(redir_to)
 			
-			return func(contest)
+			return func(obj)
 		
 		wrapper.__name__ = func.__name__
 		return wrapper

@@ -1,0 +1,100 @@
+.editor-container {
+	position: relative;
+	height: 100%;
+	display: flex;
+}
+
+#code-editor {
+	height: 100%;
+	font-size: 14px;
+	width: 60%;
+	border-right: 1px solid #ddd;
+}
+
+#content {
+	width: 100%;
+	height: 100vh;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+#editor-controls {
+	width: 40%;
+	background: #eee;
+}
+
+#editor-controls-top {
+	display: flex;
+	width: 100%;
+	justify-content: space-between;
+	padding: 15px 20px;
+	background: #ddd;
+	box-sizing: border-box;
+	border-bottom: 1px solid #ccc;
+	align-items: center;
+}
+
+.run-button, .submit-button {
+	padding: 6px 20px;
+	border: none;
+	background: rgb(80, 180, 80);
+	border-radius: 5px;
+	cursor: pointer;
+	transition: 0.1s;
+	font-size: 0.9em;
+}
+
+.run-button {
+	background: rgb(60, 140, 250);
+}
+
+.run-button:hover {
+	background: rgb(50, 120, 230);
+}
+
+.submit-button:hover {
+	background: rgb(60, 160, 60);
+}
+
+select {
+	padding: 6px 20px;
+}
+
+.test-case {
+	background: #ddd;
+	margin: 10px 20px;
+	border-radius: 5px;
+}
+
+.test-case-section-container {
+	display: flex;
+	justify-content: space-between;
+	padding: 10px 25px;
+}
+
+.test-case-section {
+	width: 50%;
+}
+
+.test-case-section-title {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.test-case-section-content {
+	white-space: pre-wrap;
+	font-family: monospace;
+}
+
+.test-case-header {
+	padding: 10px 25px;
+	background: #ccc;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	display: flex;
+	justify-content: space-between;
+}
+
+#test-case-editor {
+	padding: 10px 25px;
+}

@@ -12,4 +12,4 @@ admin.register_blueprint(contests)
 @admin.route("/admin")
 @admin_required
 def admin_view():
-	return render_template("admin.html")
+	return render_template("admin/admin.html")

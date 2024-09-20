@@ -11,12 +11,12 @@ manage = Blueprint("manage", __name__, template_folder="templates")
 @admin_required
 def add_board():
 	if request.method == "GET":
-		return render_template("add-board.html")
+		return render_template("admin/add-board.html")
 	
 	board_name = request.form["name"]
 
 	if SchoolBoard.query.filter_by(name=board_name).first() is not None:
-		return render_template("add-board.html", error="Board with that name already exists")
+		return render_template("admin/add-board.html", error="Board with that name already exists")
 	
 	board = SchoolBoard(board_name)
 	db.session.add(board)
@@ -29,18 +29,18 @@ def add_board():
 @check_object_exists(School, "/admin")
 def add_teacher(school):
 	if request.method == "GET":
-		return render_template("add-teacher.html")
+		return render_template("admin/add-teacher.html")
 	
 	teacher_name = request.form["name"]
 	username = request.form["username"]
 
 	if not teacher_name or not username:
-		return render_template("add-teacher.html", error="Username and teacher name must be provided")
+		return render_template("admin/add-teacher.html", error="Username and teacher name must be provided")
 	
 	existing_user = User.query.filter_by(username=username).first()
 
 	if existing_user is not None:
-		return render_template("add-teacher.html", error="Username already exists")
+		return render_template("admin/add-teacher.html", error="Username already exists")
 	
 	random_password = generate_random_password()
 	user = User(

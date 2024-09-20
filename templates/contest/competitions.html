@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/">&larr; Back to home</a>
+	<h1>Competitions</h1>
+	{% for competition in competitions %}
+		<a href="/contests/{{ competition.id }}">{{ competition.name }}</a><br>
+	{% endfor %}
+{% endblock %}

@@ -14,20 +14,20 @@ def contests_view(competition):
 		for problem in contest.problems:
 			total_points += problem.point_value * contest.point_multiplier
 
-	return render_template("admin-contests.html", competition=competition, total_points=total_points)
+	return render_template("admin/admin-contests.html", competition=competition, total_points=total_points)
 
 @contests.route("/admin/competitions")
 @admin_required
 def competitions_view():
 	competitions = Competition.query.all()
 
-	return render_template("admin-competitions.html", competitions=competitions)
+	return render_template("admin/admin-competitions.html", competitions=competitions)
 
 @contests.route("/admin/schools/<short_name>")
 @admin_required
 @check_object_exists(Competition, "/admin/competitions", key_name="short_name")
 def schools_view(competition):
-	return render_template("admin-schools.html", competition=competition)
+	return render_template("admin/admin-schools.html", competition=competition)
 
 @contests.route("/admin/add-school/<competition_short_name>", methods=["GET", "POST"])
 @admin_required
@@ -36,7 +36,7 @@ def add_school(competition):
 	boards = SchoolBoard.query.all()
 
 	if request.method == "GET":
-		return render_template("add-school.html", boards=boards)
+		return render_template("admin/add-school.html", boards=boards)
 	
 	board_name = request.form["board"]
 	school_name = request.form["name"]
@@ -44,12 +44,12 @@ def add_school(competition):
 	board = SchoolBoard.query.filter_by(name=board_name).first()
 
 	if board is None:
-		return render_template("add-school.html", boards=boards, error="There is no board with that name")
+		return render_template("admin/add-school.html", boards=boards, error="There is no board with that name")
 	
 	existing_school = School.query.filter_by(name=school_name, school_board=board).first()
 
 	if existing_school is not None:
-		return render_template("add-school.html", boards=boards, error="There is already a school in that board with that name")
+		return render_template("admin/add-school.html", boards=boards, error="There is already a school in that board with that name")
 		
 	school = School(name=school_name, school_board_id=board.id, competition_id=competition.id)
 	db.session.add(school)
@@ -61,17 +61,17 @@ def add_school(competition):
 @admin_required
 def add_competition():
 	if request.method == "GET":
-		return render_template("add-competition.html")
+		return render_template("admin/add-competition.html")
 	
 	name = request.form["name"]
 	short_name = request.form["short_name"]
 
 	if not name or not short_name:
-		return render_template("add-competition.html", error="Invalid name")
+		return render_template("admin/add-competition.html", error="Invalid name")
 	
 	existing_competition = Competition.query.filter_by(short_name=short_name).first()
 	if existing_competition:
-		return render_template("add-competition.html", error="Competition already exists")
+		return render_template("admin/add-competition.html", error="Competition already exists")
 
 	competition = Competition(name=name, short_name=short_name)
 	db.session.add(competition)
@@ -84,17 +84,17 @@ def add_competition():
 @check_object_exists(Competition, "/admin/contests")
 def edit_competition(competition):
 	if request.method == "GET":
-		return render_template("add-competition.html", editing=True, name=competition.name, short_name=competition.short_name, competition=competition)
+		return render_template("admin/add-competition.html", editing=True, name=competition.name, short_name=competition.short_name, competition=competition)
 	
 	name = request.form["name"]
 	short_name = request.form["short_name"]
 
 	if not name or not short_name:
-		return render_template("add-competition.html", error="Invalid name", competition=competition)
+		return render_template("admin/add-competition.html", error="Invalid name", competition=competition)
 	
 	existing_competition = Competition.query.filter_by(short_name=short_name).first()
 	if existing_competition:
-		return render_template("add-competition.html", error="Competition already exists", competition=competition)
+		return render_template("admin/add-competition.html", error="Competition already exists", competition=competition)
 
 	competition.name = name
 	competition.short_name = short_name
@@ -109,7 +109,7 @@ def add_contest(competition):
 	contest_types = ContestType.query.all()
 
 	if request.method == "GET":
-		return render_template("add-contest.html", contest_types=contest_types)
+		return render_template("admin/add-contest.html", contest_types=contest_types)
 	
 	name = request.form["name"]
 	contest_type = request.form["contest_type"]
@@ -118,17 +118,17 @@ def add_contest(competition):
 	point_multiplier = request.form["point_multiplier"]
 
 	if not start_date or not end_date or start_date >= end_date:
-		return render_template("add-contest.html", error="Invalid dates", contest_types=contest_types)
+		return render_template("admin/add-contest.html", error="Invalid dates", contest_types=contest_types)
 	
 	ctype_obj = ContestType.query.filter_by(name=contest_type).first()
 	if not ctype_obj:
-		return render_template("add-contest.html", error="Invalid contest type", contest_types=contest_types)
+		return render_template("admin/add-contest.html", error="Invalid contest type", contest_types=contest_types)
 	
 	if not name:
-		return render_template("add-contest.html", error="Invalid name", contest_types=contest_types)
+		return render_template("admin/add-contest.html", error="Invalid name", contest_types=contest_types)
 	
 	if not point_multiplier or not point_multiplier.isnumeric():
-		return render_template("add-contest.html", error="Invalid point multiplier", contest_types=contest_types)
+		return render_template("admin/add-contest.html", error="Invalid point multiplier", contest_types=contest_types)
 	
 	contest = Contest(
 		name=name,
@@ -150,7 +150,7 @@ def edit_contest(contest):
 	contest_types = ContestType.query.all()
 
 	if request.method == "GET":
-		return render_template("add-contest.html", editing=True, name=contest.name, contest_types=contest_types, contest=contest, point_multiplier=contest.point_multiplier)
+		return render_template("admin/add-contest.html", editing=True, name=contest.name, contest_types=contest_types, contest=contest, point_multiplier=contest.point_multiplier)
 	
 	name = request.form["name"]
 	contest_type = request.form["contest_type"]
@@ -159,14 +159,14 @@ def edit_contest(contest):
 	point_multiplier = request.form["point_multiplier"]
 
 	if not start_date or not end_date or start_date >= end_date:
-		return render_template("add-contest.html", error="Invalid dates", contest_types=contest_types, contest=contest)
+		return render_template("admin/add-contest.html", error="Invalid dates", contest_types=contest_types, contest=contest)
 	
 	ctype_obj = ContestType.query.filter_by(name=contest_type).first()
 	if not ctype_obj:
-		return render_template("add-contest.html", error="Invalid contest type", contest_types=contest_types, contest=contest)
+		return render_template("admin/add-contest.html", error="Invalid contest type", contest_types=contest_types, contest=contest)
 	
 	if not name:
-		return render_template("add-contest.html", error="Invalid name", contest_types=contest_types, contest=contest)
+		return render_template("admin/add-contest.html", error="Invalid name", contest_types=contest_types, contest=contest)
 	
 	contest.name = name
 	contest.contest_type_id = ctype_obj.id
@@ -196,20 +196,20 @@ def delete_contest(contest):
 @admin_required
 @check_object_exists(Contest, "/admin/contests")
 def edit_problems(contest):
-	return render_template("admin-problems.html", contest=contest)
+	return render_template("admin/admin-problems.html", contest=contest)
 
 @contests.route("/admin/create-problem/<int:contest_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(Contest, "/admin/contests")
 def create_problem(contest):
 	if request.method == "GET":
-		return render_template("create-problem.html", contest=contest)
+		return render_template("admin/add-problem.html", contest=contest)
 	
 	problem_name = request.form["name"]
 	description = request.form["description"]
 
 	if not problem_name:
-		return render_template("create-problem.html", contest=contest, error="Invalid name")
+		return render_template("admin/add-problem.html", contest=contest, error="Invalid name")
 	
 	problem = Problem(name=problem_name, description=description, contest_id=contest.id)
 	db.session.add(problem)
@@ -222,13 +222,13 @@ def create_problem(contest):
 @check_object_exists(Problem, "/admin/contests")
 def edit_problem(problem):
 	if request.method == "GET":
-		return render_template("create-problem.html", contest=problem.contest, problem=problem)
+		return render_template("admin/add-problem.html", contest=problem.contest, problem=problem)
 	
 	problem_name = request.form["name"]
 	description = request.form["description"]
 
 	if not problem_name:
-		return render_template("create-problem.html", contest=problem.contest, problem=problem, error="Invalid name")
+		return render_template("admin/add-problem.html", contest=problem.contest, problem=problem, error="Invalid name")
 
 	problem.name = problem_name
 	problem.description = description
@@ -272,14 +272,14 @@ def delete_problem(problem):
 @admin_required
 @check_object_exists(Problem, "/admin/contests")
 def view_test_cases(problem):
-	return render_template("test-cases.html", problem=problem)
+	return render_template("admin/test-cases.html", problem=problem)
 
 @contests.route("/admin/add-test-case-group/<int:problem_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(Problem, "/admin/contests")
 def add_test_case_group(problem):
 	if request.method == "GET":
-		return render_template("add-test-case-group.html", problem=problem)
+		return render_template("admin/add-test-case-group.html", problem=problem)
 	
 	point_value = request.form.get("point_value")
 	is_sample = request.form.get("is_sample") == "on"
@@ -297,7 +297,7 @@ def add_test_case_group(problem):
 @check_object_exists(AbstractTestCaseGroup, "/admin/contests")
 def edit_test_case_group(group):
 	if request.method == "GET":
-		return render_template("add-test-case-group.html", problem=group.problem, group=group)
+		return render_template("admin/add-test-case-group.html", problem=group.problem, group=group)
 	
 	point_value = request.form.get("point_value")
 	is_sample = request.form.get("is_sample") == "on"
@@ -335,13 +335,13 @@ def delete_test_case_group(group):
 @check_object_exists(AbstractTestCaseGroup, "/admin/contests")
 def add_test_case(group):
 	if request.method == "GET":
-		return render_template("add-test-case.html", problem=group.problem)
+		return render_template("admin/add-test-case.html", problem=group.problem)
 	
 	input_data = request.form.get("input")
 	output_data = request.form.get("output")
 
 	if not input_data or not output_data:
-		return render_template("add-test-case.html", problem=group.problem, error="Invalid input or output")
+		return render_template("admin/add-test-case.html", problem=group.problem, error="Invalid input or output")
 
 	tc = AbstractTestCase(input=input_data, expected_output=output_data, group_id=group.id)
 	db.session.add(tc)
@@ -354,13 +354,13 @@ def add_test_case(group):
 @check_object_exists(AbstractTestCase, "/admin/contests")
 def edit_test_case(test_case):
 	if request.method == "GET":
-		return render_template("add-test-case.html", problem=test_case.group.problem, test_case=test_case)
+		return render_template("admin/add-test-case.html", problem=test_case.group.problem, test_case=test_case)
 	
 	input_data = request.form.get("input")
 	output_data = request.form.get("output")
 
 	if not input_data or not output_data:
-		return render_template("add-test-case.html", problem=test_case.group.problem, test_case=test_case, error="Invalid input or output")
+		return render_template("admin/add-test-case.html", problem=test_case.group.problem, test_case=test_case, error="Invalid input or output")
 
 	test_case.input = input_data
 	test_case.expected_output = output_data

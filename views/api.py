@@ -1,95 +1,35 @@
 from flask import Blueprint
 from flask_login import login_required
+import time
 
-from models import SchoolBoard, User, School, UserRole
-from util import admin_required
+from models import Problem
+from util import check_object_exists
 
 api = Blueprint("api", __name__)
 
 def error(message):
 	return { "error": message }
 
-@api.route("/api/users")
-@admin_required
-def get_users():
-	users = User.query.all()
-	json_data = []
-
-	for user in users:
-		json_data.append({
-			"username": user.username,
-			"school": user.school,
-			"role": user.role
-		})
-
-	return { "users": json_data }
-
-@api.route("/api/boards")
+@api.route("/api/test_cases/<int:problem_id>")
 @login_required
-def get_boards():
-	boards = SchoolBoard.query.all()
-	json_data = []
+@check_object_exists(Problem, "/")
+def get_test_cases(problem):
+	if problem.contest.start_date > time.time():
+		return error("Problem is not available")
 
-	for board in boards:
-		json_data.append(board.name)
+	groups = problem.test_case_groups
+	all_test_cases = []
 
-	return { "boards": json_data }
+	for group in groups:
+		if not group.is_sample:
+			continue
 
-@api.route("/api/schools")
-@login_required
-def get_schools():
-	schools = School.query.all()
-	json_data = []
-
-	for school in schools:
-		json_data.append({
-			"name": school.name,
-			"board": school.school_board.name,
-			"id": school.id
-		})
-
-	return { "schools": json_data }
-
-@api.route("/api/complete-structure")
-@admin_required
-def complete_structure():
-	boards = SchoolBoard.query.all()
-	teachers = User.query.filter_by(role=UserRole.query.filter_by(name="teacher").first()).all()
-	json_data = []
-	
-	for board in boards:
-		board_data = {
-			"name": board.name,
-			"schools": [],
-			"id": board.id
-		}
-
-		for school in board.schools:
-			school_data = {
-				"name": school.name,
-				"teams": [],
-				"teachers": [],
-				"id": school.id
-			}
-
-			for teacher in teachers:
-				if teacher.school == school:
-					school_data["teachers"].append(teacher.username)
-
-			for team in school.teams:
-				team_data = {
-					"name": team.name,
-					"members": [],
-					"id": team.id
-				}
-
-				for member in team.members:
-					team_data["members"].append(member.username)
-
-				school_data["teams"].append(team_data)
-
-			board_data["schools"].append(school_data)
+		test_cases = group.test_cases
 		
-		json_data.append(board_data)
+		for test_case in test_cases:
+			all_test_cases.append({
+				"input": test_case.input,
+				"expected_output": test_case.expected_output
+			})
 
-	return { "structure": json_data }
+	return { "test_cases": all_test_cases }

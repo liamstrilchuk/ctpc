@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from time import time
 import requests, markdown
 
-from models import AbstractTestCaseGroup, Contest, ContestType, LanguageType, Problem, Submission, SubmissionStatus, Team, TestCase, TestCaseGroup, TestCaseStatus, User, db
+from models import AbstractTestCaseGroup, Competition, Contest, ContestType, LanguageType, Problem, Submission, SubmissionStatus, Team, TestCase, TestCaseGroup, TestCaseStatus, User, db
 from util import check_object_exists
 
 main = Blueprint("main", __name__, template_folder="templates")
@@ -14,13 +14,19 @@ def team_view():
 	if not current_user.role.name == "student":
 		return redirect("/")
 	
-	return render_template("team.html", team=current_user.team)
+	return render_template("contest/team.html", team=current_user.team)
 
-@main.route("/contests")
+@main.route("/competitions")
 @login_required
-def contests_view():
-	contests = Contest.query.all()
-	return render_template("contests.html", contests=contests, current_time=time())
+def competitions_view():
+	competitions = Competition.query.all()
+	return render_template("contest/competitions.html", competitions=competitions, current_time=time())
+
+@main.route("/contests/<int:competition_id>")
+@login_required
+@check_object_exists(Competition, "/competitions")
+def contests_view(competition):
+	return render_template("contest/contests.html", contests=competition.contests, current_time=time(), competition=competition)
 
 @main.route("/contest/<int:contest_id>")
 @login_required
@@ -56,7 +62,7 @@ def contest_view(contest):
 		problem_dict[sub.problem.id]["points_earned"] = sub.points_earned
 
 	return render_template(
-		"contest.html",
+		"contest/contest.html",
 		contest=contest,
 		current_time=time(),
 		user_submissions=user_submissions.order_by(Submission.timestamp.desc()).all(),
@@ -75,7 +81,7 @@ def problem_view(problem):
 
 	html_content = markdown.markdown(problem.description)
 
-	return render_template("problem.html", problem=problem, problem_html=html_content, sample_groups=sample_groups, languages=languages)
+	return render_template("contest/problem.html", problem=problem, problem_html=html_content, sample_groups=sample_groups, languages=languages)
 
 @main.route("/submit/<int:problem_id>", methods=["POST"])
 @login_required
@@ -153,4 +159,8 @@ def submission_view(submission):
 	if not submission.user == current_user and not current_user.role.name == "admin" and not (submission.problem.contest.contest_type.name == "team" and current_user.team and submission.user.team_id == current_user.team.id):
 		return redirect("/")
 
-	return render_template("submission.html", submission=submission, current_time=time())
+	return render_template("contest/submission.html", submission=submission, current_time=time())
+
+@main.route("/editor")
+def editor():
+	return render_template("editor.html", problems=Problem.query.all(), languages=LanguageType.query.all())
