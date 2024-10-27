@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_migrate import Migrate
 
@@ -11,7 +13,7 @@ def setup_app():
 	app = Flask(__name__)
 	app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 	app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
-	app.secret_key = "secret"
+	app.secret_key = os.environ["SECRET_KEY"]
 
 	app.jinja_env.auto_reload = True
 	app.config["TEMPLATES_AUTO_RELOAD"] = True

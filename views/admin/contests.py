@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, render_template, request
 
 from models import AbstractTestCase, AbstractTestCaseGroup, Competition, Contest, ContestType, Problem, School, SchoolBoard, Submission, db
 from util import admin_required, to_unix_timestamp, check_object_exists
+import handle_objects
 
 contests = Blueprint("contests", __name__, template_folder="templates")
 
@@ -51,9 +52,7 @@ def add_school(competition):
 	if existing_school is not None:
 		return render_template("admin/add-school.html", boards=boards, error="There is already a school in that board with that name")
 		
-	school = School(name=school_name, school_board_id=board.id, competition_id=competition.id)
-	db.session.add(school)
-	db.session.commit()
+	handle_objects.add_school(school_name, board.id, competition.id)
 
 	return redirect("/admin")
 
@@ -73,9 +72,7 @@ def add_competition():
 	if existing_competition:
 		return render_template("admin/add-competition.html", error="Competition already exists")
 
-	competition = Competition(name=name, short_name=short_name)
-	db.session.add(competition)
-	db.session.commit()
+	handle_objects.add_competition(name, short_name)
 
 	return redirect("/admin/competitions")
 
@@ -96,10 +93,8 @@ def edit_competition(competition):
 	if existing_competition:
 		return render_template("admin/add-competition.html", error="Competition already exists", competition=competition)
 
-	competition.name = name
-	competition.short_name = short_name
+	handle_objects.edit_competition(competition, name, short_name)
 
-	db.session.commit()
 	return redirect("/admin/competitions")
 
 @contests.route("/admin/add-contest/<competition_short_name>", methods=["GET", "POST"])
@@ -130,7 +125,7 @@ def add_contest(competition):
 	if not point_multiplier or not point_multiplier.isnumeric():
 		return render_template("admin/add-contest.html", error="Invalid point multiplier", contest_types=contest_types)
 	
-	contest = Contest(
+	handle_objects.add_contest(
 		name=name,
 		contest_type_id=ctype_obj.id,
 		start_date=start_date,
@@ -138,8 +133,6 @@ def add_contest(competition):
 		competition_id=competition.id,
 		point_multiplier=point_multiplier
 	)
-	db.session.add(contest)
-	db.session.commit()
 
 	return redirect("/admin/competitions")
 
@@ -168,13 +161,7 @@ def edit_contest(contest):
 	if not name:
 		return render_template("admin/add-contest.html", error="Invalid name", contest_types=contest_types, contest=contest)
 	
-	contest.name = name
-	contest.contest_type_id = ctype_obj.id
-	contest.start_date = start_date
-	contest.end_date = end_date
-	contest.point_multiplier = point_multiplier
-
-	db.session.commit()
+	handle_objects.edit_contest(contest, name, ctype_obj.id, start_date, end_date, point_multiplier)
 	return redirect(f"/admin/contests/{contest.competition.short_name}")
 
 @contests.route("/admin/delete-contest/<int:contest_id>", methods=["GET", "POST"])
@@ -187,8 +174,7 @@ def delete_contest(contest):
 	if request.method == "GET":
 		return render_template("confirm-delete.html", type="contest", text=contest.name)
 	
-	db.session.delete(contest)
-	db.session.commit()
+	handle_objects.delete_contest(contest)
 
 	return redirect("/admin/contests")
 

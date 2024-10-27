@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<a class="back" href="/contests/{{ contest.competition.id }}">&larr; Back to competition</a>
+	<a class="back" href="/competitions/{{ contest.competition.short_name }}">&larr; Back to competition</a>
 	<h1>{{ contest.name }}</h1>
 	{% if contest.contest_type.name == "team" and not current_user.team %}
 		<p>You are not registered to a team; however, you can still participate in this contest individually.</p>

@@ -1,58 +1,217 @@
 html, body {
+	width: 100%;
 	margin: 0;
-	padding: 0;
-}
-
-body {
-	font-family: Arial, Helvetica, sans-serif;
 	box-sizing: border-box;
+	background: rgb(20, 20, 30);
+	font-family: sans-serif;
+	scroll-behavior: smooth;
 }
 
-h1 {
-	margin: 0 0 10px 0;
-	border-bottom: 1px solid black;
-}
-
-ul {
-	margin: 0;
-}
-
-#navbar {
-	padding: 10px;
-	height: 60px;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-	position: relative;
-	z-index: 2;
-}
-
-#navbar > div {
-	padding: 0 20px;
-}
-
-#navbar a {
-	text-decoration: none;
-	color: black;
-	margin: 0 10px;
+a {
+	color: rgb(170, 170, 220);
 }
 
 #content {
-	padding: 10px 30px;
-	margin: 0 10%;
+	padding: 20px 80px;
+	color: white;
+}
+
+#landing-image {
+	width: 100%;
+	height: 500px;
+}
+
+#landing-content {
+	position: relative;
+	z-index: 1;
+	color: white;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	padding: 0 100px;
+}
+
+#landing-content h1 {
+	font-size: 2.5em;
+}
+
+#landing-content div a {
+	padding: 0 15px;
+	color: white !important;
+	text-decoration: none !important;
+	font-size: 1.2em;
+}
+
+#landing-content div a:hover {
+	text-decoration: underline !important;
+}
+
+#landing-image::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	display: block;
+	background-size: cover;
+	filter: brightness(0.4);
+	width: 100%;
+	height: 500px;
+}
+
+#navbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	padding: 0 50px;
+	justify-content: space-between;
+	width: calc(100% - 100px);
+	height: 60px;
+	backdrop-filter: blur(5px);
+	background: rgb(10, 10, 20);
+}
+
+#navbar-year {
+	color: rgb(200, 200, 255);
+	padding-left: 10px;
+	text-decoration: none;
+}
+
+#navbar-name-small {
+	display: none;
+}
+
+#navbar div {
+	color: rgb(220, 220, 220);
+}
+
+#navbar-links {
+	text-align: right;
+}
+
+#navbar-links a {
+	padding-left: 15px;
+}
+
+#navbar a:not(#navbar-year) {
+	color: rgb(220, 220, 220) !important;
+	text-decoration: none !important;
+}
+
+.section {
+	margin: auto;
+	max-width: 85%;
+	color: rgb(230, 230, 230);
+	padding: 20px 0 25px 0;
+}
+
+.section-container:nth-child(even) {
+	background: rgb(25, 25, 35);
+}
+
+.section p, .section li {
+	font-size: 1.05em;
+	line-height: 1.3em;
+}
+
+#footer {
+	background: rgb(10, 10, 20);
+	color: rgb(230, 230, 230);
+	padding: 50px 0;
+}
+
+#footer-content {
+	margin: auto;
+	max-width: 80%;
+}
+
+.section-feature-container {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	margin-top: 30px;
+}
+
+.section-feature {
+	width: 300px;
+	text-align: center;
+}
+
+.section-feature img {
+	width: 100px;
+	filter: invert(0.8);
+	transition: 0.3s;
+}
+
+.section-feature img:hover {
+	filter: invert(1);
+}
+
+.text-image-holder {
+	display: flex;
+	align-items: center;
+}
+
+.section-text {
+	width: 60%;
+	padding: 10px;
+}
+
+.section-image {
+	width: 40%;
+	padding: 20px;
+}
+
+.text-image-holder img {
+	width: 100%;
+}
+
+.big-number {
+	font-size: 3.3em;
+	font-weight: bold;
+	color: rgb(100, 100, 250);
+}
+
+@media screen and (max-width: 1100px) {
+	.text-image-holder {
+		flex-wrap: wrap;
+	}
+
+	.section-text {
+		width: 100%;
+	}
+
+	.section-image {
+		width: 100%;
+		padding: 20px;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	#navbar-name-big {
+		display: none;
+	}
+
+	#navbar-name-small {
+		display: initial;
+	}
 }
 
 .admin-board {
 	padding: 10px;
-	background: #eee;
+	background: #111;
 	margin: 10px 0;
 	border-radius: 5px;
 }
 
 .admin-school {
 	margin: 10px 0;
-	background: #ddd;
+	background: #222;
 	padding: 10px;
 	border-radius: 5px;
 }
@@ -88,7 +247,7 @@ ul {
 
 .admin-contest {
 	padding: 10px 20px;
-	background: #eee;
+	background: #111;
 	border-radius: 5px;
 }
 
@@ -102,21 +261,32 @@ form * {
 }
 
 form input, form select, form textarea {
-	margin-bottom: 10px;
+	padding: 8px 15px;
+	margin: 5px 0 10px 0;
+	background: #20202a;
+	border-radius: 5px;
+	color: white;
+	outline: none !important;
+	border: none;
+}
+
+form input[type=submit] {
+	cursor: pointer;
+	padding: 10px 15px;
 }
 
 .back {
-	color: rgb(83, 83, 83) !important;
+	color: rgb(185, 185, 185) !important;
 	display: block;
 	margin-bottom: 5px;
 }
 
 tr:nth-child(even) {
-	background-color: #f1f1f1;
+	background-color: #20202a;
 }
 
 tr:nth-child(odd) {
-	background-color: #e2e2e2;
+	background-color: #29293a;
 }
 
 td, th {
@@ -128,9 +298,13 @@ td, th {
 	padding: 10px 20px;
 	margin: 10px 0;
 	border-radius: 5px;
-	border: 1px solid #aaa;
-	background: #fafafa;
-	box-shadow: 3px 3px 2px #aaa;
+	border: 1px solid #445;
+	background: #20202a;
+	box-shadow: 3px 3px 0px #445;
+}
+
+.contest a {
+	color: rgb(150, 150, 200);
 }
 
 .contest-title {
@@ -144,26 +318,26 @@ td, th {
 }
 
 .sample-test-case {
-	border: 1px solid #ccc;
+	border: 1px solid #333;
 	margin-bottom: 10px;
 }
 
 .sample-test-case > div {
-	background: #eee;
+	background: #111;
 	padding: 5px 15px;
-	border-bottom: 1px solid #ccc;
+	border-bottom: 1px solid #333;
 }
 
 .sample-test-case > div:hover {
-	background: #dadada;
+	background: #3a3a3a;
 }
 
 .sample-test-case > div:nth-child(odd) {
-	background: #ddd;
+	background: #222;
 }
 
 .sample-test-case > div:nth-child(odd):hover {
-	background: #cacaca;
+	background: #383838;
 }
 
 .test-case-data > pre {
@@ -179,15 +353,7 @@ textarea {
 
 .submission-code {
 	font-family: monospace;
-	background: #ddd;
+	background: #20202a;
 	font-size: 1.1em;
 	padding: 10px;
-}
-
-.dark-row {
-	background: #e2e2e2 !important;
-}
-
-.light-row {
-	background: #f1f1f1 !important;
 }

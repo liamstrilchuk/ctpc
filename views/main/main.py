@@ -22,9 +22,9 @@ def competitions_view():
 	competitions = Competition.query.all()
 	return render_template("contest/competitions.html", competitions=competitions, current_time=time())
 
-@main.route("/contests/<int:competition_id>")
+@main.route("/competitions/<competition_id>")
 @login_required
-@check_object_exists(Competition, "/competitions")
+@check_object_exists(Competition, "/competitions", key_name="short_name")
 def contests_view(competition):
 	return render_template("contest/contests.html", contests=competition.contests, current_time=time(), competition=competition)
 
