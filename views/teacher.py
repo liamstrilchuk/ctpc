@@ -4,6 +4,7 @@ from flask_login import current_user
 from models import Team, User, UserRole, db
 from setup import bcrypt
 from util import generate_random_password
+import handle_objects
 
 teacher = Blueprint("teacher", __name__, template_folder="templates")
 
@@ -138,8 +139,7 @@ def delete_student(username):
 	if request.method == "GET":
 		return render_template("confirm-delete.html", text=user.username, type="user")
 
-	db.session.delete(user)
-	db.session.commit()
+	handle_objects.delete_user(user)
 
 	return redirect("/teacher")
 
@@ -169,10 +169,6 @@ def delete_team(team_id):
 	if request.method == "GET":
 		return render_template("confirm-delete.html", text=team.name, type="team")
 
-	for student in team.members:
-		student.team_id = None
-
-	db.session.delete(team)
-	db.session.commit()
+	handle_objects.delete_team(team)
 
 	return redirect("/teacher")

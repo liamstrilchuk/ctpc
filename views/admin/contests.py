@@ -166,17 +166,25 @@ def edit_contest(contest):
 
 @contests.route("/admin/delete-contest/<int:contest_id>", methods=["GET", "POST"])
 @admin_required
-@check_object_exists(Contest, "/admin/contests")
-def delete_contest(contest):
-	if len(contest.problems) > 0:
-		return redirect("/admin/contests")
-	
+@check_object_exists(Contest, "/admin/competitions")
+def delete_contest(contest):	
 	if request.method == "GET":
 		return render_template("confirm-delete.html", type="contest", text=contest.name)
 	
 	handle_objects.delete_contest(contest)
 
-	return redirect("/admin/contests")
+	return redirect("/admin/competitions")
+
+@contests.route("/admin/delete-competition/<int:competition_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(Competition, "/admin/competitions")
+def delete_competition(competition):
+	if request.method == "GET":
+		return render_template("confirm-delete.html", type="competition", text=competition.name)
+	
+	handle_objects.delete_competition(competition)
+
+	return redirect("/admin/competitions")
 
 @contests.route("/admin/edit-problems/<int:contest_id>")
 @admin_required
@@ -232,25 +240,7 @@ def delete_problem(problem):
 
 	contest_id = problem.contest.id
 
-	problem_submissions = Submission.query.filter_by(problem_id=problem.id).all()
-
-	for ps in problem_submissions:
-		for tcg in ps.test_case_groups:
-			for tc in tcg.test_cases:
-				db.session.delete(tc)
-
-			db.session.delete(tcg)
-
-		db.session.delete(ps)
-	
-	for tcg in problem.test_case_groups:
-		for tc in tcg.test_cases:
-			db.session.delete(tc)
-
-		db.session.delete(tcg)
-	
-	db.session.delete(problem)
-	db.session.commit()
+	handle_objects.delete_problem(problem)
 
 	return redirect(f"/admin/edit-problems/{contest_id}")
 
@@ -306,13 +296,8 @@ def delete_test_case_group(group):
 		return render_template("confirm-delete.html", type="test case group", text=group.id)
 	
 	problem_id = group.problem.id
-	group.problem.point_value -= group.point_value
-
-	for tc in group.test_cases:
-		db.session.delete(tc)
 	
-	db.session.delete(group)
-	db.session.commit()
+	handle_objects.delete_abstract_test_case_group(group)
 
 	return redirect(f"/admin/problems/{problem_id}")
 
@@ -364,7 +349,6 @@ def delete_test_case(test_case):
 	
 	problem_id = test_case.group.problem.id
 
-	db.session.delete(test_case)
-	db.session.commit()
+	handle_objects.delete_test_case()
 
 	return redirect(f"/admin/problems/{problem_id}")

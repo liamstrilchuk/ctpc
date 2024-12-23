@@ -52,7 +52,7 @@ def deploy():
 	bcrypt = Bcrypt()
 	user = User(
 		username="admin",
-		password=bcrypt.generate_password_hash(open("admin_password.txt", "r").read()),
+		password=bcrypt.generate_password_hash(open("admin_password.txt", "r").read().replace("\n", "")),
 		role_id=UserRole.query.filter_by(name="admin").first().id
 	)
 	db.session.add(user)
