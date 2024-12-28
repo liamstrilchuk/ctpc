@@ -1,4 +1,36 @@
 from models import *
+from util import generate_random_password
+from setup import bcrypt
+
+def add_student(username, role="student", school_id=None):
+	username_counter = 0
+	while True:
+		username_counter += 1
+		full_username = f"{username}{username_counter}"
+
+		if User.query.filter_by(username=full_username).first() is None:
+			break
+
+		if username_counter > 1000:
+			return None
+		
+	role = UserRole.query.filter_by(name=role).first()
+
+	if role is None:
+		return None
+	
+	password = generate_random_password()
+
+	user = User(
+		username=full_username,
+		password=bcrypt.generate_password_hash(password),
+		school_id=school_id,
+		role_id=role.id
+	)
+	db.session.add(user)
+	db.session.commit()
+
+	return user, password
 
 def add_school(name, school_board_id, competition_id):
 	school = School(name=name, school_board_id=school_board_id, competition_id=competition_id)

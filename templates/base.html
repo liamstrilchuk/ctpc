@@ -16,6 +16,7 @@
 			</div>
 			<div id="navbar-links">
 				{% if current_user.is_authenticated %}
+					<span>{{ current_user.username }}</span>
 					{% if current_user.role.name == "admin" %}
 						<a href="/admin">Admin</a>
 					{% endif %}

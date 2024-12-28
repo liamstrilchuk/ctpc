@@ -12,6 +12,11 @@
 				</span>
 				{% if contest.start_date > current_time %}
 					<span class="contest-status">Starts in <span class="duration">{{ contest.start_date - current_time }}</span></span>
+					{% if current_user.role.name == "admin" %}
+						<span>As an administrator, you can <a href="/contest/{{ contest.id }}">enter the contest early.</a></span>
+					{% elif current_user.role.name == "tester" %}
+						<span>As an tester, you can <a href="/contest/{{ contest.id }}">enter the contest early.</a></span>
+					{% endif %}
 				{% elif contest.end_date < current_time %}
 					<span class="contest-status">Complete</span>
 				{% else %}

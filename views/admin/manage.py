@@ -4,6 +4,7 @@ from flask_login import current_user
 from models import User, School, SchoolBoard, UserRole, db
 from util import admin_required, generate_random_password, check_object_exists
 from setup import bcrypt
+import handle_objects
 
 manage = Blueprint("manage", __name__, template_folder="templates")
 
@@ -103,16 +104,67 @@ def delete_board(board):
 
 @manage.route("/admin/delete-user/<string:username>", methods=["GET", "POST"])
 @admin_required
-def delete_user(username):
-	user = User.query.filter_by(username=username).first()
-
-	if user is None:
-		return redirect("/admin")
-	
+@check_object_exists(User, "/admin", key_name="username")
+def delete_user(user):
 	if request.method == "GET":
 		return render_template("confirm-delete.html", type="user", text=user.username)
 	
-	db.session.delete(user)
-	db.session.commit()
+	if user.username == "admin":
+		return redirect("/admin")
+	
+	handle_objects.delete_user(user)
 
 	return redirect("/admin")
+
+@manage.route("/admin/add-user", methods=["GET", "POST"])
+@admin_required
+def add_user():
+	if request.method == "GET":
+		return render_template("admin/add-user.html")
+	
+	username = request.form.get("username")
+	role = request.form.get("role")
+
+	if not username or not role in ["admin", "tester"]:
+		return render_template("admin/add-user.html", error="Invalid username or role")
+	
+	if User.query.filter_by(username=username).first() is not None:
+		return render_template("admin/add-user.html", error="Username already exists")
+	
+	try:
+		user, password = handle_objects.add_student(username, role=role)
+	except:
+		return render_template("admin/add-user.html", error="An error occurred when creating user")
+	
+	return render_template("user-created.html", username=user.username, password=password, admin_created=True)
+
+@manage.route("/admin/user-management")
+@admin_required
+def user_management():
+	return render_template("admin/user-management.html", users=User.query.all())
+
+@manage.route("/admin/assign-school/<username>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(User, "/admin", key_name="username")
+def assign_school(user):
+	if not user.role.name == "teacher":
+		return redirect("/admin")
+	
+	if request.method == "GET":
+		return render_template("admin/assign-school.html", username=user.username, schools=School.query.all())
+	
+	school = request.form.get("school")
+	obj = School.query.filter_by(id=school).first()
+
+	if not school == "unassign" and obj is None:
+		return render_template(
+			"admin/assign-school.html",
+			username=user.username,
+			schools=School.query.all(),
+			error="Could not find school"
+		)
+	
+	user.school_id = None if school == "unassign" else obj.id
+	db.session.commit()
+
+	return redirect("/admin/user-management")

@@ -66,28 +66,13 @@ def register_student():
 	if not first or not last:
 		return render_template("register-student.html", error="Please fill out all fields")
 
-	username = first[:3] + last[:5]
-	number = 1
+	username_start = first[:3] + last[:5]
+	try:
+		user, password = handle_objects.add_student(username_start, school_id=current_user.school_id)
+	except:
+		return render_template("register-student.html", error="An error occurred when registering user")
 
-	while True:
-		if User.query.filter_by(username=(username + str(number)).lower()).first() is None:
-			break
-
-		number += 1
-
-	username += str(number)
-
-	random_password = generate_random_password()
-	user = User(
-		username=username.lower(),
-		password=bcrypt.generate_password_hash(random_password),
-		school_id=current_user.school_id,
-		role_id=UserRole.query.filter_by(name="student").first().id
-	)
-	db.session.add(user)
-	db.session.commit()
-
-	return render_template("user-created.html", username=username.lower(), password=random_password)
+	return render_template("user-created.html", username=user.username, password=password)
 
 @teacher.route("/teacher/assign/<string:username>", methods=["GET", "POST"])
 @teacher_required

@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, redirect, request
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, login_user
 from time import time
-import requests, markdown
+import requests, markdown, re
 
 from models import AbstractTestCaseGroup, Competition, Contest, ContestType, LanguageType, Problem, Submission, SubmissionStatus, Team, TestCase, TestCaseGroup, TestCaseStatus, User, db
-from util import check_object_exists
+from util import check_object_exists, logout_required
+import handle_objects
 
 main = Blueprint("main", __name__, template_folder="templates")
 
@@ -30,10 +31,10 @@ def contests_view(competition):
 
 @main.route("/contest/<int:contest_id>")
 @login_required
-@check_object_exists(Contest, "/contests")
+@check_object_exists(Contest, "/competitions")
 def contest_view(contest):
-	if time() < contest.start_date:
-		return redirect("/contests")
+	if time() < contest.start_date and not current_user.role.name in ["admin", "tester"]:
+		return redirect("/competitions")
 
 	if contest.contest_type_id == ContestType.query.filter_by(name="individual").first().id or not current_user.team:
 		user_submissions = Submission.query \
@@ -71,10 +72,10 @@ def contest_view(contest):
 
 @main.route("/problem/<int:problem_id>")
 @login_required
-@check_object_exists(Problem, "/contests")
+@check_object_exists(Problem, "/competitions")
 def problem_view(problem):
-	if time() < problem.contest.start_date:
-		return redirect("/contests")
+	if time() < problem.contest.start_date and not current_user.role.name in ["admin", "tester"]:
+		return redirect("/competitions")
 	
 	sample_groups = AbstractTestCaseGroup.query.filter_by(problem_id=problem.id, is_sample=True).all()
 	languages = LanguageType.query.all()
@@ -85,10 +86,10 @@ def problem_view(problem):
 
 @main.route("/submit/<int:problem_id>", methods=["POST"])
 @login_required
-@check_object_exists(Problem, "/contests")
+@check_object_exists(Problem, "/competitions")
 def submit(problem):
-	if time() < problem.contest.start_date:
-		return redirect("/contests")
+	if time() < problem.contest.start_date and not current_user.role.name in ["admin", "tester"]:
+		return redirect("/competitions")
 	
 	language_id = request.form["language"]
 	code = request.form["code"]
@@ -160,6 +161,58 @@ def submission_view(submission):
 		return redirect("/")
 
 	return render_template("contest/submission.html", submission=submission, current_time=time())
+
+@main.route("/competitions/<competition_id>/register")
+@check_object_exists(Competition, "/competitions", key_name="short_name")
+def register(competition):
+	return render_template("register.html", competition=competition)
+
+@main.route("/competitions/<competition_id>/register/student", methods=["GET", "POST"])
+@check_object_exists(Competition, "/competitions", key_name="short_name")
+@logout_required
+def register_as_student(competition):
+	if request.method == "GET":
+		return render_template("register-as-student.html", competition=competition)
+	
+	first = request.form.get("first")
+	last = request.form.get("last")
+	password = request.form.get("password")
+	email = request.form.get("email")
+
+	return register_teacher_or_student(first, last, password, email, competition, "individual-student", "register-as-student.html")
+
+@main.route("/competitions/<competition_id>/register/teacher", methods=["GET", "POST"])
+@check_object_exists(Competition, "/competitions", key_name="short_name")
+@logout_required
+def register_as_teacher(competition):
+	if request.method == "GET":
+		return render_template("register-as-teacher.html", competition=competition)
+
+	first = request.form.get("first")
+	last = request.form.get("last")
+	password = request.form.get("password")
+	email = request.form.get("email")
+
+	return register_teacher_or_student(first, last, password, email, competition, "teacher", "register-as-teacher.html")
+
+def register_teacher_or_student(first, last, password, email, competition, role, template):
+	if not first or not last:
+		return render_template(template, competition=competition, error="Invalid name")
+
+	if not email or not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
+		return render_template(template, competition=competition, error="Invalid email")
+	
+	if not password or not len(password) >= 8:
+		return render_template(template, competition=competition, error="Password must be at least 8 characters")
+	
+	username_start = f"{first[:3]}{last[:5]}".lower()
+	try:
+		user, _ = handle_objects.add_student(username_start, role=role)
+	except Exception:
+		return render_template(template, competition=competition, error="An error occurred when registering")
+	
+	login_user(user)
+	return redirect(f"/competitions/{competition.name}")
 
 @main.route("/editor")
 def editor():

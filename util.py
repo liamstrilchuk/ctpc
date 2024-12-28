@@ -31,6 +31,17 @@ def admin_required(func):
 	
 	return wrapper
 
+def logout_required(func):
+	def wrapper(*args, **kwargs):
+		if current_user.is_authenticated:
+			return redirect("/")
+		
+		return func(*args, **kwargs)
+	
+	wrapper.__name__ = func.__name__
+
+	return wrapper
+
 def check_object_exists(classtype, redir_to, key_name="id"):
 	def decorator(func):
 		def wrapper(**kwargs):

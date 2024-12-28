@@ -1,0 +1,41 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a class="back" href="/admin">&larr; Back to admin</a>
+	<h1>User management</h1>
+	<div class="admin-controls">
+		<a href="/admin/add-user">Create admin or testing account</a>
+	</div>
+	<table>
+		<tr>
+			<th>Username</th>
+			<th>Role</th>
+			<th>School</th>
+			<th>Actions</th>
+		</tr>
+		{% for user in users %}
+			<tr>
+				<td>{{ user.username }}</td>
+				<td>
+					{{ user.role.name }}
+				</td>
+				<td>
+					{% if user.school and not user.role.name == "admin" %}
+						<a href="/admin/manage/{{ user.school.id }}">{{ user.school.name }}</a> ({{ user.school.competition.short_name }})
+					{% endif %}
+				</td>
+				<td>
+					{% if not user.username == "admin" %}
+						<a href="/admin/delete-user/{{ user.username }}">Delete</a>
+						&bull; <a href="/teacher/reset-password/{{ user.username }}">Reset password</a>
+					{% endif %}
+					{% if user.role.name == "teacher" and not user.school %}
+						&bull; <a href="/admin/assign-school/{{ user.username }}">Assign school</a>
+					{% elif user.role.name == "teacher" %}
+						&bull; <a href="/admin/assign-school/{{ user.username }}">Reassign</a>
+					{% endif %}
+				</td>
+			</tr>
+		{% endfor %}	
+	</table>
+{% endblock %}

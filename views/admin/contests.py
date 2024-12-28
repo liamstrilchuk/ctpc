@@ -122,7 +122,9 @@ def add_contest(competition):
 	if not name:
 		return render_template("admin/add-contest.html", error="Invalid name", contest_types=contest_types)
 	
-	if not point_multiplier or not point_multiplier.isnumeric():
+	try:
+		float(point_multiplier)
+	except:
 		return render_template("admin/add-contest.html", error="Invalid point multiplier", contest_types=contest_types)
 	
 	handle_objects.add_contest(
@@ -338,7 +340,7 @@ def edit_test_case(test_case):
 
 	db.session.commit()
 
-	return redirect(f"/admin/problems/{test_case.problem.id}")
+	return redirect(f"/admin/problems/{test_case.group.problem.id}")
 
 @contests.route("/admin/delete-test-case/<int:test_case_id>", methods=["GET", "POST"])
 @admin_required
@@ -349,6 +351,6 @@ def delete_test_case(test_case):
 	
 	problem_id = test_case.group.problem.id
 
-	handle_objects.delete_test_case()
+	handle_objects.delete_test_case(test_case)
 
 	return redirect(f"/admin/problems/{problem_id}")

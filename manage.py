@@ -29,7 +29,7 @@ def deploy():
 		status = SubmissionStatus(name=tcs)
 		db.session.add(status)
 
-	roles = ["admin", "teacher", "student"]
+	roles = ["admin", "teacher", "student", "individual-student", "tester"]
 
 	for role in roles:
 		user_role = UserRole(name=role)

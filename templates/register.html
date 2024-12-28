@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Register for the {{ competition.name }}</h1>
+	<a href="/competitions/{{ competition.short_name }}/register/teacher">Register as teacher</a>
+	<a href="/competitions/{{ competition.short_name }}/register/student">Register as student</a>
+{% endblock %}

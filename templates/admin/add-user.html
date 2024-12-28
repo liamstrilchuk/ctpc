@@ -1,0 +1,19 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/user-management">&larr; Back to user management</a>
+	<h1>Add admin or testing account</h1>
+	<form method="post">
+		<label for="username">Username</label>
+		<input name="username" required>
+		<label for="role">User type</label>
+		<select name="role">
+			<option value="admin">Admin</option>
+			<option value="tester">Tester</option>
+		</select>
+		<input type="submit">
+	</form>
+	{% if error %}
+		<p>{{ error }}</p>
+	{% endif %}
+{% endblock %}

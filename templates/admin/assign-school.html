@@ -1,0 +1,19 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/user-management">&larr; Back to user management</a>
+	<h1>Assign teacher to a school</h1>
+	<p>Select a school for {{ username }} to be assigned:</p>
+	<form method="post">
+		<select name="school">
+			<option value="unassign">Unassign</option>
+			{% for school in schools %}
+				<option value="{{ school.id }}">{{ school.name }} ({{ school.school_board.name }}, {{ school.competition.short_name }})</option>
+			{% endfor %}
+		</select>
+		<input type="submit">
+	</form>
+	{% if error %}
+		<p>{{ error }}</p>
+	{% endif %}
+{% endblock %}
