@@ -3,11 +3,15 @@
 {% block content %}
 	<a class="back" href="/admin/problems/{{ problem.id }}">&larr; Back to problem</a>
 	<h1>{% if test_case %}Edit{% else %}Add{% endif %} test case</h1>
-	<form method="post">
+	<form method="post" enctype="multipart/form-data">
 		<label for="input">Input</label>
 		<textarea id="input" name="input">{% if test_case %}{{ test_case.input }}{% endif %}</textarea>
+		<label for="inputfile">Or upload a file instead:</label>
+		<input type="file" name="inputfile">
 		<label for="output">Expected output</label>
 		<textarea id="output" name="output">{% if test_case %}{{ test_case.expected_output }}{% endif %}</textarea>
+		<label for="outputfile">Or upload a file instead:</label>
+		<input type="file" name="outputfile">
 		<input type="submit" value="{% if test_case %}Edit{% else %}Add{% endif %} test case">
 	</form>
 	{% if error %}
