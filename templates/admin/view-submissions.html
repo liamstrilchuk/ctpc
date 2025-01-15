@@ -1,0 +1,20 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/user-management">&larr; Back to user management</a>
+	<h1>View submissions for {{ user.username }}</h1>
+	<table>
+		<tr>
+			<th>Problem</th>
+			<th>Date</th>
+			<th>Link</th>
+		</tr>
+		{% for submission in user.submissions %}
+			<tr>
+				<td><a href="/problem/{{ submission.problem.id }}">{{ submission.problem.name }}</a></td>
+				<td class="unix-timestamp">{{ submission.timestamp }}</td>
+				<td><a href="/submission/{{ submission.id }}">View</a></td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock %}

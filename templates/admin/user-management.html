@@ -25,8 +25,9 @@
 					{% endif %}
 				</td>
 				<td>
+					<a href="/admin/view-submissions/{{ user.username }}">View submissions</a>
 					{% if not user.username == "admin" %}
-						<a href="/admin/delete-user/{{ user.username }}">Delete</a>
+						&bull; <a href="/admin/delete-user/{{ user.username }}">Delete</a>
 						&bull; <a href="/teacher/reset-password/{{ user.username }}">Reset password</a>
 					{% endif %}
 					{% if user.role.name == "teacher" and not user.school %}

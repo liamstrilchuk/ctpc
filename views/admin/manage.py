@@ -168,3 +168,9 @@ def assign_school(user):
 	db.session.commit()
 
 	return redirect("/admin/user-management")
+
+@manage.route("/admin/view-submissions/<username>")
+@admin_required
+@check_object_exists(User, "/admin", key_name="username")
+def view_submissions(user):
+	return render_template("admin/view-submissions.html", user=user)
