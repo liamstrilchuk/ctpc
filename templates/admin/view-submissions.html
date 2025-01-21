@@ -7,13 +7,19 @@
 		<tr>
 			<th>Problem</th>
 			<th>Date</th>
+			<th>Points earned</th>
 			<th>Link</th>
 		</tr>
 		{% for submission in user.submissions %}
 			<tr>
 				<td><a href="/problem/{{ submission.problem.id }}">{{ submission.problem.name }}</a></td>
 				<td class="unix-timestamp">{{ submission.timestamp }}</td>
+				<td>{{ submission.points_earned }}/{{ submission.problem.point_value }}</td>
 				<td><a href="/submission/{{ submission.id }}">View</a></td>
+			</tr>
+		{% else %}
+			<tr>
+				<td colspan="4">This user has not submitted any solutions.</td>
 			</tr>
 		{% endfor %}
 	</table>

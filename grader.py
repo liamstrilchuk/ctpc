@@ -1,6 +1,6 @@
 from fastapi import Request, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import threading, requests, math
+import threading, requests, math, json
 
 from grader_models import Submission, TestCase
 
@@ -46,7 +46,7 @@ def check_submissions():
 	for token in pending_testcases:
 		test_cases_by_grader[GRADER_URLS[pending_testcases[token].grader]].append(pending_testcases[token])
 
-	fetch_url = "/submissions/batch?fields=stdout,time,memory,stderr,token,compile_output,message,status&base64_encoded=false&tokens="
+	fetch_url = "/submissions/batch?fields=stdout,time,memory,stderr,token,compile_output,message,status&base64_encoded=true&tokens="
 
 	for grader in test_cases_by_grader:
 		if len(test_cases_by_grader[grader]) == 0:
@@ -153,10 +153,21 @@ async def get_submission_statuses(request: Request):
 
 @app.get("/status")
 def status():
+	workers_status = []
+
+	for worker in GRADER_URLS:
+		response = json.loads(requests.get(worker + "/workers").content)
+
+		workers_status.append({
+			"path": worker,
+			"queue": response[0]["size"]
+		})
+
 	return {
 		"pending_testcases": len(pending_testcases),
 		"current_submissions": len(current_submissions),
-		"total_submissions": total_submissions
+		"total_submissions": total_submissions,
+		"workers": workers_status
 	}
 
 @app.post("/cancel-all")
