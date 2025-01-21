@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect
 from flask_login import current_user
+import time, json, requests
 
-from models import User, School, SchoolBoard, UserRole, db
+from models import SubmissionStatus, User, School, SchoolBoard, UserRole, Submission, db
 from util import admin_required, generate_random_password, check_object_exists
 from setup import bcrypt
 import handle_objects
@@ -174,3 +175,65 @@ def assign_school(user):
 @check_object_exists(User, "/admin", key_name="username")
 def view_submissions(user):
 	return render_template("admin/view-submissions.html", user=user)
+
+@manage.route("/admin/view-recent-submissions/<int:timeframe>")
+@admin_required
+def view_recent_submissions(timeframe):
+	recent = Submission.query \
+		.join(SubmissionStatus) \
+		.filter((Submission.timestamp >= time.time() - timeframe) | (SubmissionStatus.name == "Pending")) \
+		.all()
+
+	try:
+		grader_response = json.loads(requests.get("http://127.0.0.1:8000/status").content)
+	except Exception as e:
+		print(e)
+		grader_response = None
+
+	return render_template(
+		"admin/view-recent-submissions.html",
+		submissions=recent,
+		timeframe=timeframe,
+		grader_response=grader_response
+	)
+
+@manage.route("/admin/resubmit-pending-submissions")
+@admin_required
+def resubmit_pending_submissions():
+	requests.post("http://127.0.0.1:8000/cancel-all")
+
+	pending_submissions = Submission.query \
+		.join(SubmissionStatus) \
+		.filter(SubmissionStatus.name == "Pending") \
+		.all()
+	
+	for sub in pending_submissions:
+		all_testcases = []
+		for tcg in sub.test_case_groups:
+			for tc in tcg.test_cases:
+				all_testcases.append({
+					"input": tc.abstract_test_case.input,
+					"expected_output": tc.abstract_test_case.expected_output,
+					"id": tc.id
+				})
+			
+		json_to_grader = {
+			"code": sub.code,
+			"testcases": all_testcases,
+			"language": sub.language.grader_id,
+			"submission_id": sub.id
+		}
+
+		requests.post("http://127.0.0.1:8000/create-submission", json=json_to_grader)
+
+	return redirect("/admin/view-recent-submissions/900")
+
+@manage.route("/admin/delete-submission/<int:submission_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(Submission, "/admin/view-recent-submissions/900")
+def delete_submission(submission):
+	if request.method == "GET":
+		return render_template("confirm-delete.html", type="submission", text=f"id={submission.id} by {submission.user.username}")
+	
+	handle_objects.delete_submission(submission)
+	return redirect("/admin/view-recent-submissions/900")

@@ -159,4 +159,13 @@ def status():
 		"total_submissions": total_submissions
 	}
 
+@app.post("/cancel-all")
+def cancel_all():
+	global pending_testcases, current_submissions
+
+	pending_testcases = {}
+	current_submissions = {}
+
+	return status()
+
 setup_thread()

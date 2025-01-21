@@ -1,0 +1,48 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a class="back" href="/admin">&larr; Back to admin</a>
+	<h1>View recent or pending submissions (last {{ (timeframe / 60)|round(1) }} minutes)</h1>
+	<div class="admin-controls">
+		<a href="/admin/view-recent-submissions/60">Last minute</a>
+		<a href="/admin/view-recent-submissions/900">Last 15 minutes</a>
+		<a href="/admin/view-recent-submissions/3600">Last hour</a>
+		<a href="/admin/view-recent-submissions/21600">Last six hours</a>
+		<a href="/admin/view-recent-submissions/86400">Last day</a>
+		<a href="/admin/resubmit-pending-submissions">Resubmit pending submissions</a>
+	</div>
+	<table>
+		<tr>
+			<th>User</th>
+			<th>Problem</th>
+			<th>Time</th>
+			<th>Status</th>
+			<th>Tools</th>
+		</tr>
+		{% for sub in submissions %}
+			<tr>
+				<td><a href="/admin/view-submissions/{{ sub.user.username }}">{{ sub.user.username }}</a></td>
+				<td><a href="/problem/{{ sub.problem.id }}">{{ sub.problem.name }}</a></td>
+				<td class="unix-timestamp">{{ sub.timestamp }}</td>
+				<td>{{ sub.status.name }}</td>
+				<td><a href="/submission/{{ sub.id }}">View</a> &bull; <a href="/admin/delete-submission/{{ sub.id }}">Delete</a></td>
+			</tr>
+		{% else %}
+			<tr>
+				<td colspan="5">
+					There are no pending or recent submissions.
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+	<h1>Grader status</h1>
+	{% if not grader_response %}
+		<p>There was an error when contacting the grader and the status could not be retrieved.</p>
+	{% else %}
+		<ul>
+			<li>Current submissions: {{ grader_response["current_submissions"] }}</li>
+			<li>Pending testcases: {{ grader_response["pending_testcases"] }}</li>
+			<li>Number of submissions since last restart: {{ grader_response["total_submissions"] }}</li>
+		</ul>
+	{% endif %}
+{% endblock %}
