@@ -95,6 +95,7 @@ def submit(problem):
 	
 	last_user_submission = Submission.query \
 		.filter_by(user_id=current_user.id) \
+		.filter_by(is_practice=False) \
 		.order_by(Submission.timestamp.desc()) \
 		.first()
 	
