@@ -9,8 +9,12 @@
 	<table>
 		{% for tcg in submission.test_case_groups %}
 			<tr class="dark-row">
-				<th {% if tcg.abstract_group.point_value == 0 %}colspan="2"{% endif %}>{% if tcg.abstract_group.is_sample %}Sample subtask{% else %}Subtask{% endif %} {{ loop.index }}</th>
-				{% if tcg.abstract_group.point_value > 0 %}<th>{{ tcg.points_earned }}/{{ tcg.abstract_group.point_value }}</th>{% endif %}
+				{% if not submission.is_practice %}
+					<th {% if tcg.abstract_group.point_value == 0 %}colspan="2"{% endif %}>{% if tcg.abstract_group.is_sample %}Sample subtask{% else %}Subtask{% endif %} {{ loop.index }}</th>
+					{% if tcg.abstract_group.point_value > 0 %}<th>{{ tcg.points_earned }}/{{ tcg.abstract_group.point_value }}</th>{% endif %}
+				{% else %}
+					<th colspan="2">Subtask {{ loop.index }}</th>
+				{% endif%}
 			</tr>
 			{% for tc in tcg.test_cases %}
 				<tr class="light-row">

@@ -39,7 +39,7 @@ def check_submissions():
 				if tc.status_id == pending_status:
 					all_completed = False
 
-			if all_correct:
+			if all_correct and not ps.is_practice:
 				total_points += tcg.abstract_group.point_value
 				tcg.points_earned = tcg.abstract_group.point_value
 

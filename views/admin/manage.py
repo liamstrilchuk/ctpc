@@ -182,6 +182,7 @@ def view_recent_submissions(timeframe):
 	recent = Submission.query \
 		.join(SubmissionStatus) \
 		.filter((Submission.timestamp >= time.time() - timeframe) | (SubmissionStatus.name == "Pending")) \
+		.order_by(Submission.timestamp.desc()) \
 		.all()
 
 	try:
@@ -208,6 +209,9 @@ def resubmit_pending_submissions():
 		.all()
 	
 	for sub in pending_submissions:
+		if sub.is_practice:
+			continue
+
 		all_testcases = []
 		for tcg in sub.test_case_groups:
 			for tc in tcg.test_cases:

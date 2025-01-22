@@ -134,6 +134,7 @@ class Submission(db.Model):
 	timestamp = sa.Column(sa.Integer, nullable=False)
 	status_id = sa.Column(sa.Integer, sa.ForeignKey("submission_statuses.id"), nullable=False)
 	points_earned = sa.Column(sa.Integer, default=0)
+	is_practice = sa.Column(sa.Boolean, default=False)
 	
 	def __repr__(self):
 		return f"<Submission {self.id}>"
@@ -143,7 +144,7 @@ class TestCase(db.Model):
 
 	id = sa.Column(sa.Integer, primary_key=True)
 	output = sa.Column(sa.String(200), default="")
-	abstract_test_case_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_cases.id"), nullable=False)
+	abstract_test_case_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_cases.id"), nullable=True)
 	status_id = sa.Column(sa.Integer, sa.ForeignKey("test_case_statuses.id"), nullable=False)
 	group_id = sa.Column(sa.Integer, sa.ForeignKey("test_case_groups.id"), nullable=False)
 	
@@ -167,7 +168,7 @@ class TestCaseGroup(db.Model):
 	__tablename__ = "test_case_groups"
 
 	id = sa.Column(sa.Integer, primary_key=True)
-	abstract_group_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_case_groups.id"), nullable=False)
+	abstract_group_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_case_groups.id"), nullable=True)
 	test_cases = db.relationship("TestCase", backref="group", lazy=True)
 	points_earned = sa.Column(sa.Integer, default=0)
 	submission_id = sa.Column(sa.Integer, sa.ForeignKey("submissions.id"), nullable=False)

@@ -3,40 +3,58 @@
 {% block head %}
 	<script src="{{ url_for('static', filename='js/ace.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/ext-language_tools.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/theme-one_dark.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/mode-python.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/mode-java.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/mode-c_cpp.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/editor.js') }}"></script>
 
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 {% endblock %}
 
 {% block content %}
 	<div class="editor-container">
-		<div id="code-editor"></div>
-		<div id="editor-controls">
-			<div id="editor-controls-top">
-				<div>
-					<select id="problem-selector" autocomplete="off">
-						<option value="" selected="selected">Select a problem</option>
-						{% for problem in problems %}
-							<option value="{{ problem.id }}">{{ problem.name }}</option>
-						{% endfor %}
-					</select>
-					<select id="language-selector">
-						{% for language in languages %}
-							<option value="{{ language.short_name }}">{{ language.name }}</option>
-						{% endfor %}
-					</select>
+		<div id="ace-container">
+			<div class="controls-top">
+				<div class="controls-top-section">
+					<a href="/problem/{{ problem.id }}"><div><span class="fa fa-arrow-left editor-icon"></span> Back to problem</div></a>
+					<div class="selected"><span class="fa fa-code editor-icon"></span> Code</div>
 				</div>
-				<div>
-					<button class="run-button">Run</button>
-					<button class="submit-button">Submit</button>
+				<div class="controls-top-section">
+					<div class="select-div">
+						<select id="language-selector">
+							{% for lang in languages %}
+								<option value="{{ lang.short_name }}">{{ lang.name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+					<div class="editor-icon-small-container" title="Editor settings" id="select-settings">
+						<span class="fa fa-gear editor-icon editor-icon-small"></span>
+					</div>
 				</div>
 			</div>
-			<div id="test-case-container">
-				
-			</div>
-			<div id="test-case-editor">
-				<button>Add custom test case</button>
+			<div id="code-editor"></div>
+		</div>
+		<div id="width-changer"></div>
+		<div id="editor-controls-container">
+			<div id="editor-controls">
+				<div class="controls-top">
+					<div class="controls-top-section">
+						<div id="select-problem" class="selected"><span class="fa fa-file-lines editor-icon"></span> Problem</div>
+						<div id="select-test-cases"><span class="fa fa-list-ul editor-icon"></span> Test Cases</div>
+						<div id="select-submissions"><span class="fa fa-file-contract editor-icon"></span> Submissions</div>
+					</div>
+					<div class="controls-top-section">
+						<div class="editor-icon-small-container" title="Run sample test cases" id="run-sample-test-cases">
+							<span class="fa fa-play editor-icon editor-icon-small"></span>
+						</div>
+						<div class="editor-icon-small-container" title="Submit solution" id="submit-solution">
+							<span class="fa fa-arrow-right editor-icon editor-icon-small"></span>
+						</div>
+					</div>
+				</div>
+				<div id="editor-controls-content"></div>
 			</div>
 		</div>
 	</div>

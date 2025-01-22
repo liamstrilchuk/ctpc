@@ -25,7 +25,7 @@
 				<td><a href="/admin/view-submissions/{{ sub.user.username }}">{{ sub.user.username }}</a></td>
 				<td><a href="/problem/{{ sub.problem.id }}">{{ sub.problem.name }}</a></td>
 				<td class="unix-timestamp">{{ sub.timestamp }}</td>
-				<td>{{ sub.points_earned }}/{{ sub.problem.point_value }}</td>
+				<td>{% if sub.is_practice %}Practice{% else %}{{ sub.points_earned }}/{{ sub.problem.point_value }}{% endif %}</td>
 				<td>{{ sub.status.name }}</td>
 				<td><a href="/submission/{{ sub.id }}">View</a> &bull; <a href="/admin/delete-submission/{{ sub.id }}">Delete</a></td>
 			</tr>

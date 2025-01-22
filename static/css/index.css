@@ -1,3 +1,7 @@
+* {
+	box-sizing: border-box;
+}
+
 html, body {
 	width: 100%;
 	margin: 0;
@@ -5,6 +9,7 @@ html, body {
 	background: rgb(20, 20, 30);
 	font-family: sans-serif;
 	scroll-behavior: smooth;
+	min-height: 100vh;
 }
 
 a {
@@ -16,6 +21,7 @@ a {
 	color: white;
 	max-width: 1200px;
 	margin: auto;
+	min-height: calc(100vh - 60px);
 }
 
 #landing-image {
@@ -67,12 +73,12 @@ a {
 	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: 2;
+	z-index: 20;
 	display: flex;
 	align-items: center;
 	padding: 0 50px;
 	justify-content: space-between;
-	width: calc(100% - 100px);
+	width: 100%;
 	height: 60px;
 	backdrop-filter: blur(5px);
 	background: rgb(10, 10, 20);
@@ -371,4 +377,15 @@ code {
 #content h1 {
 	border-bottom: 1px solid white;
 	margin: 10px 0;
+}
+
+.open-in-editor {
+	display: block;
+	margin-top: 20px;
+	padding: 10px 20px;
+	text-decoration: none;
+	width: max-content;
+	background: #334;
+	border-radius: 5px;
+	color: #cce;
 }

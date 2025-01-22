@@ -21,6 +21,7 @@
 			{% endfor %}
 		{% endfor %}
 	{% endif %}
+	<a class="open-in-editor" href="/editor/{{ problem.id }}">Open problem in editor</a>
 	<h2>Submit solution</h2>
 	<form method="post" action="/submit/{{ problem.id }}">
 		<label for="code">Code</label>
