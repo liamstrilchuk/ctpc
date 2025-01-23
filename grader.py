@@ -70,16 +70,25 @@ def check_submissions():
 					if "stdout" in tc and tc["stdout"] is not None:
 						pending_testcases[tc["token"]].output = tc["stdout"][:100] + ("..." if len(tc["stdout"]) > 100 else "")
 
+					next = pending_testcases[tc["token"]].next_testcase
+					if new_status == "Accepted":
+						if next is not None:
+							run_test_cases(next.submission, [next])
+					else:
+						while next is not None:
+							next.status = "Not Run"
+							next = next.next_testcase
+
 					del pending_testcases[tc["token"]]
 
 	setup_thread()
 
-def run_test_cases(submission: Submission):
+def run_test_cases(submission, test_cases):
 	global current_grader
 
 	to_submit = { "submissions": [] }
 
-	for test_case in submission.test_cases:
+	for test_case in test_cases:
 		to_submit["submissions"].append({
 			"language_id": submission.language_id,
 			"source_code": submission.code,
@@ -91,9 +100,9 @@ def run_test_cases(submission: Submission):
 	response = response.json()
 
 	for i in range(len(response)):
-		submission.test_cases[i].grader = current_grader
-		submission.test_cases[i].grader_token = response[i]["token"]
-		pending_testcases[response[i]["token"]] = submission.test_cases[i]
+		test_cases[i].grader = current_grader
+		test_cases[i].grader_token = response[i]["token"]
+		pending_testcases[response[i]["token"]] = test_cases[i]
 
 	current_grader = (current_grader + 1) % len(GRADER_URLS)
 
@@ -113,17 +122,31 @@ async def create_submission(request: Request):
 	if not "submission_id" in data:
 		return { "error": "No submission id provided" }
 	
-	submission = Submission(code=data["code"], language_id=data["language"], id=data["submission_id"])
+	if not "run_all" in data or not type(data["run_all"]) == bool:
+		return { "error": "run_all not specified" }
 	
-	for tc in data["testcases"]:
-		if not "input" in tc or not "expected_output" in tc or not "id" in tc:
-			return { "error": "Test case does not have expected fields" }
-		
-		test_case = TestCase(input=tc["input"], expected_output=tc["expected_output"], id=tc["id"])
-		submission.add_test_case(test_case)
+	submission = Submission(code=data["code"], language_id=data["language"], id=data["submission_id"])
+	run_immediately = []
+	
+	for tcg in data["testcases"]:
+		prev_tc = None
+		for i in range(len(tcg)):
+			tc = tcg[i]
+			if not "input" in tc or not "expected_output" in tc or not "id" in tc:
+				return { "error": "Test case does not have expected fields" }
+			
+			test_case = TestCase(submission, input=tc["input"], expected_output=tc["expected_output"], id=tc["id"])
+			submission.add_test_case(test_case)
+
+			if prev_tc is not None and not data["run_all"]:
+				prev_tc.next_testcase = test_case
+			else:
+				run_immediately.append(test_case)
+
+			prev_tc = test_case
 
 	current_submissions[submission.id] = submission
-	run_test_cases(submission)
+	run_test_cases(submission, run_immediately)
 
 	global total_submissions
 	total_submissions += 1

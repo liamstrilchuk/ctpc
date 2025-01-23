@@ -17,6 +17,8 @@ window.addEventListener("load", async function() {
 	editor.session.setMode(aceModes["py"]);
 	editor.setTheme("ace/theme/one_dark");
 	editor.setShowPrintMargin(false);
+	editor.container.style.lineHeight = 1.4;
+	editor.renderer.updateFontSize();
 
 	const rawContent = await fetch("/api/problem/" + problemId);
 	const problem = (await rawContent.json());
@@ -388,13 +390,20 @@ function updateSubmissionStatus(index) {
 			statusElem.innerHTML = "";
 
 			allDone = allDone && tc.status !== "Pending";
-			
-			if (tc.status === "Pending") {
-				statusElem.appendChild(createLoadingIcon(16, "#880", "#ff0"));
-			} else if (tc.status === "Accepted") {
-				statusElem.innerHTML = `<div class="test-case-status-circle" style="background: green;"></div>`;
-			} else {
-				statusElem.innerHTML = `<div class="test-case-status-desc">${tc.status}</div><div class="test-case-status-circle" style="background: red;"></div>`;
+
+			switch (tc.status) {
+				case "Pending":
+					statusElem.appendChild(createLoadingIcon(16, "#880", "#ff0"));
+					break;
+				case "Accepted":
+					statusElem.innerHTML = `<div class="test-case-status-circle" style="background: green;"></div>`;
+					break;
+				case "Not Run":
+					statusElem.innerHTML = `<div class="test-case-status-desc">${tc.status}</div><div class="test-case-status-circle" style="background: grey;"></div>`;
+					break;
+				default:
+					statusElem.innerHTML = `<div class="test-case-status-desc">${tc.status}</div><div class="test-case-status-circle" style="background: red;"></div>`;
+					break;
 			}
 		}
 

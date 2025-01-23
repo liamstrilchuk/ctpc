@@ -13,6 +13,7 @@ class User(UserMixin, db.Model):
 	role_id = sa.Column(sa.Integer, sa.ForeignKey("user_roles.id"), nullable=False)
 	team_id = sa.Column(sa.Integer, sa.ForeignKey("teams.id"), nullable=True)
 	school_id = sa.Column(sa.Integer, sa.ForeignKey("schools.id"), nullable=True)
+	email = sa.Column(sa.String(100), nullable=True, default="")
 	submissions = db.relationship("Submission", backref="user", lazy=True)
 	
 	def __repr__(self):

@@ -79,7 +79,10 @@ def get_submissions(problem):
 			"points_earned": sub.points_earned,
 			"point_value": sub.problem.point_value,
 			"language": sub.language.name,
-			"id": sub.id
+			"id": sub.id,
+			"user": sub.user.username,
+			"submitted_by_current_user": sub.user == current_user,
+			"team_problem": sub.problem.contest.contest_type.name == "team"
 		})
 
 	return cleaned_submissions

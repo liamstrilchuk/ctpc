@@ -6,7 +6,7 @@ html, body {
 	width: 100%;
 	margin: 0;
 	box-sizing: border-box;
-	background: rgb(20, 20, 30);
+	background: #21242b;
 	font-family: sans-serif;
 	scroll-behavior: smooth;
 	min-height: 100vh;
@@ -81,7 +81,7 @@ a {
 	width: 100%;
 	height: 60px;
 	backdrop-filter: blur(5px);
-	background: rgb(10, 10, 20);
+	background: #1a1c20;
 }
 
 #navbar-year {
@@ -271,7 +271,7 @@ form * {
 form input, form select, form textarea {
 	padding: 8px 15px;
 	margin: 5px 0 10px 0;
-	background: #20202a;
+	background: #323740;
 	border-radius: 5px;
 	color: white;
 	outline: none !important;
@@ -290,11 +290,11 @@ form input[type=submit] {
 }
 
 tr:nth-child(even) {
-	background-color: #20202a;
+	background-color: #30303d;
 }
 
 tr:nth-child(odd) {
-	background-color: #29293a;
+	background-color: #3a3a4d;
 }
 
 td, th {
@@ -331,21 +331,21 @@ td, th {
 }
 
 .sample-test-case > div {
-	background: #111;
+	background: #1d1e20;
 	padding: 5px 15px;
 	border-bottom: 1px solid #333;
 }
 
 .sample-test-case > div:hover {
-	background: #3a3a3a;
+	background: #202124;
 }
 
 .sample-test-case > div:nth-child(odd) {
-	background: #222;
+	background: #313339;
 }
 
 .sample-test-case > div:nth-child(odd):hover {
-	background: #383838;
+	background: rgb(51, 53, 59);
 }
 
 .test-case-data > pre {
@@ -361,7 +361,7 @@ textarea {
 
 .submission-code {
 	font-family: monospace;
-	background: #20202a;
+	background: #31313f;
 	font-size: 1.1em;
 	padding: 10px;
 }

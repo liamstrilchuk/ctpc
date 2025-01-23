@@ -9,11 +9,13 @@ class Submission:
 		self.test_cases.append(test_case)
 
 class TestCase:
-	def __init__(self, id="", input="", expected_output=""):
+	def __init__(self, submission, id="", input="", expected_output=""):
 		self.id = id
+		self.submission = submission
 		self.input = input
 		self.expected_output = expected_output
 		self.output = ""
 		self.grader = 0
 		self.grader_token = ""
 		self.status = "Pending"
+		self.next_testcase = None

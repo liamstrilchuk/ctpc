@@ -124,7 +124,7 @@ def submit(problem):
 	db.session.add(submission)
 	db.session.commit()
 
-	all_testcases = []
+	all_groups = []
 
 	for tcg in problem.test_case_groups:
 		test_case_group = TestCaseGroup(
@@ -135,6 +135,8 @@ def submit(problem):
 		db.session.add(test_case_group)
 		db.session.commit()
 
+		all_groups.append([])
+
 		for tc in tcg.test_cases:
 			test_case = TestCase(
 				abstract_test_case_id=tc.id,
@@ -143,23 +145,21 @@ def submit(problem):
 			)
 
 			db.session.add(test_case)
-			all_testcases.append(test_case)
+			db.session.commit()
 
-		db.session.commit()
+			all_groups[-1].append({
+				"input": test_case.abstract_test_case.input,
+				"expected_output": test_case.abstract_test_case.expected_output,
+				"id": test_case.id
+			})
 
-	all_testcases = [
-		{
-			"input": tc.abstract_test_case.input,
-			"expected_output": tc.abstract_test_case.expected_output,
-			"id": tc.id
-		} for tc in all_testcases
-	]
 
 	json_to_grader = {
 		"code": submission.code,
-		"testcases": all_testcases,
+		"testcases": all_groups,
 		"language": language.grader_id,
-		"submission_id": submission.id
+		"submission_id": submission.id,
+		"run_all": False
 	}
 
 	requests.post("http://127.0.0.1:8000/create-submission", json=json_to_grader)
@@ -221,9 +221,10 @@ def submit_practice(problem):
 
 		json_to_grader = {
 			"code": code,
-			"testcases": send_to_grader,
+			"testcases": [send_to_grader],
 			"language": language.grader_id,
-			"submission_id": submission.id
+			"submission_id": submission.id,
+			"run_all": True
 		}
 
 		response = requests.post("http://127.0.0.1:8000/create-submission", json=json_to_grader)
