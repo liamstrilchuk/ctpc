@@ -1,112 +1,158 @@
-{% extends "base.html" %}
-
-{% block head %}
-	<style>
-		#navbar-margin {
-			margin: 0 !important;
-		}
-
-		#landing-image::before {
-			background-image: url("{{ url_for('static', filename='images/joan-gamell-ZS67i1HLllo-unsplash.jpg') }}");
-		}
-
-		#navbar {
-			background: transparent !important;
-		}
-
-		#content {
-			padding: 0 !important;
-			max-width: none !important;
-		}
-
-		h1 {
-			border: none !important;
-		}
-	</style>
-{% endblock %}
-
-{% block content %}
-	<div id="landing-image">
-		<div id="landing-content">
-			<h1>Canadian Team Programming Competition</h1>
-			<div>
-				<a href="#about-competition">About the competition &rarr;</a>
-				<a href="#register">Register &rarr;</a>
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+		<link rel="icon" href="{{ url_for('static', filename='images/favicon.ico' )}}">
+		<script src="{{ url_for('static', filename='js/homepage.js') }}"></script>
+		<title>Canadian Team Programming Competition</title>
+	</head>
+	<body>
+		<div id="navbar-side">
+			<h1>CTPC</h1>
+			<a href="/competitions/2025"><b>2025</b></a>
+			<a href="#about">About the competition</a>
+			<a href="#faq">Frequently asked questions</a>
+			<a href="#register" class="navbar-link-spacing">Register</a>
+			<a href="/login">Login</a>
+			<a class="navbar-link-spacing"><b>Contact us</b></a>
+			<a href="mailto:launch@ctpc.ca">launch@ctpc.ca</a>
+			<div id="navbar-close-icon">
+				<span class="fa fa-close"></span>
 			</div>
 		</div>
-	</div>
-	<div class="section-container">
-		<div class="section">
-			<div class="text-image-holder">
-				<div class="section-text">
-					<h1 id="about-competition">About the competition</h1>
-					<p>The CTPC (Canadian Team Programming Competition) is a team computing contest, open to all high school students in Canada, where teams compete both remotely and in-person. This contest is for students familiar with computing to test their skills in a fun and challenging environment. This will be a nonprofit event that is free for all participants, to make it accessible to everybody. Teams can have up to four students.</p>
-					<p>The contest consists of two stages. The first stage is an individual portion, where each participant will attempt to solve four problems without help from the rest of their team. The second stage is a team problem solving event, where teams are allowed to collaborate and work together to solve twelve problems.</p>
-					<p>The problems in this contest are designed similarly to problems in other computing competitions, testing a wide range of skills, from executing basic operations in code and working with different data types to more advanced topics such as dynamic programming and graph traversal algorithms. The difficulty range of problems is large enough to best accommodate students of any skill level.</p>
-					<p>The date and venue of the 2025 competition have not yet been decided. This page will be updated as these become available.</p>
-				</div>
-				<div class="section-image">
-					<img src="{{ url_for('static', filename='images/wrcc.jpg') }}">
+		<div id="background">
+			<div class="img-container">
+				<img src="/static/images/homepage/sky_small.png">
+				<img src="/static/images/homepage/swirls_small.png">
+				<img src="/static/images/homepage/mountain_bg.png">
+				<img src="/static/images/homepage/mountains.png">
+				<img src="/static/images/homepage/small_planets.png">
+				<img src="/static/images/homepage/planet.png" id="planet">
+				<div class="content">
+					<div id="navbar">
+						<div>
+							<img src="/static/images/homepage/ctpclogo.png" id="logo">
+							<a href="/competitions/2025">2025</a>
+						</div>
+						<div>
+							<a href="/login">Login</a>
+							<a href="#register">Register</a>
+							<span class="fa fa-bars" id="hamburger-icon"></span>
+						</div>
+					</div>
+					<div id="main-text-container">
+						<h1 id="main-text">Canadian Team<br>Programming Competition</h1>
+						<a href="#about"><button class="register-button first-button" style="margin-right: 15px;">Learn more&nbsp;&nbsp;&rarr;</button></a>
+						<a href="#register"><button class="register-button second-button">Register&nbsp;&nbsp;&rarr;</button></a>
+					</div>
+					<div id="about" class="section">
+						<h1>About the competition</h1>
+						<p>The Canadian Team Programming Competition is an event designed to challenge and showcase participants' skills in data structures and algorithms through both individual and team-based problem-solving. The contest features a variety of coding challenges that span diverse topics and difficulty levels, ensuring accessibility and engagement for participants of all experience levels.</p>
+						<p>Participants can choose to compete virtually or attend the in-person event, which offers additional perks such as complimentary meals, an inspiring keynote address from a guest speaker, and networking opportunities with leading companies in the tech industry. The contest is completely free to enter, and top-performing teams will receive monetary prizes in recognition of their achievements.</p>
+					</div>
+					<div id="numbers" class="section">
+						<div class="numbers-section" id="ns1">
+							<div class="numbers-section-header">344</div>
+							<div class="numbers-section-text">Students participated in the 2023 contest</div>
+						</div>
+						<div class="numbers-section" id="ns2">
+							<div class="numbers-section-header">90</div>
+							<div class="numbers-section-text">Teams took part in the 2023 contest</div>
+						</div>
+						<div class="numbers-section" id="ns3">
+							<div class="numbers-section-header">28</div>
+							<div class="numbers-section-text">Schools across Ontario participated in the 2023 contest</div>
+						</div>
+					</div>
+					<div id="register" class="section">
+						<h1>Register</h1>
+						<p>Registration for the 2025 competition <b>will open shortly</b>.</p>
+						<p>If you are a high school teacher, you can register as many students as you would like for the official competition through our website. All students in the official competition will participate on the same day, and will be eligible for prizes.</p>
+						<p>Any students who wish to participate individually can do so at a time of their choosing after the official contest has ended. However, they will not be eligible for prizes or leaderboards.</p>
+					</div>
+					<div id="bottom-content">
+						<div id="bottom-content-width">
+							<div class="section" id="faq">
+								<h1 id="faq-header">Frequently asked questions</h1>
+								<h1 id="faq-alt-header">FAQ</h1>
+								<div id="faq-section-container">
+									<div class="faq-column">
+										<div class="faq-section faq-active-section">
+											<div class="faq-section-header">
+												<div class="faq-section-header-text">
+													What skill level is necessary to participate?
+												</div>
+												<div class="faq-section-header-icon">
+													<span class="fa fa-chevron-up"></span>
+												</div>
+											</div>
+											<div class="faq-section-content">
+												<p>The problems in the competition are intended to be able to be solved by a wide range of skill levels, from beginner to advanced. To get an idea of what the problems will be like, please see our sample problem set.</p>
+											</div>
+										</div>
+										<div class="faq-section faq-active-section">
+											<div class="faq-section-header">
+												<div class="faq-section-header-text">
+													What is the format of the competition?
+												</div>
+												<div class="faq-section-header-icon">
+													<span class="fa fa-chevron-up"></span>
+												</div>
+											</div>
+											<div class="faq-section-content">
+												<p>The competition will consist of two stages: an individual portion, lasting one hour and consisting of four questions, and a team portion, lasting two hours and consisting of twelve questions.</p>
+											</div>
+										</div>
+									</div>
+									<div class="faq-column">
+										<div class="faq-section faq-active-section">
+											<div class="faq-section-header">
+												<div class="faq-section-header-text">
+													What are the rules of the contest?
+												</div>
+												<div class="faq-section-header-icon">
+													<span class="fa fa-chevron-up"></span>
+												</div>
+											</div>
+											<div class="faq-section-content">
+												<p>To ensure the contest is fair for everyone, some rules have been put in place:</p>
+												<ul>
+													<li>During the individual portion of the event, collaboration with others is not allowed. During the team portion, participants may discuss the problems only with their team members.</li>
+													<li>Use of generative AI models (for example, ChatGPT, Claude, and GitHub Copilot) is not allowed.</li>
+													<li>During the contest, the only websites that may be accessed are: a code editor of each participant's choice, and the official documentation for the language they are using.</li>
+												</ul>
+											</div>
+										</div>
+										<div class="faq-section faq-active-section">
+											<div class="faq-section-header">
+												<div class="faq-section-header-text">
+													What's the difference between in-person and virtual?
+												</div>
+												<div class="faq-section-header-icon">
+													<span class="fa fa-chevron-up"></span>
+												</div>
+											</div>
+											<div class="faq-section-content">
+												<p>Both in-person and virtual participants will take part on the same day. To allow more flexibility, online participants will be able to start the contest at a time of their choosing, while the in-person event will follow a schedule.</p>
+												<p>In-person participants will also have the opportunity to take part in additional activities, including presentations and networking.</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="contact">
+							<h1>Contact us</h1>
+							<a href="mailto:launch@ctpc.ca">launch@ctpc.ca</a>
+							<span>&copy; 2025 CTPC organizers</span>
+						</div>
+						<img src="/static/images/homepage/subplanet_flag.png" id="subplanet">
+					</div>
 				</div>
 			</div>
-		</div>	
-	</div>
-	<div class="section-container">
-		<div class="section">
-			<div class="section-feature-container">
-				<div class="section-feature">
-					<img src="{{ url_for('static', filename='images/people.png') }}">
-					<p>Teams can be made of up to <b>four students</b> from the same school</p>
-				</div>
-				<div class="section-feature">
-					<img src="{{ url_for('static', filename='images/user.png') }}">
-					<p>The <b>individual portion</b> will have four problems and last 90 minutes</p>
-				</div>
-				<div class="section-feature">
-					<img src="{{ url_for('static', filename='images/management.png') }}">
-					<p>The team <b>will work together</b> to solve twelve problems over two hours</p>
-				</div>
-			</div>
 		</div>
-	</div>
-	<div class="section-container">
-		<div class="section">
-			<div class="section-feature-container">
-				<div class="section-feature">
-					<span class="big-number">344</span>
-					<p>Students participated in the 2023 contest</p>
-				</div>
-				<div class="section-feature">
-					<span class="big-number">90</span>
-					<p>Teams took part in the contest</p>
-				</div>
-				<div class="section-feature">
-					<span class="big-number">28</span>
-					<p>Schools from across Ontario participated</p>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="section-container">
-		<div class="section">
-			<h1 id="register">Register</h1>
-			<p>Registration for the 2025 competition is <b>not yet open</b>.</p>
-			<p>If you are a high school teacher, you can register as many students as you would like for the official competition through our website. All students in the official competition will participate on the same day, and will be eligible for prizes.</p>
-			<p>If you are a student who does not wish to participate through a school, you may register separately. You will be able to participate in the contest at a date of your choosing, but will not be eligible for prizes. </p>
-		</div>
-	</div>
-	<div class="section-container">
-		<div class="section">
-			<h1 id="faq">Frequently asked questions</h1>
-			<p><b>What skill level is necessary to participate?</b></p>
-			<p>The problems in the competition are intended to be able to be solved by a wide range of skill levels, from beginner to advanced. To get an idea of what the problems will be like, please see our sample problem set.</p>
-			<p><b>What are the rules of the contest?</b></p>
-			<p>To ensure the contest is fair for everyone, some rules have been put in place:</p>
-			<ul>
-				<li>During the individual portion of the event, collaboration with others is not allowed. During the team portion, participants may discuss the problems only with their team members.</li>
-				<li>Use of generative AI models (for example, ChatGPT, Claude, and GitHub Copilot) is not allowed.</li>
-				<li>During the contest, the only websites that may be accessed are: a code editor of each participant's choice, and the official documentation for the language they are using.</li>
-			</ul>
-		</div>
-	</div>
-{% endblock %}
+	</body>
+</html>
