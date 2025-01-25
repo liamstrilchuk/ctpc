@@ -120,14 +120,15 @@ img {
 }
 
 .numbers-section-header {
-	font-size: 3em;
+	font-size: 4em;
 	color: #efd26f;
 	font-weight: bold;
-	margin-bottom: 20px;
+	margin-bottom: 30px;
 }
 
 .numbers-section-text {
 	line-height: 1.3em;
+	font-size: 1.1em;
 }
 
 #ns1 {
@@ -176,7 +177,7 @@ img {
 
 #background {
 	width: 100%;
-	height: calc(850px + 238vw);
+	height: calc(850px + 236vw);
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -330,6 +331,12 @@ img {
 	margin-bottom: 30px;
 }
 
+@media screen and (min-width: 2300px) {
+	#subplanet {
+		top: 350px;
+	}
+}
+
 @media screen and (max-width: 1500px) {
 	img:not(#subplanet) {
 		width: 1500px;
@@ -367,6 +374,15 @@ img {
 
 	#background {
 		height: 4450px;
+	}
+
+	.numbers-section-header {
+		font-size: 3em;
+		margin-bottom: 20px;
+	}
+
+	.numbers-section-text {
+		font-size: 1em;
 	}
 }
 
