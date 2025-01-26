@@ -13,7 +13,7 @@ window.addEventListener("load", () => {
 	});
 
 	[
-		...document.querySelectorAll("#navbar-side a"),
+		...document.querySelectorAll("#navbar-side a[href]"),
 		document.getElementById("navbar-close-icon"),
 		document.getElementById("background")
 	].forEach(elem => {

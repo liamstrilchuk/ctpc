@@ -20,8 +20,18 @@
 			<a href="/competitions/2025"><b>2025</b></a>
 			<a href="#about">About the competition</a>
 			<a href="#faq">Frequently asked questions</a>
-			<a href="#register" class="navbar-link-spacing">Register</a>
-			<a href="/login">Login</a>
+			{% if current_user.is_authenticated %}
+				<a class="navbar-link-spacing">Logged in as <b>{{ current_user.username }}</b></a>
+				{% if current_user.role.name == "admin" %}
+					<a href="/admin">Admin</a>
+				{% elif current_user.role.name == "teacher" %}
+					<a href="/teacher">My school</a>
+				{% endif %}
+				<a href="/logout">Log out</a>
+			{% else %}
+				<a href="#register" class="navbar-link-spacing">Register</a>
+				<a href="/login">Login</a>
+			{% endif %}
 			<a class="navbar-link-spacing"><b>Contact us</b></a>
 			<a href="mailto:launch@ctpc.ca">launch@ctpc.ca</a>
 			<div id="navbar-close-icon">
@@ -43,8 +53,17 @@
 							<a href="/competitions/2025">2025</a>
 						</div>
 						<div>
-							<a href="/login">Login</a>
-							<a href="#register">Register</a>
+							{% if current_user.is_authenticated %}
+								<a>{{ current_user.username }}</a>
+								{% if current_user.role.name == "admin" %}
+									<a href="/admin">Admin</a>
+								{% elif current_user.role.name == "teacher" %}
+									<a href="/teacher">My school</a>
+								{% endif %}
+							{% else %}
+								<a href="/login">Login</a>
+								<a href="#register">Register</a>
+							{% endif %}
 							<span class="fa fa-bars" id="hamburger-icon"></span>
 						</div>
 					</div>
