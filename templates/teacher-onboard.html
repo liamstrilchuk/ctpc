@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+	<form method="post" class="form">
+		<h1>Thanks for registering!</h1>
+		<p>We just need a little more information:</p>
+		<p>The in-person event for this competition will take place at the University of Waterloo. Students participating in-person will have the opportunity to meet like-minded students from other schools, watch presentations from speakers, and take part in other activities. In-person participants will recieve complimentary meal(s), along with the chance of winning prizes exclusive to in-person teams.</p>
+		<p>Preference will be given to teams who, by March 1st:</p>
+		<ul>
+			<li>Have a full four team members;</li>
+			<li>Have completed their profiles after registration; and</li>
+			<li>Have at least partially completed the practice contest.</li>
+		</ul>
+		<p>Unfortunately, we are not able to cover the cost of transportation at this time. A maximum of two teams per school will be considered, though you may have additional teams participate virtually.</p>
+		<p><b>Would you like your team(s) to be considered for in-person attendance?</b></p>
+		<input type="checkbox" name="in-person" style="width: max-content; margin-right: 10px;">
+		<label for="in-person">Yes, I would like my teams to be considered</label>
+		<p>Teams also have the opportunity to participate synchronously (via Google Meet) alongside the in-person participants. They will be able to listen to presentations and participate in other activities.</p>
+		<p><b>Would you like to participate synchronously?</b></p>
+		<input type="radio" name="sync" value="yes" required>
+		<label for="yes-sync">Yes, I would like to participate synchronously</label><br>
+		<input type="radio" name="sync" value="no">
+		<label for="yes-sync">No, I would prefer to participate asynchronously</label>
+		<input type="submit" value="Submit">
+	</form>
+{% endblock %}

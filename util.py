@@ -9,6 +9,11 @@ def generate_random_password():
 
 	return "".join([random.choice(characters) for _ in range(length)])
 
+def generate_school_code():
+	characters = "QWERTYUIOPASDFGHJKLZXCVBNM"
+	
+	return "".join([random.choice(characters) for _ in range(8)])
+
 def to_unix_timestamp(timestamp):
 	try:
 		dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M")

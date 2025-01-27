@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+{% endblock %}
+
 {% block content %}
-	<h1>Log in</h1>
-	<form method="post">
-		<label for="username">Username:</label>
+	<form method="post" class="form">
+		<h1>Log in</h1>
+		<label for="username">Username</label>
 		<input type="text" id="username" name="username" required>
 		<br>
-		<label for="password">Password:</label>
+		<label for="password">Password</label>
 		<input type="password" id="password" name="password" required>
 		<br>
 		<input type="submit" value="Login">

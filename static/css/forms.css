@@ -1,0 +1,97 @@
+.form {
+	background: #30333f;
+	padding: 20px 35px;
+	border-radius: 5px;
+	width: 650px;
+	max-width: 100%;
+	margin: auto;
+	font-family: Ubuntu, sans-serif;
+	line-height: 1.5em;
+}
+
+.form label * {
+	display: inline;
+}
+
+.form > div {
+	margin: auto;
+}
+
+.form h1 {
+	font-size: 1.5em;
+	padding-bottom: 5px;
+}
+
+.form input {
+	background: #434b59;
+	width: 100%;
+	font-size: 0.95em;
+}
+
+.form input[type=radio] {
+	width: max-content;
+}
+
+.form-section-container {
+	display: flex;
+	justify-content: space-between;
+}
+
+.form-section {
+	width: calc(50% - 10px);
+}
+
+.form input[type=submit] {
+	background: #3b5dc3;
+	font-size: 1em;
+	margin-top: 20px;
+}
+
+.form input[type=submit]:disabled {
+	cursor: not-allowed;
+	background: #5870b8;
+}
+
+.form input[type=submit]:hover {
+	background: #3053be;
+}
+
+.form input[type=submit]:disabled:hover {
+	background: #5870b8;
+}
+
+.form .required {
+	color: rgb(230, 77, 77);
+}
+
+.required-desc {
+	font-size: 0.9em;
+	color: rgb(255, 192, 192);
+}
+
+.after-label {
+	margin-bottom: 10px;
+	color: #ddd;
+}
+
+.input-red {
+	outline: 1px solid rgb(233, 92, 92) !important;
+}
+
+@media screen and (max-width: 650px) {
+	.form-section-container {
+		display: block;
+	}
+
+	.form-section {
+		width: 100%;
+	}
+
+	.form input {
+		width: 100% !important;
+	}
+
+	#content {
+		padding: 20px;
+	}
+}

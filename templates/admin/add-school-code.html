@@ -1,0 +1,20 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a href="/admin/school-codes/{{ competition.short_name }}" class="back">&larr; Back to school codes</a>
+	<h1>Add school code for {{ competition.short_name }}</h1>
+	<form method="post">
+		<label for="board">School board</label>
+		<select name="board">
+			{% for board in boards %}
+				<option>{{ board.name }}</option>
+			{% endfor %}
+		</select>
+		<label for="school">School name</label>
+		<input type="text" name="school" required>
+		<input type="submit">
+	</form>
+	{% if error %}
+		<p>{{ error }}</p>
+	{% endif %}
+{% endblock %}

@@ -29,7 +29,7 @@
 					<td>
 						{% for teacher in school.members %}
 							{% if teacher.role.name == "teacher" %}
-								<a href="/admin/manage/{{ teacher.id }}">{{ teacher.username }}</a> (<a href="/admin/delete-user/{{ teacher.username }}">delete</a> &bull; <a href="/teacher/reset-password/{{ teacher.username }}">reset password</a>)<br>
+								<span>{{ teacher.username }}</span> (<a href="/admin/delete-user/{{ teacher.username }}">delete</a> &bull; <a href="/teacher/reset-password/{{ teacher.username }}">reset password</a>)<br>
 							{% endif %}
 						{% endfor %}
 					</td>

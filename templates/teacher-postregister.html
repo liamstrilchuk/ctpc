@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+	<div class="form">
+		<h1>Thanks for registering!</h1>
+		{% if in_person %}
+			<p>You have chosen to be considered for in-person attendance. To ensure the greatest chance of being accepted, please have your students fill out their profiles after registration and complete the practice contest.</p>
+		{% endif %}
+		{% if sync %}
+			{% if in_person %}
+				<p>You have chosen to participate synchronously. If your teams are not accepted to attend in-person, you will be sent an email before the contest starts with a Google Meet link.</p>
+			{% else %}
+				<p>You have chosen to participate synchronously. You will be sent an email before the contest starts with a Google Meet link.</p>
+			{% endif %}
+		{% else %}
+			{% if in_person %}
+				<p>You have chosen to participate asynchronously. If your teams are not accepted to attend in-person, your students will be able to participate at a time of their choosing on the date of the contest.</p>
+			{% else %}
+				<p>You have chosen to participate asynchronously. Your students will be able to participate at a time of their choosing on the date of the contest.</p>
+			{% endif %}
+		{% endif %}
+		<p>If you have any questions, please contact us at <a href="mailto:launch@ctpc.ca">launch@ctpc.ca</a>.</p>
+		<a href="/teacher"><input type="submit" value="Continue"></a>
+	</div>
+{% endblock %}

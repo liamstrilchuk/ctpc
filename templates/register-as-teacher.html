@@ -1,23 +1,46 @@
 {% extends "base.html" %}
 
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+	<script src="{{ url_for('static', filename='js/register-teacher.js') }}"></script>
+{% endblock %}
+
 {% block content %}
-	<h1>Register as a teacher for the <span class="text-highlight">{{ competition.name }}</span></h1>
-	<form method="post">
-		<label for="first">First name:</label>
-		<input type="text" id="first" name="first" required>
-		<br>
-		<label for="last">Last name:</label>
-		<input type="text" id="last" name="last" required>
-		<br>
-		<label for="email">Email (please use school-issued email):</label>
-		<input type="email" id="email" name="email" required>
-		<br>
-		<label for="password">Password: (minimum 8 characters)</label>
-		<input type="password" id="password" name="password" required>
-		<br>
-		<input type="submit" value="Register">
-		{% if error %}
-			<p>{{ error }}</p>
-		{% endif %}
+	<form method="post" class="form">
+		<h1>Register as a teacher for the <span class="text-highlight">{{ competition.name }}</span></h1>
+		<div>
+			<div class="form-section-container">
+				<div class="form-section">
+					<label for="first">First name <span class="required">*</span></label>
+					<input type="text" id="first" name="first" required placeholder="First">
+				</div>
+				<div class="form-section">
+					<label for="last">Last name <span class="required">*</span></label>
+					<input type="text" id="last" name="last" required placeholder="Last">
+				</div>
+			</div>
+			<label for="email">Email <span class="required">*</span></label>
+			<input type="email" id="email" name="email" required placeholder="name@school.ca">
+			<label class="after-label">Please use your school-issued email</label>
+			<div class="form-section-container">
+				<div class="form-section">
+					<label for="password">Password <span class="required">*</span></label>
+					<input type="password" id="password" name="password" required>
+				</div>
+				<div class="form-section">
+					<label for="confirm">Confirm password <span class="required">*</span></label>
+					<input type="password" id="confirm" name="confirm" required>
+				</div>
+			</div>
+			<label class="after-label">Your password must be at least 8 characters</label>
+			<label for="schoolcode">School code <span class="required">*</span></label>
+			<input type="text" id="schoolcode" name="schoolcode" placeholder="XXXX-XXXX" required>
+			<label class="after-label">If you do not have a school code, please contact us at <a href="mailto:launch@ctpc.ca">launch@ctpc.ca</a></label>
+			<label class="required-desc"><span class="required">*</span> Required</label>
+			<input type="submit" value="Register" disabled>
+			{% if error %}
+				<p>{{ error }}</p>
+			{% endif %}
+		</div>
 	</form>
 {% endblock %}

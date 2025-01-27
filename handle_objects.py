@@ -1,5 +1,5 @@
 from models import *
-from util import generate_random_password
+from util import generate_random_password, generate_school_code
 from setup import bcrypt
 
 def add_student(username, role="student", school_id=None):
@@ -35,6 +35,23 @@ def add_student(username, role="student", school_id=None):
 def add_school(name, school_board_id, competition_id):
 	school = School(name=name, school_board_id=school_board_id, competition_id=competition_id)
 	db.session.add(school)
+	db.session.commit()
+
+	return school
+
+def add_school_code(school_board_id, competition_id, school_name):
+	code = generate_school_code()
+	school_code = SchoolCode(
+		code=code,
+		competition_id=competition_id,
+		school_board_id=school_board_id,
+		school_name=school_name
+	)
+	db.session.add(school_code)
+	db.session.commit()
+
+def delete_school_code(code):
+	db.session.delete(code)
 	db.session.commit()
 
 def add_competition(name, short_name):

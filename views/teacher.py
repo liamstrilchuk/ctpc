@@ -30,11 +30,36 @@ def teacher_controls(teacher, student):
 
 @teacher.route("/teacher")
 @teacher_required
-def teacher_view():	
+def teacher_view():
+	if current_user.role.name == "teacher" and not current_user.completed_onboarding:
+		return redirect("/teacher-onboarding")
+
 	teams = Team.query.filter_by(school=current_user.school).all()
 	unassigned = User.query.filter_by(school=current_user.school, team_id=None, role=UserRole.query.filter_by(name="student").first()).all()
 
 	return render_template("teacher.html", teams=teams, unassigned=unassigned)
+
+@teacher.route("/teacher-onboarding", methods=["GET", "POST"])
+@teacher_required
+def teacher_onboarding():
+	if not current_user.role.name == "teacher":
+		return redirect("/teacher")
+	
+	if current_user.school is None:
+		return redirect("/")
+	
+	if request.method == "GET":
+		return render_template("teacher-onboard.html")
+	
+	in_person = request.form.get("in-person") == "on"
+	sync = request.form.get("sync") == "yes"
+
+	current_user.school.consider_in_person = in_person
+	current_user.school.synchronous = sync
+	current_user.completed_onboarding = True
+	db.session.commit()
+
+	return render_template("teacher-postregister.html", in_person=in_person, sync=sync)
 
 @teacher.route("/teacher/create-team", methods=["GET", "POST"])
 @teacher_required

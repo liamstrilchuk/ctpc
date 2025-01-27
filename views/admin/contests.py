@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
 
-from models import AbstractTestCase, AbstractTestCaseGroup, Competition, Contest, ContestType, Problem, School, SchoolBoard, Submission, db
+from models import AbstractTestCase, AbstractTestCaseGroup, Competition, Contest, ContestType, Problem, School, SchoolBoard, SchoolCode, Submission, db
 from util import admin_required, to_unix_timestamp, check_object_exists
 import handle_objects
 
@@ -30,6 +30,69 @@ def competitions_view():
 def schools_view(competition):
 	return render_template("admin/admin-schools.html", competition=competition)
 
+@contests.route("/admin/school-codes/<short_name>")
+@admin_required
+@check_object_exists(Competition, "/admin/competitions", key_name="short_name")
+def school_codes(competition):
+	return render_template(
+		"admin/school-codes.html",
+		competition=competition,
+		codes=SchoolCode.query.filter_by(competition_id=competition.id)
+	)
+
+@contests.route("/admin/add-school-code/<short_name>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(Competition, "/admin/competitions", key_name="short_name")
+def add_school_code(competition):
+	if request.method == "GET":
+		return render_template(
+			"admin/add-school-code.html",
+			competition=competition,
+			boards=SchoolBoard.query.all()
+		)
+	
+	board_name = request.form["board"]
+	school_name = request.form["school"]
+
+	board = SchoolBoard.query.filter_by(name=board_name).first()
+
+	if board is None:
+		return render_template(
+			"admin/add-school-code.html",
+			competition=competition,
+			boards=SchoolBoard.query.all(),
+			error="There is no board with that name"
+		)
+	
+	existing_code = SchoolCode.query.filter_by(
+		competition_id=competition.id,
+		school_name=school_name,
+		school_board_id=board.id
+	).first()
+
+	if existing_code is not None:
+		return render_template(
+			"admin/add-school.html",
+			competition=competition,
+			boards=SchoolBoard.query.all(),
+			error="There is already a school code with that school name"
+		)
+	
+	handle_objects.add_school_code(board.id, competition.id, school_name)
+
+	return redirect(f"/admin/school-codes/{competition.short_name}")
+
+@contests.route("/admin/delete-school-code/<int:code_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(SchoolCode, "/admin/competitions")
+def delete_school_code(code):
+	if request.method == "GET":
+		return render_template("confirm-delete.html", type="school code", text=f"for {code.school_name}")
+	
+	competition_name = code.competition.short_name
+	handle_objects.delete_school_code(code)
+	return redirect(f"/admin/school-codes/{competition_name}")
+
 @contests.route("/admin/add-school/<competition_short_name>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(Competition, "/admin/competitions", key_name="short_name")
@@ -47,7 +110,7 @@ def add_school(competition):
 	if board is None:
 		return render_template("admin/add-school.html", boards=boards, error="There is no board with that name")
 	
-	existing_school = School.query.filter_by(name=school_name, school_board=board).first()
+	existing_school = School.query.filter_by(name=school_name, school_board=board, competition_id=competition.id).first()
 
 	if existing_school is not None:
 		return render_template("admin/add-school.html", boards=boards, error="There is already a school in that board with that name")

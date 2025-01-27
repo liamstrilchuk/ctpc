@@ -15,6 +15,7 @@ class User(UserMixin, db.Model):
 	school_id = sa.Column(sa.Integer, sa.ForeignKey("schools.id"), nullable=True)
 	email = sa.Column(sa.String(100), nullable=True, default="")
 	submissions = db.relationship("Submission", backref="user", lazy=True)
+	completed_onboarding = sa.Column(sa.Boolean, default=False)
 	
 	def __repr__(self):
 		return f"<User {self.username}>"
@@ -37,6 +38,7 @@ class Competition(db.Model):
 	short_name = sa.Column(sa.String(20), nullable=False)
 	contests = db.relationship("Contest", backref="competition", lazy=True)
 	schools = db.relationship("School", backref="competition", lazy=True)
+	school_codes = db.relationship("SchoolCode", backref="competition", lazy=True)
 	
 	def __repr__(self):
 		return f"<Competition {self.name}>"
@@ -50,9 +52,24 @@ class School(db.Model):
 	teams = db.relationship("Team", backref="school", lazy=True)
 	members = db.relationship("User", backref="school", lazy=True)
 	competition_id = sa.Column(sa.Integer, sa.ForeignKey("competitions.id"), nullable=True)
+	consider_in_person = sa.Column(sa.Boolean, default=False)
+	synchronous = sa.Column(sa.Boolean, default=False)
 	
 	def __repr__(self):
 		return f"<School {self.name}>"
+	
+class SchoolCode(db.Model):
+	__tablename__ = "school_codes"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	school_name = sa.Column(sa.String(100), nullable=False)
+	school_board_id = sa.Column(sa.Integer, sa.ForeignKey("school_boards.id"), nullable=False)
+	competition_id = sa.Column(sa.Integer, sa.ForeignKey("competitions.id"), nullable=False)
+	code = sa.Column(sa.String(100), nullable=False)
+	used = sa.Column(sa.Boolean, default=False)
+
+	def __repr__(self):
+		return f"<SchoolCode {self.code}>"
 	
 class SchoolBoard(db.Model):
 	__tablename__ = "school_boards"
@@ -60,6 +77,7 @@ class SchoolBoard(db.Model):
 	id = sa.Column(sa.Integer, primary_key=True)
 	name = sa.Column(sa.String(100), nullable=False)
 	schools = db.relationship("School", backref="school_board", lazy=True)
+	school_codes = db.relationship("SchoolCode", backref="school_board", lazy=True)
 
 	def __init__(self, name):
 		self.name = name

@@ -21,6 +21,7 @@
 				<td>{{ competition.contests|length }}</td>
 				<td>{{ competition.schools|length }}</td>
 				<td>
+					<a href="/admin/school-codes/{{ competition.short_name }}">School codes</a> &bull;
 					<a href="/admin/schools/{{ competition.short_name }}">Schools</a> &bull;
 					<a href="/admin/contests/{{ competition.short_name }}">Contests</a> &bull;
 					<a href="/admin/edit-competition/{{ competition.id }}">Edit</a> &bull;

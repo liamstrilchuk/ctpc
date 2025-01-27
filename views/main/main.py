@@ -3,7 +3,7 @@ from flask_login import login_required, current_user, login_user
 from time import time
 import requests, markdown, re
 
-from models import AbstractTestCaseGroup, Competition, Contest, ContestType, LanguageType, Problem, Submission, SubmissionStatus, Team, TestCase, TestCaseGroup, TestCaseStatus, User, db
+from models import AbstractTestCaseGroup, Competition, Contest, ContestType, LanguageType, Problem, SchoolCode, Submission, SubmissionStatus, Team, TestCase, TestCaseGroup, TestCaseStatus, User, db
 from util import check_object_exists, logout_required
 import handle_objects
 
@@ -323,7 +323,8 @@ def register_as_student(competition):
 	password = request.form.get("password")
 	email = request.form.get("email")
 
-	return register_teacher_or_student(first, last, password, email, competition, "individual-student", "register-as-student.html")
+	user = register_teacher_or_student(first, last, password, email, competition, "individual-student", "register-as-student.html")
+	return redirect(f"/competitions/{competition.short_name}")
 
 @main.route("/competitions/<competition_id>/register/teacher", methods=["GET", "POST"])
 @check_object_exists(Competition, "/competitions", key_name="short_name")
@@ -336,8 +337,30 @@ def register_as_teacher(competition):
 	last = request.form.get("last")
 	password = request.form.get("password")
 	email = request.form.get("email")
+	rawcode = request.form.get("schoolcode")
+	code = ""
+	for c in rawcode:
+		if c.isalpha():
+			code += c
 
-	return register_teacher_or_student(first, last, password, email, competition, "teacher", "register-as-teacher.html")
+	code_obj = SchoolCode.query.filter_by(code=code).first()
+
+	if code_obj is None:
+		return render_template("register-as-teacher.html", competition=competition, error="School code is not valid")
+	
+	if code_obj.used:
+		return render_template("register-as-teacher.html", competition=competition, error="School code has already been used")
+	
+	school = handle_objects.add_school(code_obj.school_name, code_obj.school_board.id, code_obj.competition.id)
+	
+	code_obj.used = True
+	db.session.commit()
+
+	user = register_teacher_or_student(first, last, password, email, competition, "teacher", "register-as-teacher.html")
+	user.school_id = school.id
+	db.session.commit()
+
+	return redirect("/teacher")
 
 def register_teacher_or_student(first, last, password, email, competition, role, template):
 	if not first or not last:
@@ -356,7 +379,7 @@ def register_teacher_or_student(first, last, password, email, competition, role,
 		return render_template(template, competition=competition, error="An error occurred when registering")
 	
 	login_user(user)
-	return redirect(f"/competitions/{competition.name}")
+	return user
 
 @main.route("/editor/<int:problem_id>")
 @login_required

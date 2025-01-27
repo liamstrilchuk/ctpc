@@ -48,6 +48,12 @@ def get_problem(problem):
 @login_required
 @check_object_exists(Problem, "/")
 def get_submissions(problem):
+	last_submission = Submission.query \
+		.filter_by(user_id=current_user.id) \
+		.filter_by(is_practice=False) \
+		.order_by(Submission.timestamp.desc()) \
+		.first()
+	
 	submissions = Submission.query \
 		.filter_by(user_id=current_user.id) \
 		.filter_by(problem_id=problem.id) \
@@ -85,4 +91,7 @@ def get_submissions(problem):
 			"team_problem": sub.problem.contest.contest_type.name == "team"
 		})
 
-	return cleaned_submissions
+	return {
+		"submissions": cleaned_submissions,
+		"last_submission_time": last_submission.timestamp if last_submission is not None else 0
+	}

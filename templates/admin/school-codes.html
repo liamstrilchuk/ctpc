@@ -1,0 +1,28 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a href="/admin/competitions" class="back">&larr; Back to competitions</a>
+	<h1>View school codes</h1>
+	<div class="admin-controls">
+		<span>{{ competition.name }}</span>
+		<a href="/admin/add-school-code/{{ competition.short_name }}">Add code</a>
+	</div>
+	<table>
+		<tr>
+			<th>School board</th>
+			<th>School</th>
+			<th>Code</th>
+			<th>Redeemed</th>
+			<th>Actions</th>
+		</tr>
+		{% for code in codes %}
+			<tr>
+				<td>{{ code.school_board.name }}</td>
+				<td>{{ code.school_name }}</td>
+				<td>{{ code.code }}</td>
+				<td>{% if code.used %}Yes{% endif %}</td>
+				<td><a href="/admin/delete-school-code/{{ code.id }}">Delete</a></td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock %}

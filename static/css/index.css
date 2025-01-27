@@ -128,7 +128,7 @@ a {
 }
 
 #footer {
-	background: rgb(10, 10, 20);
+	background: #1a1c20;
 	color: rgb(230, 230, 230);
 	padding: 50px 0;
 }
@@ -264,11 +264,11 @@ a {
 	font-size: 1.2em;
 }
 
-form * {
+form:not(.form) * {
 	display: block;
 }
 
-form input, form select, form textarea {
+form input, form select, form textarea, .form input[type=submit] {
 	padding: 8px 15px;
 	margin: 5px 0 10px 0;
 	background: #323740;
@@ -278,7 +278,7 @@ form input, form select, form textarea {
 	border: none;
 }
 
-form input[type=submit] {
+form input[type=submit], .form input[type=submit] {
 	cursor: pointer;
 	padding: 10px 15px;
 }

@@ -29,7 +29,8 @@ window.addEventListener("load", async function() {
 	testCaseResults = lastPracticeSubmission.test_cases;
 	editor.setValue(lastPracticeSubmission.code, 1);
 
-	previousSubmissions = (await (await fetch("/api/submissions/" + problemId)).json());
+	const submissionData = (await (await fetch("/api/submissions/" + problemId)).json());
+	previousSubmissions = submissionData["submissions"];
 
 	buttonElements = {
 		selectProblem: document.getElementById("select-problem"),
@@ -42,18 +43,17 @@ window.addEventListener("load", async function() {
 		widthChanger: document.getElementById("width-changer")
 	};
 
-	if (previousSubmissions.length > 0) {
-		submissionCooldown = new Date(previousSubmissions[0].time * 1000 + 60000);
-		if (new Date() < submissionCooldown) {
-			const loadingIcon = createLoadingIcon(30, "#555", "#fff", 0.7, {
-				"type": "progress",
-				"start": new Date(previousSubmissions[0].time * 1000),
-				"end": new Date(previousSubmissions[0].time * 1000 + 60000)
-			});
-			loadingIcon.classList.add("large-loading-icon");
-			buttonElements.submitSolution.classList.add("in-progress-button");
-			buttonElements.submitSolution.appendChild(loadingIcon);
-		}
+	submissionCooldown = new Date(submissionData["last_submission_time"] * 1000 + 60000);
+	
+	if (new Date() < submissionCooldown) {
+		const loadingIcon = createLoadingIcon(30, "#555", "#fff", 0.7, {
+			"type": "progress",
+			"start": new Date(submissionData["last_submission_time"] * 1000),
+			"end": new Date(submissionData["last_submission_time"] * 1000 + 60000)
+		});
+		loadingIcon.classList.add("large-loading-icon");
+		buttonElements.submitSolution.classList.add("in-progress-button");
+		buttonElements.submitSolution.appendChild(loadingIcon);
 	}
 
 	buttonElements.languageSelector.value = lastPracticeSubmission.language || "py";
