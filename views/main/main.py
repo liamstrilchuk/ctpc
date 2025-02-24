@@ -316,20 +316,20 @@ def submission_view(submission):
 def register(competition):
 	return render_template("register.html", competition=competition)
 
-@main.route("/competitions/<competition_id>/register/student", methods=["GET", "POST"])
-@check_object_exists(Competition, "/competitions", key_name="short_name")
-@logout_required
-def register_as_student(competition):
-	if request.method == "GET":
-		return render_template("register-as-student.html", competition=competition)
+# @main.route("/competitions/<competition_id>/register/student", methods=["GET", "POST"])
+# @check_object_exists(Competition, "/competitions", key_name="short_name")
+# @logout_required
+# def register_as_student(competition):
+# 	if request.method == "GET":
+# 		return render_template("register-as-student.html", competition=competition)
 	
-	first = request.form.get("first")
-	last = request.form.get("last")
-	password = request.form.get("password")
-	email = request.form.get("email")
+# 	first = request.form.get("first")
+# 	last = request.form.get("last")
+# 	password = request.form.get("password")
+# 	email = request.form.get("email")
 
-	user = register_teacher_or_student(first, last, password, email, competition, "individual-student", "register-as-student.html")
-	return redirect(f"/competitions/{competition.short_name}")
+# 	user = register_teacher_or_student(first, last, password, email, competition, "individual-student", "register-as-student.html")
+# 	return redirect(f"/competitions/{competition.short_name}")
 
 @main.route("/competitions/<competition_id>/register/teacher", methods=["GET", "POST"])
 @check_object_exists(Competition, "/competitions", key_name="short_name")

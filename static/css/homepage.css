@@ -12,6 +12,10 @@ body, html {
 	min-width: 350px;
 }
 
+a {
+	color: rgb(121, 168, 255);
+}
+
 img {
 	position: absolute;
 	top: 0;
@@ -324,11 +328,14 @@ img {
 	margin-bottom: 5px;
 }
 
+#contact span {
+	display: block;
+	margin-bottom: 30px;
+}
+
 #contact a {
 	color: white;
 	font-size: 1.2em;
-	display: block;
-	margin-bottom: 30px;
 }
 
 @media screen and (min-width: 2300px) {
