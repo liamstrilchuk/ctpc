@@ -49,6 +49,7 @@ def add_school_code(school_board_id, competition_id, school_name):
 	)
 	db.session.add(school_code)
 	db.session.commit()
+	return code
 
 def delete_school_code(code):
 	db.session.delete(code)
