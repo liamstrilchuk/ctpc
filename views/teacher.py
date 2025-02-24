@@ -119,7 +119,7 @@ def assign_student(username):
 	if team is None or not team.school == current_user.school:
 		return redirect("/teacher")
 	
-	if len(team.members) >= 6:
+	if len(team.members) >= 4:
 		return render_template("assign-student.html", user=user, teams=teams, error="That team is already full.")
 
 	user.team_id = team_id

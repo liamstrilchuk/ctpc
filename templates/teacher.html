@@ -8,6 +8,7 @@
 	<div class="admin-controls">
 		<a href="/teacher/create-team">Create team</a>
 		<a href="/teacher/register-student">Register student</a>
+		<a href="/teacher-onboarding">Change preferences</a>
 	</div>
 	<p>You are a teacher for <b>{{ current_user.school.name }}</b> ({{ current_user.school.school_board.name }}).</p>
 	{% if unassigned %}
@@ -39,7 +40,7 @@
 		<div class="admin-board">
 			<span class="admin-team-name"><b>{{ team.name }}</b></span>
 			<div class="admin-controls">
-				<span>{{ 6 - team.members|length }} spot{% if team.members|length != 5 %}s{% endif %} remaining</span> <a href="/teacher/delete-team/{{ team.id }}">Delete team</a>
+				<span>{{ 4 - team.members|length }} spot{% if team.members|length != 3 %}s{% endif %} remaining</span> <a href="/teacher/delete-team/{{ team.id }}">Delete team</a>
 			</div>
 			{% if team.members %}
 				<ul>

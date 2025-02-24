@@ -24,6 +24,9 @@
 					{% if current_user.role.name == "admin" %}
 						<a href="/admin">Admin</a>
 					{% endif %}
+					{% if current_user.role.name == "teacher" %}
+						<a href="/teacher">My school</a>
+					{% endif %}
 					<a href="/logout">Logout</a>
 				{% else %}
 					<a href="/login">Login</a>

@@ -164,17 +164,27 @@ def create_student_profile(user, first, last, email, github, linkedin, resume, t
 	user.email = email
 	user.completed_onboarding = True
 
-	if resume is not None:
-		resume.save(f"user_uploads/{user.username}_resume.pdf")
+	resume_filename = ""
+	if resume.filename:
+		resume_filename = f"user_uploads/{user.username}_resume.pdf"
+		resume.save(resume_filename)
+
 	tshirt_size = tshirt_size if tshirt_size in ["XS", "S", "M", "L", "XL"] else ""
 
-	profile = StudentProfile(
-		user_id=user.id,
-		github_url=github,
-		linkedin_url=linkedin,
-		tshirt_size=tshirt_size,
-		resume_filename=f"{user.username}_resume.pdf"
-	)
-	user.profile = profile
-	db.session.add(profile)
+	existing_profile = StudentProfile.query.filter_by(user_id=user.id).first()
+	if existing_profile is None:
+		profile = StudentProfile(
+			user_id=user.id,
+			github_url=github,
+			linkedin_url=linkedin,
+			tshirt_size=tshirt_size,
+			resume_filename=resume_filename
+		)
+		user.profile = profile
+		db.session.add(profile)
+	else:
+		existing_profile.github_url = github
+		existing_profile.linkedin_url = linkedin
+		existing_profile.tshirt_size = tshirt_size
+
 	db.session.commit()
