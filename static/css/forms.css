@@ -22,7 +22,7 @@
 	padding-bottom: 5px;
 }
 
-.form input {
+.form input, .form select {
 	background: #434b59;
 	width: 100%;
 	font-size: 0.95em;

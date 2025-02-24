@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+	<form method="post" class="form" enctype="multipart/form-data">
+		<h1>Welcome to the CTPC</h1>
+		<p>We just need a little information before you can continue:</p>
+		<p>This contest gives you the opportunity to connect with sponsors, and potentially be considered for opportunities. Filling out the profile below will increase your chances of being considered for opportunities, receiving prizes, and being accepted for our in-person competition.</p>
+		<div class="form-section-container">
+			<div class="form-section">
+				<label for="first">First name <span class="required">*</span></label>
+				<input type="text" id="first" name="first" required placeholder="First" value="{{ current_user.first }}">
+			</div>
+			<div class="form-section">
+				<label for="last">Last name <span class="required">*</span></label>
+				<input type="text" id="last" name="last" required placeholder="Last" value="{{ current_user.last }}">
+			</div>
+		</div>
+		<label for="email">Email</label>
+		<input type="email" id="email" name="email" placeholder="name@website.com">
+		<label for="linkedin">LinkedIn profile URL</label>
+		<input type="text" id="linkedin" name="linkedin" placeholder="https://www.linkedin.com/in/your-name">
+		<label for="github">Github profile URL</label>
+		<input type="text" id="github" name="github" placeholder="https://github.com/example">
+		<div class="form-section-container">
+			<div class="form-section">
+				<label for="resume">Resume (.pdf)</label>
+				<input type="file" accept="pdf" name="resume">
+			</div>
+			<div class="form-section">
+				<label for="tshirt">T-shirt size</label>
+				<select name="tshirt">
+					<option>--- choose an option ---</option>
+					<option>XS</option>
+					<option>S</option>
+					<option>M</option>
+					<option>L</option>
+					<option>XL</option>
+				</select>
+			</div>
+		</div>
+		<label class="required-desc"><span class="required">*</span> Required</label>
+		<input type="submit" value="Submit">
+		{% if error %}<p>{{ error }}</p>{% endif %}
+	</form>
+{% endblock %}

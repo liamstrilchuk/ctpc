@@ -58,6 +58,7 @@ def check_submissions():
 
 			response = requests.get(grader + fetch_url + token_str)
 			response = response.json()
+			print(response)
 
 			for tc in response["submissions"]:
 				if tc is None:

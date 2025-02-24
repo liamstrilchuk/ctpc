@@ -16,9 +16,25 @@ class User(UserMixin, db.Model):
 	email = sa.Column(sa.String(100), nullable=True, default="")
 	submissions = db.relationship("Submission", backref="user", lazy=True)
 	completed_onboarding = sa.Column(sa.Boolean, default=False)
+	first = sa.Column(sa.String(100), default="")
+	last = sa.Column(sa.String(100), default="")
+	profile = db.relationship("StudentProfile", uselist=False, backref="user")
 	
 	def __repr__(self):
 		return f"<User {self.username}>"
+	
+class StudentProfile(db.Model):
+	__tablename__ = "student_profiles"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	user_id = sa.Column(sa.Integer, sa.ForeignKey("users.id"))
+	github_url = sa.Column(sa.String(100))
+	resume_filename = sa.Column(sa.String(100))
+	linkedin_url = sa.Column(sa.String(100))
+	tshirt_size = sa.Column(sa.String(5))
+
+	def __repr__(self):
+		return f"<StudentProfile {self.id}>"
 	
 class UserRole(db.Model):
 	__tablename__ = "user_roles"

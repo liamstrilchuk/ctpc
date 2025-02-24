@@ -22,7 +22,7 @@ def add_student(username, role="student", school_id=None):
 	password = generate_random_password()
 
 	user = User(
-		username=full_username,
+		username=full_username.lower(),
 		password=bcrypt.generate_password_hash(password),
 		school_id=school_id,
 		role_id=role.id
@@ -143,6 +143,10 @@ def delete_user(user):
 	for sub in user.submissions:
 		delete_submission(sub)
 
+	if user.profile is not None:
+		db.session.delete(user.profile)
+		db.session.commit()
+
 	db.session.delete(user)
 	db.session.commit()
 
@@ -151,4 +155,25 @@ def delete_team(team):
 		student.team_id = None
 
 	db.session.delete(team)
+	db.session.commit()
+
+def create_student_profile(user, first, last, email, github, linkedin, resume, tshirt_size):
+	user.first = first
+	user.last = last
+	user.email = email
+	user.completed_onboarding = True
+
+	if resume is not None:
+		resume.save(f"user_uploads/{user.username}_resume.pdf")
+	tshirt_size = tshirt_size if tshirt_size in ["XS", "S", "M", "L", "XL"] else ""
+
+	profile = StudentProfile(
+		user_id=user.id,
+		github_url=github,
+		linkedin_url=linkedin,
+		tshirt_size=tshirt_size,
+		resume_filename=f"{user.username}_resume.pdf"
+	)
+	user.profile = profile
+	db.session.add(profile)
 	db.session.commit()

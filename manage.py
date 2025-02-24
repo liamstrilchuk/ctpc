@@ -17,7 +17,7 @@ def deploy():
 	from models import User, School, SchoolBoard, TestCaseStatus, UserRole, ContestType, SubmissionStatus, LanguageType
 	from flask_bcrypt import Bcrypt
 
-	test_case_statuses = ["Pending", "Accepted", "Wrong Answer", "Time Limit Exceeded", "Memory Limit Exceeded", "Runtime Error", "Compilation Error", "Failed", "Not Run"]
+	test_case_statuses = ["Pending", "Accepted", "Wrong Answer", "Time Limit Exceeded", "Memory Limit Exceeded", "Runtime Error", "Compilation Error", "Failed", "Not Run", "Server Error"]
 
 	for tcs in test_case_statuses:
 		status = TestCaseStatus(name=tcs)

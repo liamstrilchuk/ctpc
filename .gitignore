@@ -6,3 +6,4 @@ migrations/
 views/__pycache__/
 admin_password.txt
 *.env
+user_uploads/*

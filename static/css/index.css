@@ -6,7 +6,7 @@ html, body {
 	width: 100%;
 	margin: 0;
 	box-sizing: border-box;
-	background: #21242b;
+	background: #27293f;
 	font-family: sans-serif;
 	scroll-behavior: smooth;
 	min-height: 100vh;
@@ -81,7 +81,7 @@ a {
 	width: 100%;
 	height: 60px;
 	backdrop-filter: blur(5px);
-	background: #1a1c20;
+	background: #1f2134;
 }
 
 #navbar-year {
@@ -128,7 +128,7 @@ a {
 }
 
 #footer {
-	background: #1a1c20;
+	background: #1f2134;
 	color: rgb(230, 230, 230);
 	padding: 50px 0;
 }
@@ -290,11 +290,11 @@ form input[type=submit], .form input[type=submit] {
 }
 
 tr:nth-child(even) {
-	background-color: #30303d;
+	background-color: #3a3a4c;
 }
 
 tr:nth-child(odd) {
-	background-color: #3a3a4d;
+	background-color: #46465b;
 }
 
 td, th {
@@ -307,7 +307,7 @@ td, th {
 	margin: 10px 0;
 	border-radius: 5px;
 	border: 1px solid #445;
-	background: #20202a;
+	background: #25253e;
 	box-shadow: 3px 3px 0px #445;
 }
 

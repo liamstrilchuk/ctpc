@@ -20,6 +20,9 @@ def team_view():
 @main.route("/competitions")
 @login_required
 def competitions_view():
+	if current_user.role.name == "student" and not current_user.completed_onboarding:
+		return redirect("/student-onboarding")
+
 	competitions = Competition.query.all()
 	return render_template("contest/competitions.html", competitions=competitions, current_time=time())
 
@@ -27,6 +30,9 @@ def competitions_view():
 @login_required
 @check_object_exists(Competition, "/competitions", key_name="short_name")
 def contests_view(competition):
+	if current_user.role.name == "student" and not current_user.completed_onboarding:
+		return redirect("/student-onboarding")
+
 	return render_template("contest/contests.html", contests=competition.contests, current_time=time(), competition=competition)
 
 @main.route("/contest/<int:contest_id>")
@@ -152,7 +158,6 @@ def submit(problem):
 				"expected_output": test_case.abstract_test_case.expected_output,
 				"id": test_case.id
 			})
-
 
 	json_to_grader = {
 		"code": submission.code,
@@ -389,3 +394,27 @@ def editor(problem):
 		return redirect("/competitions")
 
 	return render_template("editor.html", problem=problem, languages=LanguageType.query.all())
+
+@main.route("/student-onboarding", methods=["GET", "POST"])
+@login_required
+def student_onboarding():
+	if not current_user.role.name == "student":
+		return redirect("/")
+	
+	if request.method == "GET":
+		return render_template("student-onboard.html")
+	
+	first = request.form.get("first")
+	last = request.form.get("last")
+	email = request.form.get("email")
+	linkedin = request.form.get("linkedin")
+	github = request.form.get("github")
+	resume_file = request.files.get("resume")
+	tshirt_size = request.form.get("tshirt")
+
+	if not first or not last:
+		return render_template("student-onboard.html", error="Must include first and last name")
+
+	handle_objects.create_student_profile(current_user, first, last, email, github, linkedin, resume_file, tshirt_size)
+
+	return redirect("/competitions/2025")
