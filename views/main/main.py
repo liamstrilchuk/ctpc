@@ -380,6 +380,9 @@ def register_teacher_or_student(first, last, password, email, competition, role,
 	username_start = f"{first[:3]}{last[:5]}".lower()
 	try:
 		user, _ = handle_objects.add_student(username_start, role=role)
+		user.email = email
+		user.first = first
+		user.last = last
 	except Exception:
 		return render_template(template, competition=competition, error="An error occurred when registering")
 	
@@ -403,7 +406,7 @@ def student_onboarding():
 	
 	if request.method == "GET":
 		return render_template("student-onboard.html")
-	
+
 	first = request.form.get("first")
 	last = request.form.get("last")
 	email = request.form.get("email")
