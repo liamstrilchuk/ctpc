@@ -2,7 +2,7 @@ from models import *
 from util import generate_random_password, generate_school_code
 from setup import bcrypt
 
-def add_student(username, role="student", school_id=None):
+def add_student(username, role="student", password=None, school_id=None):
 	username_counter = 0
 	while True:
 		username_counter += 1
@@ -19,7 +19,7 @@ def add_student(username, role="student", school_id=None):
 	if role is None:
 		return None
 	
-	password = generate_random_password()
+	password = generate_random_password() if password is None else password
 
 	user = User(
 		username=full_username.lower(),

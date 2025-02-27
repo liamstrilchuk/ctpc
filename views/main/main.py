@@ -362,6 +362,9 @@ def register_as_teacher(competition):
 	db.session.commit()
 
 	user = register_teacher_or_student(first, last, password, email, competition, "teacher", "register-as-teacher.html")
+	if type(user) == str:
+		return user
+
 	user.school_id = school.id
 	db.session.commit()
 
@@ -382,7 +385,7 @@ def register_teacher_or_student(first, last, password, email, competition, role,
 	
 	username_start = f"{first[:3]}{last[:5]}".lower()
 	try:
-		user, _ = handle_objects.add_student(username_start, role=role)
+		user, _ = handle_objects.add_student(username_start, password=password, role=role)
 		user.email = email.lower()
 		user.first = first
 		user.last = last

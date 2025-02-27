@@ -17,7 +17,7 @@ def login_view():
 	user = User.query.filter_by(username=username).first()
 
 	if user is None:
-		user = User.query.filter_by(email=username.lower()).first()
+		user = User.query.filter_by(email=username).first()
 
 	if user is None or not bcrypt.check_password_hash(user.password, password):
 		return render_template("login.html", error="Invalid username or password")
