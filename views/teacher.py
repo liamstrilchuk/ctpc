@@ -91,7 +91,19 @@ def register_student():
 	if not first or not last:
 		return render_template("register-student.html", error="Please fill out all fields")
 
-	username_start = first[:3] + last[:5]
+	first_clean, last_clean = "", ""
+	for c in first.lower():
+		if c in "abcdefghijklmnopqrstuvwxyz":
+			first_clean += c
+
+	for c in last.lower():
+		if c in "abcdefghijklmnopqrstuvwxyz":
+			last_clean += c
+
+	if not first_clean and not last_clean:
+		last_clean = "user"
+
+	username_start = first_clean[:3] + last_clean[:5]
 	try:
 		user, password = handle_objects.add_student(username_start, school_id=current_user.school_id)
 	except:

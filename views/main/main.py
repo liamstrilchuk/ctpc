@@ -357,15 +357,13 @@ def register_as_teacher(competition):
 		return render_template("register-as-teacher.html", competition=competition, error="School code has already been used")
 	
 	school = handle_objects.add_school(code_obj.school_name, code_obj.school_board.id, code_obj.competition.id)
-	
-	code_obj.used = True
-	db.session.commit()
 
 	user = register_teacher_or_student(first, last, password, email, competition, "teacher", "register-as-teacher.html")
 	if type(user) == str:
 		return user
 
 	user.school_id = school.id
+	code_obj.used = True
 	db.session.commit()
 
 	return redirect("/teacher")
@@ -382,8 +380,20 @@ def register_teacher_or_student(first, last, password, email, competition, role,
 	
 	if not password or not len(password) >= 8:
 		return render_template(template, competition=competition, error="Password must be at least 8 characters")
-	
-	username_start = f"{first[:3]}{last[:5]}".lower()
+
+	first_clean, last_clean = "", ""
+	for c in first.lower():
+		if c in "abcdefghijklmnopqrstuvwxyz":
+			first_clean += c
+
+	for c in last.lower():
+		if c in "abcdefghijklmnopqrstuvwxyz":
+			last_clean += c
+
+	if not first_clean and not last_clean:
+		last_clean = "user"
+
+	username_start = f"{first_clean[:3]}{last_clean[:5]}".lower()
 	try:
 		user, _ = handle_objects.add_student(username_start, password=password, role=role)
 		user.email = email.lower()
