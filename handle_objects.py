@@ -161,7 +161,7 @@ def delete_team(team):
 def create_student_profile(user, first, last, email, github, linkedin, resume, tshirt_size):
 	user.first = first
 	user.last = last
-	user.email = email
+	user.email = email.lower()
 	user.completed_onboarding = True
 
 	resume_filename = ""

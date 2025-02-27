@@ -373,6 +373,9 @@ def register_teacher_or_student(first, last, password, email, competition, role,
 
 	if not email or not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
 		return render_template(template, competition=competition, error="Invalid email")
+
+	if User.query.filter_by(email=email.lower()).first() is not None:
+		return render_template(template, competition=competition, error="Email is already in use")
 	
 	if not password or not len(password) >= 8:
 		return render_template(template, competition=competition, error="Password must be at least 8 characters")
@@ -380,7 +383,7 @@ def register_teacher_or_student(first, last, password, email, competition, role,
 	username_start = f"{first[:3]}{last[:5]}".lower()
 	try:
 		user, _ = handle_objects.add_student(username_start, role=role)
-		user.email = email
+		user.email = email.lower()
 		user.first = first
 		user.last = last
 	except Exception:
@@ -414,6 +417,9 @@ def student_onboarding():
 	github = request.form.get("github")
 	resume_file = request.files.get("resume")
 	tshirt_size = request.form.get("tshirt")
+
+	if User.query.filter_by(email=email.lower()).first() is not None:
+		return render_template("student-onbaord.html", error="Email is already in use")
 
 	if not first or not last:
 		return render_template("student-onboard.html", error="Must include first and last name")
