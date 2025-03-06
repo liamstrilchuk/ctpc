@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template
-from flask_login import current_user
 
 from models import Competition, Contest, Submission, User, Problem, Team, School
 from util import admin_required, check_object_exists
@@ -34,7 +33,8 @@ def contest_leaderboard_data(contest):
 			} for _ in problems],
 			"total_score": 0,
 			"name": user.username if contest.contest_type.name == "individual" else f"{user.name} ({user.school.name})",
-			"obj": user
+			"obj": user,
+			"in_person": (user.team is not None and user.team.in_person) if contest.contest_type.name == "individual" else user.in_person
 		}
 
 	all_submissions = Submission.query \
@@ -95,7 +95,8 @@ def competition_leaderboard(competition):
 			"obj": contest
 		} for contest in contests],
 		"total_score": 0,
-		"name": f"{team.name} ({team.school.name})"
+		"name": f"{team.name} ({team.school.name})",
+		"in_person": team.in_person
 	} for team in teams }
 
 	for i in range(len(contests)):
@@ -113,6 +114,9 @@ def competition_leaderboard(competition):
 		else:
 			for x in user_data:
 				team = user_data[x]
+				if not team["obj"].id in team_data:
+					continue
+
 				team_data[team["obj"].id]["problems"][i]["score"] = team["total_score"]
 				team_data[team["obj"].id]["total_score"] += team["total_score"]
 

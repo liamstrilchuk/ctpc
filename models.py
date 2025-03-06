@@ -70,6 +70,7 @@ class School(db.Model):
 	competition_id = sa.Column(sa.Integer, sa.ForeignKey("competitions.id"), nullable=True)
 	consider_in_person = sa.Column(sa.Boolean, default=False)
 	synchronous = sa.Column(sa.Boolean, default=False)
+	in_person_spots = sa.Column(sa.Integer, default=0)
 	
 	def __repr__(self):
 		return f"<School {self.name}>"
@@ -108,6 +109,7 @@ class Team(db.Model):
 	name = sa.Column(sa.String(100), nullable=False)
 	school_id = sa.Column(sa.Integer, sa.ForeignKey("schools.id"), nullable=False)
 	members = db.relationship("User", backref="team", lazy=True)
+	in_person = sa.Column(sa.Boolean, default=False)
 
 	def __init__(self, name, school_id):
 		self.name = name

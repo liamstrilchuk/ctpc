@@ -10,6 +10,7 @@
 	<h1>Leaderboard for {{ contest.name }}</h1>
 	<div class="admin-controls">
 		<a href="#" id="toggle-problems">Toggle {% if type == "contest" %}problems{% else %}contests{% endif %}</a>
+		<a href="#" id="toggle-virtual">Toggle virtual</a>
 	</div>
 	<div class="leaderboard-container">
 		<table>
@@ -21,7 +22,7 @@
 				<th>Total</th>
 			</tr>
 			{% for user in sorted_users %}
-				<tr>
+				<tr class="{% if not sorted_users[user]['in_person'] %}virtual{% endif %}">
 					<td>{{ sorted_users[user]["name"] }}</td>
 					{% for problem in sorted_users[user]["problems"] %}
 						{% if not problem["attempted"] %}
