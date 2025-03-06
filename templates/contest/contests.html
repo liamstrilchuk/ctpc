@@ -3,6 +3,11 @@
 {% block content %}
 	<a class="back" href="/">&larr; Back to home</a>
 	<h1>{{ competition.name }}</h1>
+	{% if current_user.role.name == "admin" %}
+		<div class="admin-controls">
+			<a href="/competitions/{{ competition.short_name }}/leaderboard">Leaderboard</a>
+		</div>
+	{% endif %}
 	{% if contests %}
 		{% for contest in contests %}
 			<div class="contest">
@@ -13,7 +18,7 @@
 				{% if contest.start_date > current_time %}
 					<span class="contest-status">Starts in <span class="duration">{{ contest.start_date - current_time }}</span></span>
 					{% if current_user.role.name == "admin" %}
-						<span>As an administrator, you can <a href="/contest/{{ contest.id }}">enter the contest early.</a></span>
+						<span>As an administrator, you can <a href="/contest/{{ contest.id }}">enter the contest early.</a> You can also view this contest's <a href="/contest/{{ contest.id }}/leaderboard">leaderboard</a>.</span>
 					{% elif current_user.role.name == "tester" %}
 						<span>As an tester, you can <a href="/contest/{{ contest.id }}">enter the contest early.</a></span>
 					{% endif %}
@@ -21,6 +26,9 @@
 					<span class="contest-status">Complete</span>
 				{% else %}
 					<a class="contest-status" href="/contest/{{ contest.id }}">Enter (ends in <span class="duration">{{ contest.end_date - current_time }}</span>)</a>
+					{% if current_user.role.name == "admin" %}
+						&bull; <a href="/contest/{{ contest.id }}/leaderboard">View Leaderboard</a>
+					{% endif %}
 				{% endif %}
 			</div>
 		{% endfor %}

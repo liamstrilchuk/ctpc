@@ -41,7 +41,7 @@ def deploy():
 		ct = ContestType(name=contest_type)
 		db.session.add(ct)
 
-	language_types = [("Python", "py", 71), ("C++", "cpp", 54), ("Java", "java", 26), ("C", "c", 50), ("JavaScript", "js", 63)]
+	language_types = [("Python", "py", 71), ("C++", "cpp", 54), ("Java", "java", 62), ("C", "c", 50), ("JavaScript", "js", 63)]
 
 	for language_type in language_types:
 		lt = LanguageType(name=language_type[0], short_name=language_type[1], grader_id=language_type[2])

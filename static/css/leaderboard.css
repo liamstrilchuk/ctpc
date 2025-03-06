@@ -1,0 +1,8 @@
+.leaderboard-container {
+	max-width: 100%;
+	overflow: auto;
+}
+
+.leaderboard-container table {
+	width: max-content;
+}

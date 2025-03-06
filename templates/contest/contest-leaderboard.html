@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/leaderboard.css') }}">
+	<script src="{{ url_for('static', filename='js/leaderboard.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+	<a class="back" href="/contest/{{ contest.id }}">&larr; Back to contest</a>
+	<h1>Leaderboard for {{ contest.name }}</h1>
+	<div class="admin-controls">
+		<a href="#" id="toggle-problems">Toggle {% if type == "contest" %}problems{% else %}contests{% endif %}</a>
+	</div>
+	<div class="leaderboard-container">
+		<table>
+			<tr>
+				<th></th>
+				{% for problem in problems %}
+					<th class="problem-cell">{{ problem.name }}</th>
+				{% endfor %}
+				<th>Total</th>
+			</tr>
+			{% for user in sorted_users %}
+				<tr>
+					<td>{{ sorted_users[user]["name"] }}</td>
+					{% for problem in sorted_users[user]["problems"] %}
+						{% if not problem["attempted"] %}
+							<td class="problem-cell" style="color: rgb(160, 160, 160);">Not attempted</td>
+						{% else %}
+							<td class="problem-cell">
+								{% if type == "contest" %}
+									{{ problem["score"] }}
+								{% else %}
+									<a href="/contest/{{ problem['obj'].id }}/leaderboard">{{ problem["score"] }}</a>
+								{% endif %}
+							</td>
+						{% endif %}
+					{% endfor %}
+					<td><b>{{ sorted_users[user]["total_score"] }}</b></td>
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% endblock %}

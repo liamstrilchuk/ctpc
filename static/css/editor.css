@@ -11,6 +11,10 @@ body {
 	position: relative;
 }
 
+#content {
+	background: rgb(54, 58, 70);
+}
+
 #navbar-margin {
 	margin: 0 !important;
 }

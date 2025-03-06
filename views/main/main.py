@@ -431,8 +431,8 @@ def student_onboarding():
 	resume_file = request.files.get("resume")
 	tshirt_size = request.form.get("tshirt")
 
-	if User.query.filter_by(email=email.lower()).first() is not None:
-		return render_template("student-onbaord.html", error="Email is already in use")
+	if not email or User.query.filter_by(email=email.lower()).first() is not None:
+		return render_template("student-onboard.html", error="Email is already in use")
 
 	if not first or not last:
 		return render_template("student-onboard.html", error="Must include first and last name")

@@ -212,10 +212,11 @@ def resubmit_pending_submissions():
 		if sub.is_practice:
 			continue
 
-		all_testcases = []
+		all_groups = []
 		for tcg in sub.test_case_groups:
+			all_groups.append([])
 			for tc in tcg.test_cases:
-				all_testcases.append({
+				all_groups[-1].append({
 					"input": tc.abstract_test_case.input,
 					"expected_output": tc.abstract_test_case.expected_output,
 					"id": tc.id
@@ -223,9 +224,10 @@ def resubmit_pending_submissions():
 			
 		json_to_grader = {
 			"code": sub.code,
-			"testcases": all_testcases,
+			"testcases": all_groups,
 			"language": sub.language.grader_id,
-			"submission_id": sub.id
+			"submission_id": sub.id,
+			"run_all": True
 		}
 
 		requests.post("http://127.0.0.1:8000/create-submission", json=json_to_grader)
