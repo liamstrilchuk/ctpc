@@ -10,7 +10,15 @@
 		<a href="/teacher/register-student">Register student</a>
 		<a href="/teacher-onboarding">Change preferences</a>
 	</div>
-	<p>You are a teacher for <b>{{ current_user.school.name }}</b> ({{ current_user.school.school_board.name }}).</p>
+	<p>
+		You are a teacher for <b>{{ current_user.school.name }}</b> ({{ current_user.school.school_board.name }}).
+		{% if current_user.school.consider_in_person %}You have requested to be considered for the in-person competition.{% endif %}
+		{% if current_user.school.consider_in_person %}Any teams not selected for in-person attendance{% else %}Your teams{% endif %} will be participating {% if current_user.school.synchronous %}synchronously with the in-person competition{% else %}asynchronously{% endif %}.
+	</p>
+	{% if current_user.school.in_person_spots > 0 %}
+		<p style="color: skyblue;"><b>You have been invited to bring {{ current_user.school.in_person_spots }} team{% if not current_user.school.in_person_spots == 1 %}s{% endif %} to the in-person competition. Please select which of your teams will attend in-person below. We have sent you an email with more details. If you have any questions, or you no longer wish to participate in-person, please contact <a href="mailto:launch@ctpc.ca">launch@ctpc.ca</a> as soon as possible.</b></p>
+	{% endif %}
+
 	{% if unassigned %}
 		{% if unassigned|length == 1 %}
 			<p>You have 1 student who is not assigned to a team:</p>
@@ -38,9 +46,18 @@
 
 	{% for team in teams %}
 		<div class="admin-board">
-			<span class="admin-team-name"><b>{{ team.name }}</b></span>
+			<span class="admin-team-name"><b>{{ team.name }}</b>&nbsp;&nbsp;&nbsp;({% if team.in_person %}in-person{% else %}virtual{% endif %})</span>
 			<div class="admin-controls">
-				<span>{{ 4 - team.members|length }} spot{% if team.members|length != 3 %}s{% endif %} remaining</span> <a href="/teacher/delete-team/{{ team.id }}">Delete team</a>
+				<span>{{ 4 - team.members|length }} spot{% if team.members|length != 3 %}s{% endif %} remaining</span>
+				{% if not team.in_person %}
+					{% if remaining_in_person_spots > 0 %}
+						<a href="/teacher/assign-in-person/{{ team.id }}">Register for in-person</a>
+					{% endif %}
+					<a href="/teacher/delete-team/{{ team.id }}">Delete team</a>
+				{% else %}
+					<b>This team is registered for the in-person competition.</b>
+					<a href="/teacher/assign-in-person/{{ team.id }}">Unregister</a>
+				{% endif %}
 			</div>
 			{% if team.members %}
 				<ul>

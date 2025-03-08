@@ -6,7 +6,11 @@
 {% endblock %}
 
 {% block content %}
-	<a class="back" href="/contest/{{ contest.id }}">&larr; Back to contest</a>
+	{% if type == "contest" %}
+		<a class="back" href="/contest/{{ contest.id }}">&larr; Back to contest</a>
+	{% else %}
+		<a class="back" href="/competitions/{{ contest.short_name }}">&larr; Back to competition</a>
+	{% endif %}
 	<h1>Leaderboard for {{ contest.name }}</h1>
 	<div class="admin-controls">
 		<a href="#" id="toggle-problems">Toggle {% if type == "contest" %}problems{% else %}contests{% endif %}</a>

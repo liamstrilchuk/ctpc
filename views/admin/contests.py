@@ -28,7 +28,56 @@ def competitions_view():
 @admin_required
 @check_object_exists(Competition, "/admin/competitions", key_name="short_name")
 def schools_view(competition):
-	return render_template("admin/admin-schools.html", competition=competition)
+	students_by_school = {}
+	in_person_teams_by_school = {}
+
+	for school in competition.schools:
+		students_by_school[school.id] = 0
+		in_person_teams_by_school[school.id] = 0
+
+		for user in school.members:
+			if user.role.name == "student":
+				students_by_school[school.id] += 1
+
+		for team in school.teams:
+			if team.in_person:
+				in_person_teams_by_school[school.id] += 1
+	
+	return render_template(
+		"admin/admin-schools.html",
+		competition=competition,
+		students_by_school=students_by_school,
+		in_person_teams_by_school=in_person_teams_by_school
+	)
+
+@contests.route("/admin/invite-teams/<int:school_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(School, "/admin/competitions")
+def invite_teams(school):
+	if request.method == "GET":
+		return render_template("admin/invite-teams.html", school=school)
+	
+	new_count = request.form.get("new_count")
+	try:
+		new_count = int(new_count)
+
+		if new_count < 0:
+			raise Exception()
+	except:
+		return render_template("admin/invite-teams.html", school=school, error="Invalid number")
+	
+	current_in_person = 0
+	for team in school.teams:
+		if team.in_person:
+			current_in_person += 1
+
+	if new_count < current_in_person:
+		return render_template("admin/invite-teams.html", school=school, error="New count cannot be less than number of currently assigned in person teams")
+	
+	school.in_person_spots = new_count
+	db.session.commit()
+
+	return redirect(f"/admin/schools/{school.competition.short_name}")
 
 @contests.route("/admin/school-codes/<short_name>")
 @admin_required

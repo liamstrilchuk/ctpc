@@ -16,6 +16,9 @@
 				<th>Actions</th>
 				<th>Teachers</th>
 				<th>Teams registered</th>
+				<th>Students registered</th>
+				<th>In person requested</th>
+				<th>Synchronous</th>
 			</tr>
 			{% for school in competition.schools %}
 				<tr class="light-row">
@@ -34,11 +37,21 @@
 						{% endfor %}
 					</td>
 					<td>{{ school.teams|length }}</td>
+					<td>{{ students_by_school[school.id] }}</td>
+					<td>{% if school.consider_in_person %}Yes (<a href="/admin/invite-teams/{{ school.id }}">{{ school.in_person_spots }} team{% if not school.in_person_spots == 1 %}s{% endif %} invited</a>){% else %}No{% endif %}</td>
+					<td>{% if school.synchronous %}Yes{% else %}No{% endif %}</td>
 				</div>
 			{% endfor %}
 			<tr class="dark-row">
-				<th colspan="4">Total</th>
+				<th colspan="4">Totals</th>
 				<th>{{ competition.schools|map(attribute="teams")|map("length")|sum }}</th>
+				<th>{{ students_by_school.values()|sum }}</th>
+				<td>
+					{{ competition.schools|map(attribute="consider_in_person")|sum }} school{% if not competition.schools|map(attribute="consider_in_person")|sum == 1 %}s{% endif %} requested;<br>
+					{{ competition.schools|map(attribute="in_person_spots")|sum }} team{% if not competition.schools|map(attribute="in_person_spots")|sum == 1 %}s{% endif %} invited;<br>
+					{{ in_person_teams_by_school.values()|sum }} team{% if not in_person_teams_by_school.values()|sum == 1 %}s{% endif %} accepted
+				</td>
+				<th>{{ competition.schools|map(attribute="synchronous")|sum }}/{{ competition.schools|length }}</th>
 			</tr>
 		</table>
 	</div>

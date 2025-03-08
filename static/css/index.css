@@ -212,7 +212,7 @@ a {
 
 .admin-board {
 	padding: 10px 20px;
-	background: #223;
+	background: #40405e;
 	margin: 10px 0;
 	border-radius: 5px;
 }
@@ -271,7 +271,7 @@ form:not(.form) * {
 form input, form select, form textarea, .form input[type=submit] {
 	padding: 8px 15px;
 	margin: 5px 0 10px 0;
-	background: #323740;
+	background: #404b5e;
 	border-radius: 5px;
 	color: white;
 	outline: none !important;
@@ -388,4 +388,8 @@ code {
 	background: #334;
 	border-radius: 5px;
 	color: #cce;
+}
+
+#adminContainer table {
+	width: max-content;
 }

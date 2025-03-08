@@ -3,7 +3,7 @@ from flask_login import current_user
 
 from models import Team, User, UserRole, db
 from setup import bcrypt
-from util import generate_random_password
+from util import check_object_exists, generate_random_password
 import handle_objects
 
 teacher = Blueprint("teacher", __name__, template_folder="templates")
@@ -36,8 +36,23 @@ def teacher_view():
 
 	teams = Team.query.filter_by(school=current_user.school).all()
 	unassigned = User.query.filter_by(school=current_user.school, team_id=None, role=UserRole.query.filter_by(name="student").first()).all()
+	remaining_in_person_spots = current_user.school.in_person_spots - len(Team.query.filter_by(school=current_user.school, in_person=True).all())
 
-	return render_template("teacher.html", teams=teams, unassigned=unassigned)
+	return render_template("teacher.html", teams=teams, unassigned=unassigned, remaining_in_person_spots=remaining_in_person_spots)
+
+@teacher.route("/teacher/assign-in-person/<int:team_id>")
+@teacher_required
+@check_object_exists(Team, "/teacher")
+def assign_in_person(team):
+	remaining_in_person_spots = current_user.school.in_person_spots - len(Team.query.filter_by(school=current_user.school, in_person=True).all())
+
+	if not team.in_person and remaining_in_person_spots == 0:
+		return redirect("/teacher")
+	
+	team.in_person = not team.in_person
+	db.session.commit()
+
+	return redirect("/teacher")
 
 @teacher.route("/teacher-onboarding", methods=["GET", "POST"])
 @teacher_required

@@ -1,0 +1,13 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/schools/{{ school.competition.short_name }}">&larr; Back to competition</a>
+	<h1>Change number of invited teams</h1>
+	<p>The school {{ school.name }} currently has {{ school.in_person_spots }} teams invited to attend in person.</p>
+	<form method="post">
+		<label>Enter new number of invitations:</label>
+		<input type="number" value="{{ school.in_person_spots }}" name="new_count">
+		<input type="submit">
+		{% if error %}{{ error }}{% endif %}
+	</form>
+{% endblock %}
