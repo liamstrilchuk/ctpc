@@ -8,6 +8,7 @@ import handle_objects
 
 teacher = Blueprint("teacher", __name__, template_folder="templates")
 
+
 def teacher_required(func):
 	def wrapper(*args, **kwargs):
 		if not current_user.is_authenticated:
@@ -22,11 +23,13 @@ def teacher_required(func):
 	
 	return wrapper
 
+
 def teacher_controls(teacher, student):
 	if student is None or not student.school == teacher.school or not student.role.name == "student" or not teacher.role.name in ("teacher", "admin"):
 		return False
 
 	return True
+
 
 @teacher.route("/teacher")
 @teacher_required
@@ -40,10 +43,14 @@ def teacher_view():
 
 	return render_template("teacher.html", teams=teams, unassigned=unassigned, remaining_in_person_spots=remaining_in_person_spots)
 
+
 @teacher.route("/teacher/assign-in-person/<int:team_id>")
 @teacher_required
 @check_object_exists(Team, "/teacher")
 def assign_in_person(team):
+	if not team.school == current_user.school:
+		return redirect("/teacher")
+
 	remaining_in_person_spots = current_user.school.in_person_spots - len(Team.query.filter_by(school=current_user.school, in_person=True).all())
 
 	if not team.in_person and remaining_in_person_spots == 0:
@@ -53,6 +60,7 @@ def assign_in_person(team):
 	db.session.commit()
 
 	return redirect("/teacher")
+
 
 @teacher.route("/teacher-onboarding", methods=["GET", "POST"])
 @teacher_required
@@ -76,6 +84,7 @@ def teacher_onboarding():
 
 	return render_template("teacher-postregister.html", in_person=in_person, sync=sync)
 
+
 @teacher.route("/teacher/create-team", methods=["GET", "POST"])
 @teacher_required
 def create_team():
@@ -93,6 +102,7 @@ def create_team():
 	db.session.commit()
 
 	return redirect("/teacher")
+
 
 @teacher.route("/teacher/register-student", methods=["GET", "POST"])
 @teacher_required
@@ -126,6 +136,7 @@ def register_student():
 
 	return render_template("user-created.html", username=user.username, password=password)
 
+
 @teacher.route("/teacher/assign/<string:username>", methods=["GET", "POST"])
 @teacher_required
 def assign_student(username):
@@ -154,6 +165,7 @@ def assign_student(username):
 
 	return redirect("/teacher")
 
+
 @teacher.route("/teacher/unassign/<string:username>")
 @teacher_required
 def unassign_student(username):
@@ -165,6 +177,7 @@ def unassign_student(username):
 	db.session.commit()
 
 	return redirect("/teacher")
+
 
 @teacher.route("/teacher/delete/<string:username>", methods=["GET", "POST"])
 @teacher_required
@@ -179,6 +192,7 @@ def delete_student(username):
 	handle_objects.delete_user(user)
 
 	return redirect("/teacher")
+
 
 @teacher.route("/teacher/reset-password/<string:username>", methods=["GET", "POST"])
 @teacher_required
@@ -195,6 +209,7 @@ def reset_password(username):
 	db.session.commit()
 
 	return render_template("user-created.html", username=username, password=random_password, text="Password reset successfully")
+
 
 @teacher.route("/teacher/delete-team/<int:team_id>", methods=["GET", "POST"])
 @teacher_required

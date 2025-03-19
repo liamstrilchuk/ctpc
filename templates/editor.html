@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block head %}
-	<script src="{{ url_for('static', filename='js/ace.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/ext-language_tools.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/theme-one_dark.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/mode-python.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/mode-java.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/mode-c_cpp.js') }}"></script>
-	<script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor/ace.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor/ext-language_tools.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor/theme-one_dark.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor/mode-python.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor/mode-java.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor/mode-c_cpp.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor/editor.js') }}"></script>
 
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">

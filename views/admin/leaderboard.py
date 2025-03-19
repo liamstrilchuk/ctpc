@@ -5,6 +5,7 @@ from util import admin_required, check_object_exists
 
 leaderboard = Blueprint("leaderboard", __name__, template_folder="templates")
 
+
 def contest_leaderboard_data(contest):
 	problems = Problem.query.filter_by(contest_id=contest.id).all()
 	problem_id_dict = { problems[i].id: i for i in range(len(problems)) }
@@ -63,6 +64,7 @@ def contest_leaderboard_data(contest):
 
 	return problems, sorted_users
 
+
 @leaderboard.route("/contest/<int:contest_id>/leaderboard")
 @admin_required
 @check_object_exists(Contest, "/competitions")
@@ -76,6 +78,7 @@ def contest_leaderboard(contest):
 		sorted_users=sorted_users,
 		type="contest"
 	)
+
 
 @leaderboard.route("/competitions/<competition_name>/leaderboard")
 @admin_required

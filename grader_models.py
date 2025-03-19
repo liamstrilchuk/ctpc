@@ -8,6 +8,7 @@ class Submission:
 	def add_test_case(self, test_case):
 		self.test_cases.append(test_case)
 
+
 class TestCase:
 	def __init__(self, submission, id="", input="", expected_output=""):
 		self.id = id

@@ -9,6 +9,7 @@ import handle_objects
 
 main = Blueprint("main", __name__, template_folder="templates")
 
+
 @main.route("/team")
 @login_required
 def team_view():
@@ -16,6 +17,7 @@ def team_view():
 		return redirect("/")
 	
 	return render_template("contest/team.html", team=current_user.team)
+
 
 @main.route("/competitions")
 @login_required
@@ -26,6 +28,7 @@ def competitions_view():
 	competitions = Competition.query.all()
 	return render_template("contest/competitions.html", competitions=competitions, current_time=time())
 
+
 @main.route("/competitions/<competition_id>")
 @login_required
 @check_object_exists(Competition, "/competitions", key_name="short_name")
@@ -34,6 +37,7 @@ def contests_view(competition):
 		return redirect("/student-onboarding")
 
 	return render_template("contest/contests.html", contests=competition.contests, current_time=time(), competition=competition)
+
 
 @main.route("/contest/<int:contest_id>")
 @login_required
@@ -78,6 +82,7 @@ def contest_view(contest):
 		problem_dict=problem_dict
 	)
 
+
 @main.route("/problem/<int:problem_id>")
 @login_required
 @check_object_exists(Problem, "/competitions")
@@ -91,6 +96,7 @@ def problem_view(problem):
 	html_content = markdown.markdown(problem.description)
 
 	return render_template("contest/problem.html", problem=problem, problem_html=html_content, sample_groups=sample_groups, languages=languages)
+
 
 @main.route("/submit/<int:problem_id>", methods=["POST"])
 @login_required
@@ -171,6 +177,7 @@ def submit(problem):
 
 	return redirect(f"/submission/{submission.id}") if not return_id else { "id": submission.id }
 
+
 @main.route("/submit-practice/<int:problem_id>", methods=["POST"])
 @login_required
 @check_object_exists(Problem, "/competitions")
@@ -239,6 +246,7 @@ def submit_practice(problem):
 
 	return { "id": submission.id }
 
+
 @main.route("/practice-submission-status/<int:submission_id>")
 @login_required
 @check_object_exists(Submission, "/")
@@ -257,6 +265,7 @@ def practice_submission_status(submission):
 			})
 
 	return test_case_data
+
 
 @main.route("/last-practice-submission/<int:problem_id>")
 @login_required
@@ -302,6 +311,7 @@ def last_practice_submission(problem):
 			"language": ""
 		}
 
+
 @main.route("/submission/<int:submission_id>")
 @login_required
 @check_object_exists(Submission, "/competitions")
@@ -311,25 +321,27 @@ def submission_view(submission):
 
 	return render_template("contest/submission.html", submission=submission, current_time=time())
 
+
 @main.route("/competitions/<competition_id>/register")
 @check_object_exists(Competition, "/competitions", key_name="short_name")
 def register(competition):
 	return render_template("register.html", competition=competition)
 
-# @main.route("/competitions/<competition_id>/register/student", methods=["GET", "POST"])
-# @check_object_exists(Competition, "/competitions", key_name="short_name")
-# @logout_required
-# def register_as_student(competition):
-# 	if request.method == "GET":
-# 		return render_template("register-as-student.html", competition=competition)
-	
-# 	first = request.form.get("first")
-# 	last = request.form.get("last")
-# 	password = request.form.get("password")
-# 	email = request.form.get("email")
 
-# 	user = register_teacher_or_student(first, last, password, email, competition, "individual-student", "register-as-student.html")
-# 	return redirect(f"/competitions/{competition.short_name}")
+@main.route("/competitions/<competition_id>/register/student", methods=["GET", "POST"])
+@check_object_exists(Competition, "/competitions", key_name="short_name")
+@logout_required
+def register_as_student(competition):
+	if request.method == "GET":
+		return redirect("/")
+		# return render_template("register-as-student.html", competition=competition)
+	
+	password = request.form.get("password")
+	email = request.form.get("email")
+
+	register_teacher_or_student("", "", password, email, competition, "individual-student", "register-as-student.html")
+	return redirect(f"/competitions/{competition.short_name}")
+
 
 @main.route("/competitions/<competition_id>/register/teacher", methods=["GET", "POST"])
 @check_object_exists(Competition, "/competitions", key_name="short_name")
@@ -368,6 +380,7 @@ def register_as_teacher(competition):
 
 	return redirect("/teacher")
 
+
 def register_teacher_or_student(first, last, password, email, competition, role, template):
 	if not first or not last:
 		return render_template(template, competition=competition, error="Invalid name")
@@ -405,6 +418,7 @@ def register_teacher_or_student(first, last, password, email, competition, role,
 	login_user(user)
 	return user
 
+
 @main.route("/editor/<int:problem_id>")
 @login_required
 @check_object_exists(Problem, "/competitions")
@@ -413,6 +427,7 @@ def editor(problem):
 		return redirect("/competitions")
 
 	return render_template("editor.html", problem=problem, languages=LanguageType.query.all())
+
 
 @main.route("/student-onboarding", methods=["GET", "POST"])
 @login_required

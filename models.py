@@ -23,6 +23,7 @@ class User(UserMixin, db.Model):
 	def __repr__(self):
 		return f"<User {self.username}>"
 	
+
 class StudentProfile(db.Model):
 	__tablename__ = "student_profiles"
 
@@ -36,6 +37,7 @@ class StudentProfile(db.Model):
 	def __repr__(self):
 		return f"<StudentProfile {self.id}>"
 	
+
 class UserRole(db.Model):
 	__tablename__ = "user_roles"
 
@@ -46,6 +48,7 @@ class UserRole(db.Model):
 	def __repr__(self):
 		return f"<UserRole {self.name}>"
 	
+
 class Competition(db.Model):
 	__tablename__ = "competitions"
 
@@ -58,6 +61,7 @@ class Competition(db.Model):
 	
 	def __repr__(self):
 		return f"<Competition {self.name}>"
+
 
 class School(db.Model):
 	__tablename__ = "schools"
@@ -75,6 +79,7 @@ class School(db.Model):
 	def __repr__(self):
 		return f"<School {self.name}>"
 	
+
 class SchoolCode(db.Model):
 	__tablename__ = "school_codes"
 
@@ -88,6 +93,7 @@ class SchoolCode(db.Model):
 	def __repr__(self):
 		return f"<SchoolCode {self.code}>"
 	
+
 class SchoolBoard(db.Model):
 	__tablename__ = "school_boards"
 
@@ -102,14 +108,17 @@ class SchoolBoard(db.Model):
 	def __repr__(self):
 		return f"<SchoolBoard {self.name}>"
 	
+
 class Team(db.Model):
 	__tablename__ = "teams"
 
 	id = sa.Column(sa.Integer, primary_key=True)
 	name = sa.Column(sa.String(100), nullable=False)
-	school_id = sa.Column(sa.Integer, sa.ForeignKey("schools.id"), nullable=False)
+	school_id = sa.Column(sa.Integer, sa.ForeignKey("schools.id"), nullable=True)
 	members = db.relationship("User", backref="team", lazy=True)
 	in_person = sa.Column(sa.Boolean, default=False)
+	team_code = sa.Column(sa.String(100), nullable=True)
+	individual = sa.Column(sa.Boolean, default=False)
 
 	def __init__(self, name, school_id):
 		self.name = name
@@ -118,6 +127,7 @@ class Team(db.Model):
 	def __repr__(self):
 		return f"<Team {self.name}>"
 	
+
 class ContestType(db.Model):
 	__tablename__ = "contest_types"
 
@@ -128,6 +138,7 @@ class ContestType(db.Model):
 	def __repr__(self):
 		return f"<ContestType {self.name}>"
 	
+
 class Contest(db.Model):
 	__tablename__ = "contests"
 
@@ -144,6 +155,7 @@ class Contest(db.Model):
 	def __repr__(self):
 		return f"<Contest {self.name}>"
 	
+
 class Problem(db.Model):
 	__tablename__ = "problems"
 
@@ -159,6 +171,7 @@ class Problem(db.Model):
 	def __repr__(self):
 		return f"<Problem {self.name}>"
 	
+
 class Submission(db.Model):
 	__tablename__ = "submissions"
 
@@ -176,6 +189,7 @@ class Submission(db.Model):
 	def __repr__(self):
 		return f"<Submission {self.id}>"
 	
+
 class TestCase(db.Model):
 	__tablename__ = "test_cases"
 
@@ -188,6 +202,7 @@ class TestCase(db.Model):
 	def __repr__(self):
 		return f"<TestCase {self.id}>"
 	
+
 class AbstractTestCaseGroup(db.Model):
 	__tablename__ = "abstract_test_case_groups"
 
@@ -201,6 +216,7 @@ class AbstractTestCaseGroup(db.Model):
 	def __repr__(self):
 		return f"<AbstractTestCaseGroup {self.id}>"
 	
+
 class TestCaseGroup(db.Model):
 	__tablename__ = "test_case_groups"
 
@@ -213,6 +229,7 @@ class TestCaseGroup(db.Model):
 	def __repr__(self):
 		return f"<TestCaseGroup {self.id}>"
 	
+
 class AbstractTestCase(db.Model):
 	__tablename__ = "abstract_test_cases"
 
@@ -226,6 +243,7 @@ class AbstractTestCase(db.Model):
 	def __repr__(self):
 		return f"<AbstractTestCase {self.id}>"
 	
+
 class TestCaseStatus(db.Model):
 	__tablename__ = "test_case_statuses"
 
@@ -236,6 +254,7 @@ class TestCaseStatus(db.Model):
 	def __repr__(self):
 		return f"<TestCaseStatus {self.name}>"
 	
+
 class SubmissionStatus(db.Model):
 	__tablename__ = "submission_statuses"
 
@@ -246,6 +265,7 @@ class SubmissionStatus(db.Model):
 	def __repr__(self):
 		return f"<SubmissionStatus {self.name}>"
 	
+
 class LanguageType(db.Model):
 	__tablename__ = "language_types"
 

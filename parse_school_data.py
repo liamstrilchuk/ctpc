@@ -2,6 +2,7 @@ import models, csv
 import handle_objects
 from app import app
 
+
 def main():
 	lines = []
 	with open("school_data/teacher_emails.csv", "r") as f:
@@ -28,6 +29,7 @@ def main():
 	with open("school_data/teacher_emails_with_codes.csv", "w") as f:
 		writer = csv.writer(f)
 		writer.writerows(lines)
+
 
 if __name__ == "__main__":
 	main()

@@ -28,10 +28,12 @@ STATUSES = {
 	"Server Error": ["Internal Error", "Exec Format Error"]
 }
 
+
 def setup_thread():
 	timer = threading.Timer(2.0, check_submissions)
 	timer.daemon = True
 	timer.start()
+
 
 def get_refined_status(grader_status):
 	for item in STATUSES:
@@ -39,6 +41,7 @@ def get_refined_status(grader_status):
 			return item
 		
 	return "Server Error"
+
 
 def check_submissions():
 	test_cases_by_grader = { k: [] for k in GRADER_URLS }
@@ -84,6 +87,7 @@ def check_submissions():
 
 	setup_thread()
 
+
 def run_test_cases(submission, test_cases):
 	global current_grader
 
@@ -106,6 +110,7 @@ def run_test_cases(submission, test_cases):
 		pending_testcases[response[i]["token"]] = test_cases[i]
 
 	current_grader = (current_grader + 1) % len(GRADER_URLS)
+
 
 @app.post("/create-submission")
 async def create_submission(request: Request):
@@ -152,6 +157,7 @@ async def create_submission(request: Request):
 	global total_submissions
 	total_submissions += 1
 
+
 @app.post("/get-submission-statuses")
 async def get_submission_statuses(request: Request):
 	data = await request.json()
@@ -175,6 +181,7 @@ async def get_submission_statuses(request: Request):
 
 	return to_return
 
+
 @app.get("/status")
 def status():
 	workers_status = []
@@ -193,6 +200,7 @@ def status():
 		"total_submissions": total_submissions,
 		"workers": workers_status
 	}
+
 
 @app.post("/cancel-all")
 def cancel_all():

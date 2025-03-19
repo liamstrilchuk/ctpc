@@ -2,6 +2,7 @@ from models import *
 from util import generate_random_password, generate_school_code
 from setup import bcrypt
 
+
 def add_student(username, role="student", password=None, school_id=None):
 	username_counter = 0
 	while True:
@@ -32,12 +33,14 @@ def add_student(username, role="student", password=None, school_id=None):
 
 	return user, password
 
+
 def add_school(name, school_board_id, competition_id):
 	school = School(name=name, school_board_id=school_board_id, competition_id=competition_id)
 	db.session.add(school)
 	db.session.commit()
 
 	return school
+
 
 def add_school_code(school_board_id, competition_id, school_name):
 	code = generate_school_code()
@@ -51,19 +54,23 @@ def add_school_code(school_board_id, competition_id, school_name):
 	db.session.commit()
 	return code
 
+
 def delete_school_code(code):
 	db.session.delete(code)
 	db.session.commit()
+
 
 def add_competition(name, short_name):
 	competition = Competition(name=name, short_name=short_name)
 	db.session.add(competition)
 	db.session.commit()
 
+
 def edit_competition(competition, name, short_name):
 	competition.name = name
 	competition.short_name = short_name
 	db.session.commit()
+
 
 def add_contest(name, contest_type_id, start_date, end_date, point_multiplier, competition_id):
 	contest = Contest(
@@ -77,6 +84,7 @@ def add_contest(name, contest_type_id, start_date, end_date, point_multiplier, c
 	db.session.add(contest)
 	db.session.commit()
 
+
 def edit_contest(contest, name, contest_type_id, start_date, end_date, point_multiplier):
 	contest.name = name
 	contest.contest_type_id = contest_type_id
@@ -85,9 +93,11 @@ def edit_contest(contest, name, contest_type_id, start_date, end_date, point_mul
 	contest.point_multiplier = point_multiplier
 	db.session.commit()
 
+
 def delete_test_case(tc):
 	db.session.delete(tc)
 	db.session.commit()
+
 
 def delete_test_case_group(tcg):
 	for tc in tcg.test_cases:
@@ -96,6 +106,7 @@ def delete_test_case_group(tcg):
 	db.session.delete(tcg)
 	db.session.commit()
 
+
 def delete_submission(submission):
 	for tcg in submission.test_case_groups:
 		delete_test_case_group(tcg)
@@ -103,9 +114,11 @@ def delete_submission(submission):
 	db.session.delete(submission)
 	db.session.commit()
 
+
 def delete_abstract_test_case(atc):
 	db.session.delete(atc)
 	db.session.commit()
+
 
 def delete_abstract_test_case_group(atcg):
 	atcg.problem.point_value -= atcg.point_value
@@ -115,6 +128,7 @@ def delete_abstract_test_case_group(atcg):
 
 	db.session.delete(atcg)
 	db.session.commit()
+
 
 def delete_problem(problem):
 	for sub in problem.submissions:
@@ -126,6 +140,7 @@ def delete_problem(problem):
 	db.session.delete(problem)
 	db.session.commit()
 
+
 def delete_contest(contest):
 	for problem in contest.problems:
 		delete_problem(problem)
@@ -133,12 +148,14 @@ def delete_contest(contest):
 	db.session.delete(contest)
 	db.session.commit()
 
+
 def delete_competition(competition):
 	for contest in competition.contests:
 		delete_contest(contest)
 
 	db.session.delete(competition)
 	db.session.commit()
+
 
 def delete_user(user):
 	for sub in user.submissions:
@@ -151,12 +168,14 @@ def delete_user(user):
 	db.session.delete(user)
 	db.session.commit()
 
+
 def delete_team(team):
 	for student in team.members:
 		student.team_id = None
 
 	db.session.delete(team)
 	db.session.commit()
+
 
 def create_student_profile(user, first, last, email, github, linkedin, resume, tshirt_size):
 	user.first = first

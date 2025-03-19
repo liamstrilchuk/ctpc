@@ -5,6 +5,7 @@ from models import Submission, SubmissionStatus, TestCaseStatus, db
 
 GRADER_URL = "http://127.0.0.1:8000"
 
+
 def check_submissions():
 	pending_submissions = Submission.query.filter_by(
 		status_id=SubmissionStatus.query.filter_by(name="Pending").first().id
@@ -48,6 +49,7 @@ def check_submissions():
 			ps.points_earned = total_points
 
 	db.session.commit()
+
 
 def main():
 	while True:

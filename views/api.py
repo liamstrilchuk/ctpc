@@ -7,8 +7,10 @@ from util import check_object_exists
 
 api = Blueprint("api", __name__)
 
+
 def error(message):
 	return { "error": message }
+
 
 @api.route("/api/test-cases/<int:problem_id>")
 @login_required
@@ -34,6 +36,7 @@ def get_test_cases(problem):
 
 	return { "test_cases": all_test_cases }
 
+
 @api.route("/api/problem/<int:problem_id>")
 @login_required
 @check_object_exists(Problem, "/")
@@ -43,6 +46,7 @@ def get_problem(problem):
 	
 	raw_content = problem.description
 	return { "content": markdown.markdown(raw_content), "title": problem.name }
+
 
 @api.route("/api/submissions/<int:problem_id>")
 @login_required

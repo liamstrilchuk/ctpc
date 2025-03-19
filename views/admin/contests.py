@@ -6,6 +6,7 @@ import handle_objects
 
 contests = Blueprint("contests", __name__, template_folder="templates")
 
+
 @contests.route("/admin/contests/<short_name>")
 @admin_required
 @check_object_exists(Competition, "/admin/competitions", key_name="short_name")
@@ -17,12 +18,14 @@ def contests_view(competition):
 
 	return render_template("admin/admin-contests.html", competition=competition, total_points=total_points)
 
+
 @contests.route("/admin/competitions")
 @admin_required
 def competitions_view():
 	competitions = Competition.query.all()
 
 	return render_template("admin/admin-competitions.html", competitions=competitions)
+
 
 @contests.route("/admin/schools/<short_name>")
 @admin_required
@@ -49,6 +52,7 @@ def schools_view(competition):
 		students_by_school=students_by_school,
 		in_person_teams_by_school=in_person_teams_by_school
 	)
+
 
 @contests.route("/admin/invite-teams/<int:school_id>", methods=["GET", "POST"])
 @admin_required
@@ -79,6 +83,7 @@ def invite_teams(school):
 
 	return redirect(f"/admin/schools/{school.competition.short_name}")
 
+
 @contests.route("/admin/school-codes/<short_name>")
 @admin_required
 @check_object_exists(Competition, "/admin/competitions", key_name="short_name")
@@ -88,6 +93,7 @@ def school_codes(competition):
 		competition=competition,
 		codes=SchoolCode.query.filter_by(competition_id=competition.id)
 	)
+
 
 @contests.route("/admin/add-school-code/<short_name>", methods=["GET", "POST"])
 @admin_required
@@ -131,6 +137,7 @@ def add_school_code(competition):
 
 	return redirect(f"/admin/school-codes/{competition.short_name}")
 
+
 @contests.route("/admin/delete-school-code/<int:code_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(SchoolCode, "/admin/competitions")
@@ -141,6 +148,7 @@ def delete_school_code(code):
 	competition_name = code.competition.short_name
 	handle_objects.delete_school_code(code)
 	return redirect(f"/admin/school-codes/{competition_name}")
+
 
 @contests.route("/admin/add-school/<competition_short_name>", methods=["GET", "POST"])
 @admin_required
@@ -168,6 +176,7 @@ def add_school(competition):
 
 	return redirect("/admin")
 
+
 @contests.route("/admin/add-competition", methods=["GET", "POST"])
 @admin_required
 def add_competition():
@@ -187,6 +196,7 @@ def add_competition():
 	handle_objects.add_competition(name, short_name)
 
 	return redirect("/admin/competitions")
+
 
 @contests.route("/admin/edit-competition/<int:competition_id>", methods=["GET", "POST"])
 @admin_required
@@ -208,6 +218,7 @@ def edit_competition(competition):
 	handle_objects.edit_competition(competition, name, short_name)
 
 	return redirect("/admin/competitions")
+
 
 @contests.route("/admin/add-contest/<competition_short_name>", methods=["GET", "POST"])
 @admin_required
@@ -250,6 +261,7 @@ def add_contest(competition):
 
 	return redirect("/admin/competitions")
 
+
 @contests.route("/admin/edit-contest/<int:contest_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(Contest, "/admin/contests")
@@ -278,6 +290,7 @@ def edit_contest(contest):
 	handle_objects.edit_contest(contest, name, ctype_obj.id, start_date, end_date, point_multiplier)
 	return redirect(f"/admin/contests/{contest.competition.short_name}")
 
+
 @contests.route("/admin/delete-contest/<int:contest_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(Contest, "/admin/competitions")
@@ -288,6 +301,7 @@ def delete_contest(contest):
 	handle_objects.delete_contest(contest)
 
 	return redirect("/admin/competitions")
+
 
 @contests.route("/admin/delete-competition/<int:competition_id>", methods=["GET", "POST"])
 @admin_required
@@ -300,11 +314,13 @@ def delete_competition(competition):
 
 	return redirect("/admin/competitions")
 
+
 @contests.route("/admin/edit-problems/<int:contest_id>")
 @admin_required
 @check_object_exists(Contest, "/admin/contests")
 def edit_problems(contest):
 	return render_template("admin/admin-problems.html", contest=contest)
+
 
 @contests.route("/admin/create-problem/<int:contest_id>", methods=["GET", "POST"])
 @admin_required
@@ -324,6 +340,7 @@ def create_problem(contest):
 	db.session.commit()
 
 	return redirect(f"/admin/edit-problems/{contest.id}")
+
 
 @contests.route("/admin/edit-problem/<int:problem_id>", methods=["GET", "POST"])
 @admin_required
@@ -345,6 +362,7 @@ def edit_problem(problem):
 
 	return redirect(f"/admin/edit-problems/{problem.contest.id}")
 
+
 @contests.route("/admin/delete-problem/<int:problem_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(Problem, "/admin/contests")
@@ -358,11 +376,13 @@ def delete_problem(problem):
 
 	return redirect(f"/admin/edit-problems/{contest_id}")
 
+
 @contests.route("/admin/problems/<int:problem_id>")
 @admin_required
 @check_object_exists(Problem, "/admin/contests")
 def view_test_cases(problem):
 	return render_template("admin/test-cases.html", problem=problem)
+
 
 @contests.route("/admin/add-test-case-group/<int:problem_id>", methods=["GET", "POST"])
 @admin_required
@@ -381,6 +401,7 @@ def add_test_case_group(problem):
 	db.session.commit()
 
 	return redirect(f"/admin/problems/{problem.id}")
+
 
 @contests.route("/admin/edit-test-case-group/<int:group_id>", methods=["GET", "POST"])
 @admin_required
@@ -402,6 +423,7 @@ def edit_test_case_group(group):
 
 	return redirect(f"/admin/problems/{group.problem.id}")
 
+
 @contests.route("/admin/delete-test-case-group/<int:group_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(AbstractTestCaseGroup, "/admin/contests")
@@ -414,6 +436,7 @@ def delete_test_case_group(group):
 	handle_objects.delete_abstract_test_case_group(group)
 
 	return redirect(f"/admin/problems/{problem_id}")
+
 
 @contests.route("/admin/add-test-case/<int:group_id>", methods=["GET", "POST"])
 @admin_required
@@ -434,11 +457,15 @@ def add_test_case(group):
 	input = input_data if not input_file.filename else input_file.stream.read().decode("ascii")
 	output = output_data if not output_file.filename else output_file.stream.read().decode("ascii")
 
+	input = input.replace("\r", "")
+	output = output.replace("\r", "")
+
 	tc = AbstractTestCase(input=input, expected_output=output, group_id=group.id)
 	db.session.add(tc)
 	db.session.commit()
 
 	return redirect(f"/admin/problems/{group.problem.id}")
+
 
 @contests.route("/admin/edit-test-case/<int:test_case_id>", methods=["GET", "POST"])
 @admin_required
@@ -459,12 +486,13 @@ def edit_test_case(test_case):
 	input = input_data if not input_file.filename else input_file.stream.read().decode("ascii")
 	output = output_data if not output_file.filename else output_file.stream.read().decode("ascii")
 
-	test_case.input = input
-	test_case.expected_output = output
+	test_case.input = input.replace("\r", "")
+	test_case.expected_output = output.replace("\r", "")
 
 	db.session.commit()
 
 	return redirect(f"/admin/problems/{test_case.group.problem.id}")
+
 
 @contests.route("/admin/delete-test-case/<int:test_case_id>", methods=["GET", "POST"])
 @admin_required

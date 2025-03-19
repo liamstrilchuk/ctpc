@@ -9,6 +9,7 @@ import handle_objects
 
 manage = Blueprint("manage", __name__, template_folder="templates")
 
+
 @manage.route("/admin/add-board", methods=["GET", "POST"])
 @admin_required
 def add_board():
@@ -25,6 +26,7 @@ def add_board():
 	db.session.commit()
 	
 	return redirect("/admin")
+
 
 @manage.route("/admin/add-teacher/<school_id>", methods=["GET", "POST"])
 @admin_required
@@ -57,6 +59,7 @@ def add_teacher(school):
 
 	return render_template("user-created.html", username=username, password=random_password, admin_created=True)
 
+
 @manage.route("/admin/manage/<int:school_id>")
 @admin_required
 @check_object_exists(School, "/admin")
@@ -65,6 +68,7 @@ def manage_school(school):
 	db.session.commit()
 
 	return redirect("/teacher")
+
 
 @manage.route("/admin/delete-school/<int:school_id>", methods=["GET", "POST"])
 @admin_required
@@ -86,6 +90,7 @@ def delete_school(school):
 
 	return redirect("/admin")
 
+
 @manage.route("/admin/delete-board/<int:board_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(SchoolBoard, "/admin")
@@ -103,6 +108,7 @@ def delete_board(board):
 
 	return redirect("/admin")
 
+
 @manage.route("/admin/delete-user/<string:username>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(User, "/admin", key_name="username")
@@ -116,6 +122,7 @@ def delete_user(user):
 	handle_objects.delete_user(user)
 
 	return redirect("/admin")
+
 
 @manage.route("/admin/add-user", methods=["GET", "POST"])
 @admin_required
@@ -139,10 +146,12 @@ def add_user():
 	
 	return render_template("user-created.html", username=user.username, password=password, admin_created=True)
 
+
 @manage.route("/admin/user-management")
 @admin_required
 def user_management():
 	return render_template("admin/user-management.html", users=User.query.all())
+
 
 @manage.route("/admin/assign-school/<username>", methods=["GET", "POST"])
 @admin_required
@@ -170,11 +179,13 @@ def assign_school(user):
 
 	return redirect("/admin/user-management")
 
+
 @manage.route("/admin/view-submissions/<username>")
 @admin_required
 @check_object_exists(User, "/admin", key_name="username")
 def view_submissions(user):
 	return render_template("admin/view-submissions.html", user=user)
+
 
 @manage.route("/admin/view-recent-submissions/<int:timeframe>")
 @admin_required
@@ -197,6 +208,7 @@ def view_recent_submissions(timeframe):
 		timeframe=timeframe,
 		grader_response=grader_response
 	)
+
 
 @manage.route("/admin/resubmit-pending-submissions")
 @admin_required
@@ -233,6 +245,7 @@ def resubmit_pending_submissions():
 		requests.post("http://127.0.0.1:8000/create-submission", json=json_to_grader)
 
 	return redirect("/admin/view-recent-submissions/900")
+
 
 @manage.route("/admin/delete-submission/<int:submission_id>", methods=["GET", "POST"])
 @admin_required

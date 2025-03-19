@@ -3,16 +3,19 @@ from flask import redirect
 from flask_login import current_user
 import random
 
+
 def generate_random_password():
 	characters = "1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm"
 	length = 12
 
 	return "".join([random.choice(characters) for _ in range(length)])
 
+
 def generate_school_code():
 	characters = "QWERTYUIOPASDFGHJKLZXCVBNM"
 	
 	return "".join([random.choice(characters) for _ in range(8)])
+
 
 def to_unix_timestamp(timestamp):
 	try:
@@ -21,6 +24,7 @@ def to_unix_timestamp(timestamp):
 		return int(dt.timestamp())
 	except:
 		return None
+
 
 def admin_required(func):
 	def wrapper(*args, **kwargs):
@@ -36,6 +40,7 @@ def admin_required(func):
 	
 	return wrapper
 
+
 def logout_required(func):
 	def wrapper(*args, **kwargs):
 		if current_user.is_authenticated:
@@ -46,6 +51,7 @@ def logout_required(func):
 	wrapper.__name__ = func.__name__
 
 	return wrapper
+
 
 def check_object_exists(classtype, redir_to, key_name="id"):
 	def decorator(func):

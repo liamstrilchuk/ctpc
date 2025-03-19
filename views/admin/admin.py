@@ -10,6 +10,7 @@ admin.register_blueprint(manage)
 admin.register_blueprint(contests)
 admin.register_blueprint(leaderboard)
 
+
 @admin.route("/admin")
 @admin_required
 def admin_view():
