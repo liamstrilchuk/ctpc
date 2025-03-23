@@ -10,11 +10,12 @@ class Submission:
 
 
 class TestCase:
-	def __init__(self, submission, id="", input="", expected_output=""):
+	def __init__(self, submission, id="", input="", expected_output="", explanation=""):
 		self.id = id
 		self.submission = submission
 		self.input = input
 		self.expected_output = expected_output
+		self.explanation = explanation
 		self.output = ""
 		self.grader = 0
 		self.grader_token = ""

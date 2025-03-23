@@ -180,6 +180,12 @@ function selectTestCases(container, testCases) {
 						<pre class="test-case-section-content">${testCase.expected_output}</pre>
 					</div>
 				</div>
+				<div class="test-case-explanation">
+					<div class="test-case-section-header">
+						Explanation
+					</div>
+					<pre class="test-case-section-content">${testCase.explanation}</pre>
+				</div>
 			</div>
 		`;
 	}

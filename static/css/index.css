@@ -351,6 +351,7 @@ td, th {
 .test-case-data > pre {
 	font-family: monospace;
 	font-size: 1.1em;
+	text-wrap: wrap;
 }
 
 textarea {

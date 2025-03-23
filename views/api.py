@@ -31,7 +31,8 @@ def get_test_cases(problem):
 		for test_case in test_cases:
 			all_test_cases.append({
 				"input": test_case.input,
-				"expected_output": test_case.expected_output
+				"expected_output": test_case.expected_output,
+				"explanation": test_case.explanation
 			})
 
 	return { "test_cases": all_test_cases }
