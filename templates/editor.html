@@ -7,6 +7,7 @@
 	<script src="{{ url_for('static', filename='js/editor/mode-python.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/editor/mode-java.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/editor/mode-c_cpp.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor/mode-javascript.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/editor/editor.js') }}"></script>
 
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
@@ -29,9 +30,9 @@
 							{% endfor %}
 						</select>
 					</div>
-					<div class="editor-icon-small-container" title="Editor settings" id="select-settings">
+					<!-- <div class="editor-icon-small-container" title="Editor settings" id="select-settings">
 						<span class="fa fa-gear editor-icon editor-icon-small"></span>
-					</div>
+					</div> -->
 				</div>
 			</div>
 			<div id="code-editor"></div>
