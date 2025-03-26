@@ -447,6 +447,7 @@ def add_test_case(group):
 	
 	input_data = request.form.get("input")
 	output_data = request.form.get("output")
+	explanation_data = request.form.get("explanation")
 
 	input_file = request.files["inputfile"]
 	output_file = request.files["outputfile"]
@@ -456,11 +457,12 @@ def add_test_case(group):
 	
 	input = input_data if not input_file.filename else input_file.stream.read().decode("ascii")
 	output = output_data if not output_file.filename else output_file.stream.read().decode("ascii")
+	explanation = explanation_data
 
 	input = input.replace("\r", "")
 	output = output.replace("\r", "")
 
-	tc = AbstractTestCase(input=input, expected_output=output, group_id=group.id)
+	tc = AbstractTestCase(input=input, expected_output=output, explanation=explanation, group_id=group.id)
 	db.session.add(tc)
 	db.session.commit()
 
@@ -476,18 +478,22 @@ def edit_test_case(test_case):
 	
 	input_data = request.form.get("input")
 	output_data = request.form.get("output")
+	explanation_data = request.form.get("explanation")
 
 	input_file = request.files["inputfile"]
 	output_file = request.files["outputfile"]
+	explanation_file = request.files["explanationfile"]
 
 	if (not input_data and not input_file.filename) or (not output_data and not output_file.filename):
 		return render_template("admin/add-test-case.html", problem=test_case.group.problem, test_case=test_case, error="Invalid input or output")
 
 	input = input_data if not input_file.filename else input_file.stream.read().decode("ascii")
 	output = output_data if not output_file.filename else output_file.stream.read().decode("ascii")
+	explanation = explanation_data if not explanation_file.filename else explanation_file.stream.read().decode("ascii")
 
 	test_case.input = input.replace("\r", "")
 	test_case.expected_output = output.replace("\r", "")
+	test_case.explanation = explanation
 
 	db.session.commit()
 

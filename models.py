@@ -236,8 +236,8 @@ class AbstractTestCase(db.Model):
 	id = sa.Column(sa.Integer, primary_key=True)
 	input = sa.Column(sa.Text, nullable=True)
 	expected_output = sa.Column(sa.Text, nullable=True)
-	test_cases = db.relationship("TestCase", backref="abstract_test_case", lazy=True)
 	explanation = sa.Column(sa.Text, nullable=True)
+	test_cases = db.relationship("TestCase", backref="abstract_test_case", lazy=True)
 	group_id = sa.Column(sa.Integer, sa.ForeignKey("abstract_test_case_groups.id"), nullable=True)
 
 	def __repr__(self):
