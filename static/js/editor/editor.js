@@ -8,13 +8,13 @@ const aceModes = {
 	"py": "ace/mode/python",
 	"java": "ace/mode/java",
 	"c": "ace/mode/c_cpp",
-	"cpp": "ace/mode/c_cpp"
+	"cpp": "ace/mode/c_cpp",
+	"js": "ace/mode/javascript"
 };
 
 window.addEventListener("load", async function() {
 	const elem = document.getElementById("code-editor");
 	editor = ace.edit(elem);
-	editor.session.setMode(aceModes["py"]);
 	editor.setTheme("ace/theme/one_dark");
 	editor.setShowPrintMargin(false);
 	editor.container.style.lineHeight = 1.4;
@@ -43,6 +43,7 @@ window.addEventListener("load", async function() {
 		widthChanger: document.getElementById("width-changer")
 	};
 
+	editor.session.setMode(aceModes[buttonElements.languageSelector.value]);
 	submissionCooldown = new Date(submissionData["last_submission_time"] * 1000 + 60000);
 	
 	if (new Date() < submissionCooldown) {
@@ -148,6 +149,25 @@ function setTestCaseStatusHTML(index, container) {
 			container.children[0].style.background = "red";
 			container.children[1].innerText = testCaseResults[index].status + " at " + dateString;
 		}
+
+		if ("output" in testCaseResults[index]) {
+			const contentsContainer = container.parentElement.parentElement.children[1];
+
+			if (contentsContainer.children.length > 2) {
+				contentsContainer.children[2].remove();
+			}
+
+			if (testCaseResults[index].status !== "Accepted") {
+				if (contentsContainer.children.length === 2) {
+					contentsContainer.innerHTML += `
+						<div class="test-case-section your-output-section">
+							<div class="test-case-section-header">Your output</div>
+							<pre class="test-case-section-content">${atob(testCaseResults[index]["output"])}</pre>
+						</div>
+					`;
+				}
+			}
+		}
 	}
 }
 
@@ -209,7 +229,7 @@ function selectSubmissions(container) {
 		let submissionHTML = `
 			<div class="test-case" data-subid=${sub.id}>
 				<div class="test-case-header submission-section-header">
-					<div>Submission at ${getDateString(sub.time)}</div>
+					<div><a href="/submission/${sub.id}" target="_blank" class="submission-link">Submission at ${getDateString(sub.time)}</a></div>
 					${sub.status === "Pending" ? "<div class='status-placeholder'></div>" : `<div>${sub.points_earned}/${sub.point_value}</div>`}
 				</div>
 		`;
@@ -319,7 +339,7 @@ async function submitSolution(container) {
 
 	submissionId = (await response.json()).id;
 
-	previousSubmissions = (await (await fetch("/api/submissions/" + problemId)).json());
+	previousSubmissions = (await (await fetch("/api/submissions/" + problemId)).json())["submissions"];
 
 	const loadingIcon = createLoadingIcon(30, "#555", "#fff", 0.7);
 	loadingIcon.classList.add("large-loading-icon");
@@ -443,7 +463,7 @@ window.setInterval(async () => {
 			setTestCaseStatusHTML(index, elem);
 		});
 	} else {
-		previousSubmissions = (await (await fetch("/api/submissions/" + problemId)).json());
+		previousSubmissions = (await (await fetch("/api/submissions/" + problemId)).json())["submissions"];
 		updateSubmissionStatus(0);
 
 		if (previousSubmissions[0].status === "Completed") {

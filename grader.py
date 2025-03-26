@@ -1,10 +1,10 @@
 from fastapi import Request, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import threading, requests, math, json
+import threading, requests, math, json, base64
 
 from grader_models import Submission, TestCase
 
-GRADER_URLS = ["http://localhost:2358"]
+GRADER_URLS = ["http://143.198.43.131:2358"]
 current_grader = 0
 current_submissions = {}
 pending_testcases = {}
@@ -61,7 +61,6 @@ def check_submissions():
 
 			response = requests.get(grader + fetch_url + token_str)
 			response = response.json()
-			print(response)
 
 			for tc in response["submissions"]:
 				if tc is None:
@@ -71,8 +70,19 @@ def check_submissions():
 				pending_testcases[tc["token"]].status = new_status
 
 				if not new_status == "Pending":
+					output = ""
 					if "stdout" in tc and tc["stdout"] is not None:
-						pending_testcases[tc["token"]].output = tc["stdout"][:100] + ("..." if len(tc["stdout"]) > 100 else "")
+						output = tc["stdout"]
+
+					if "stderr" in tc and tc["stderr"] is not None:
+						output = tc["stderr"]
+
+					decoded = base64.b64decode(output).decode("utf-8")
+
+					if len(decoded) > 150:
+						decoded = decoded[:150] + "..."
+
+					pending_testcases[tc["token"]].output = base64.b64encode(str.encode(decoded))
 
 					next = pending_testcases[tc["token"]].next_testcase
 					if new_status == "Accepted":
