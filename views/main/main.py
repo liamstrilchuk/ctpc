@@ -3,11 +3,42 @@ from flask_login import login_required, current_user, login_user
 from time import time
 import requests, markdown, re
 
-from models import AbstractTestCaseGroup, Competition, Contest, ContestType, LanguageType, Problem, SchoolCode, Submission, SubmissionStatus, Team, TestCase, TestCaseGroup, TestCaseStatus, User, db
+from models import AbstractTestCaseGroup, AsyncStartTime, Competition, Contest, ContestType, \
+	LanguageType, Problem, SchoolCode, Submission, SubmissionStatus, Team, TestCase, \
+	TestCaseGroup, TestCaseStatus, User, db
 from util import check_object_exists, logout_required
 import handle_objects
 
 main = Blueprint("main", __name__, template_folder="templates")
+
+
+def can_access_contest(contest, submit=False):
+	if current_user.role.name in ["admin", "tester"]:
+		return True
+
+	if contest.point_multiplier == 0 and time() > contest.start_date \
+		and (not submit or time() < contest.end_date):
+		return True
+
+	if (current_user.school.synchronous or (current_user.team and current_user.team.in_person)) \
+		and time() > contest.start_date and (not submit or time() < contest.end_date):
+		return True
+	
+	if contest.competition.async_end is not None and time() > contest.competition.async_end \
+		and not submit:
+		return True
+	
+	async_start_time = AsyncStartTime.query \
+		.filter_by(school=current_user.school, contest=contest) \
+		.first()
+
+	if async_start_time is None:
+		return False
+	
+	if time() > async_start_time.start_time and (not submit or time() < async_start_time.end_time):
+		return True
+	
+	return False
 
 
 @main.route("/team")
@@ -26,7 +57,11 @@ def competitions_view():
 		return redirect("/student-onboarding")
 
 	competitions = Competition.query.all()
-	return render_template("contest/competitions.html", competitions=competitions, current_time=time())
+	return render_template(
+		"contest/competitions.html",
+		competitions=competitions,
+		current_time=time()
+	)
 
 
 @main.route("/competitions/<competition_id>")
@@ -36,17 +71,39 @@ def contests_view(competition):
 	if current_user.role.name == "student" and not current_user.completed_onboarding:
 		return redirect("/student-onboarding")
 
-	return render_template("contest/contests.html", contests=competition.contests, current_time=time(), competition=competition)
+	contest_data = []
+
+	for contest in competition.contests:
+		async_start_time = AsyncStartTime.query \
+			.filter_by(school=current_user.school, contest=contest) \
+			.first()
+		
+		contest_data.append({
+			"contest": contest
+		})
+
+		if (current_user.team is None or not current_user.team.in_person) \
+			and (current_user.school is not None and not current_user.school.synchronous) \
+			and (not current_user.role.name == "admin") and contest.point_multiplier > 0:
+			contest_data[-1]["async_start_time"] = async_start_time
+
+	return render_template(
+		"contest/contests.html",
+		contests=contest_data,
+		current_time=time(),
+		competition=competition
+	)
 
 
 @main.route("/contest/<int:contest_id>")
 @login_required
 @check_object_exists(Contest, "/competitions")
 def contest_view(contest):
-	if time() < contest.start_date and not current_user.role.name in ["admin", "tester"]:
+	if not can_access_contest(contest):
 		return redirect("/competitions")
 
-	if contest.contest_type_id == ContestType.query.filter_by(name="individual").first().id or not current_user.team:
+	if contest.contest_type_id == ContestType.query.filter_by(name="individual").first().id \
+		or not current_user.team:
 		user_submissions = Submission.query \
 			.join(Problem, Submission.problem_id == Problem.id) \
 			.filter(Problem.contest_id == contest.id) \
@@ -62,7 +119,12 @@ def contest_view(contest):
 			.filter(Submission.is_practice == False)
 	
 	ordered_submissions = user_submissions.order_by(Submission.points_earned.desc()).all()
-	problem_dict = { problem.id: { "points_earned": 0, "has_submission": False } for problem in contest.problems }
+	problem_dict = {
+		problem.id: {
+			"points_earned": 0,
+			"has_submission": False
+		} for problem in contest.problems
+	}
 
 	for sub in ordered_submissions:
 		if not sub.problem.contest == contest:
@@ -87,22 +149,30 @@ def contest_view(contest):
 @login_required
 @check_object_exists(Problem, "/competitions")
 def problem_view(problem):
-	if time() < problem.contest.start_date and not current_user.role.name in ["admin", "tester"]:
+	if not can_access_contest(problem.contest):
 		return redirect("/competitions")
 	
-	sample_groups = AbstractTestCaseGroup.query.filter_by(problem_id=problem.id, is_sample=True).all()
+	sample_groups = AbstractTestCaseGroup.query \
+		.filter_by(problem_id=problem.id, is_sample=True).all()
 	languages = LanguageType.query.all()
 
 	html_content = markdown.markdown(problem.description)
 
-	return render_template("contest/problem.html", problem=problem, problem_html=html_content, sample_groups=sample_groups, languages=languages)
+	return render_template(
+		"contest/problem.html",
+		problem=problem,
+		problem_html=html_content,
+		sample_groups=sample_groups,
+		languages=languages,
+		can_submit=can_access_contest(problem.contest, submit=True)
+	)
 
 
 @main.route("/submit/<int:problem_id>", methods=["POST"])
 @login_required
 @check_object_exists(Problem, "/competitions")
 def submit(problem):
-	if time() < problem.contest.start_date and not current_user.role.name in ["admin", "tester"]:
+	if not can_access_contest(problem.contest, submit=True):
 		return redirect("/competitions")
 	
 	last_user_submission = Submission.query \
@@ -182,7 +252,7 @@ def submit(problem):
 @login_required
 @check_object_exists(Problem, "/competitions")
 def submit_practice(problem):
-	if time() < problem.contest.start_date and not current_user.role.name in ["admin", "tester"]:
+	if not can_access_contest(problem.contest, submit=True):
 		return redirect("/competitions")
 	
 	data = request.get_json()
@@ -195,10 +265,14 @@ def submit_practice(problem):
 		send_to_grader = []
 
 		for tc in test_cases:
-			if not "expected_output" in tc or not "input" in tc or len(tc["expected_output"]) > 2000 or len(tc["input"]) > 2000:
+			if not "expected_output" in tc or not "input" in tc \
+				or len(tc["expected_output"]) > 2000 or len(tc["input"]) > 2000:
 				raise Exception()
 			
-			send_to_grader.append({ "input": tc["input"], "expected_output": tc["expected_output"] })
+			send_to_grader.append({
+				"input": tc["input"],
+				"expected_output": tc["expected_output"]
+			})
 
 		submission = Submission(
 			user_id=current_user.id,
@@ -271,7 +345,7 @@ def practice_submission_status(submission):
 @login_required
 @check_object_exists(Problem, "/competitions")
 def last_practice_submission(problem):
-	if time() < problem.contest.start_date and not current_user.role.name in ["tester", "admin"]:
+	if not can_access_contest(problem.contest):
 		return []
 	
 	all_submissions = Submission.query \
@@ -316,7 +390,9 @@ def last_practice_submission(problem):
 @login_required
 @check_object_exists(Submission, "/competitions")
 def submission_view(submission):
-	if not submission.user == current_user and not current_user.role.name == "admin" and not (submission.problem.contest.contest_type.name == "team" and current_user.team and submission.user.team_id == current_user.team.id):
+	if not submission.user == current_user and not current_user.role.name == "admin" and not \
+		(submission.problem.contest.contest_type.name == "team" and \
+   		current_user.team and submission.user.team_id == current_user.team.id):
 		return redirect("/")
 
 	return render_template("contest/submission.html", submission=submission, current_time=time())
@@ -339,7 +415,10 @@ def register_as_student(competition):
 	password = request.form.get("password")
 	email = request.form.get("email")
 
-	register_teacher_or_student("", "", password, email, competition, "individual-student", "register-as-student.html")
+	register_teacher_or_student(
+		"", "", password, email,
+		competition, "individual-student", "register-as-student.html"
+	)
 	return redirect(f"/competitions/{competition.short_name}")
 
 
@@ -363,14 +442,28 @@ def register_as_teacher(competition):
 	code_obj = SchoolCode.query.filter_by(code=code).first()
 
 	if code_obj is None:
-		return render_template("register-as-teacher.html", competition=competition, error="School code is not valid")
+		return render_template(
+			"register-as-teacher.html",
+			competition=competition,
+			error="School code is not valid"
+		)
 	
 	if code_obj.used:
-		return render_template("register-as-teacher.html", competition=competition, error="School code has already been used")
+		return render_template(
+			"register-as-teacher.html",
+			competition=competition,
+			error="School code has already been used"
+		)
 	
-	school = handle_objects.add_school(code_obj.school_name, code_obj.school_board.id, code_obj.competition.id)
+	school = handle_objects.add_school(
+		code_obj.school_name,
+		code_obj.school_board.id,
+		code_obj.competition.id
+	)
 
-	user = register_teacher_or_student(first, last, password, email, competition, "teacher", "register-as-teacher.html")
+	user = register_teacher_or_student(
+		first, last, password, email, competition, "teacher", "register-as-teacher.html"
+	)
 	if type(user) == str:
 		return user
 
@@ -392,7 +485,11 @@ def register_teacher_or_student(first, last, password, email, competition, role,
 		return render_template(template, competition=competition, error="Email is already in use")
 	
 	if not password or not len(password) >= 8:
-		return render_template(template, competition=competition, error="Password must be at least 8 characters")
+		return render_template(
+			template,
+			competition=competition,
+			error="Password must be at least 8 characters"
+		)
 
 	first_clean, last_clean = "", ""
 	for c in first.lower():
@@ -413,7 +510,11 @@ def register_teacher_or_student(first, last, password, email, competition, role,
 		user.first = first
 		user.last = last
 	except Exception:
-		return render_template(template, competition=competition, error="An error occurred when registering")
+		return render_template(
+			template,
+			competition=competition,
+			error="An error occurred when registering"
+		)
 	
 	login_user(user)
 	return user
@@ -423,7 +524,7 @@ def register_teacher_or_student(first, last, password, email, competition, role,
 @login_required
 @check_object_exists(Problem, "/competitions")
 def editor(problem):
-	if time() < problem.contest.start_date and not current_user.role.name in ["tester", "admin"]:
+	if not can_access_contest(problem.contest):
 		return redirect("/competitions")
 
 	return render_template("editor.html", problem=problem, languages=LanguageType.query.all())
@@ -435,8 +536,14 @@ def student_onboarding():
 	if not current_user.role.name == "student":
 		return redirect("/")
 	
+	full_profile_cutoff = current_user.school.competition.full_profile_cutoff
+	full = True
+
+	if full_profile_cutoff is not None and time() > full_profile_cutoff:
+		full = False
+	
 	if request.method == "GET":
-		return render_template("student-onboard.html")
+		return render_template("student-onboard.html", full=full)
 
 	first = request.form.get("first")
 	last = request.form.get("last")
@@ -446,12 +553,19 @@ def student_onboarding():
 	resume_file = request.files.get("resume")
 	tshirt_size = request.form.get("tshirt")
 
-	if not email or User.query.filter_by(email=email.lower()).first() is not None:
-		return render_template("student-onboard.html", error="Email is already in use")
+	if not email or ((user := User.query.filter_by(email=email.lower()).first()) is not None \
+		and not user.username == current_user.username):
+		return render_template("student-onboard.html", full=full, error="Email is already in use")
 
 	if not first or not last:
-		return render_template("student-onboard.html", error="Must include first and last name")
+		return render_template(
+			"student-onboard.html",
+			full=full,
+			error="Must include first and last name"
+		)
 
-	handle_objects.create_student_profile(current_user, first, last, email, github, linkedin, resume_file, tshirt_size)
+	handle_objects.create_student_profile(
+		current_user, first, last, email, github, linkedin, resume_file, tshirt_size
+	)
 
 	return redirect("/competitions/2025")

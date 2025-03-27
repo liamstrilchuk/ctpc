@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, render_template, request
 
-from models import AbstractTestCase, AbstractTestCaseGroup, Competition, Contest, ContestType, Problem, School, SchoolBoard, SchoolCode, Submission, db
+from models import AbstractTestCase, AbstractTestCaseGroup, Competition, Contest, \
+	ContestType, Problem, School, SchoolBoard, SchoolCode, Submission, db
 from util import admin_required, to_unix_timestamp, check_object_exists
 import handle_objects
 
@@ -16,7 +17,11 @@ def contests_view(competition):
 		for problem in contest.problems:
 			total_points += problem.point_value * contest.point_multiplier
 
-	return render_template("admin/admin-contests.html", competition=competition, total_points=total_points)
+	return render_template(
+		"admin/admin-contests.html",
+		competition=competition,
+		total_points=total_points
+	)
 
 
 @contests.route("/admin/competitions")
@@ -76,7 +81,11 @@ def invite_teams(school):
 			current_in_person += 1
 
 	if new_count < current_in_person:
-		return render_template("admin/invite-teams.html", school=school, error="New count cannot be less than number of currently assigned in person teams")
+		return render_template(
+			"admin/invite-teams.html",
+			school=school,
+			error="New count cannot be less than number of currently assigned in person teams"
+		)
 	
 	school.in_person_spots = new_count
 	db.session.commit()
@@ -93,6 +102,29 @@ def school_codes(competition):
 		competition=competition,
 		codes=SchoolCode.query.filter_by(competition_id=competition.id)
 	)
+
+
+@contests.route("/admin/cutoff-dates/<short_name>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(Competition, "/admin/competitions", key_name="short_name")
+def cutoff_dates(competition):
+	if request.method == "GET":
+		return render_template("admin/cutoff-dates.html")
+	
+	async_start = to_unix_timestamp(request.form.get("async_start"))
+	async_end = to_unix_timestamp(request.form.get("async_end"))
+
+	if (async_start is None and async_end is not None) or \
+		(async_start is not None and async_end is not None and async_end < async_start):
+		return render_template("admin/cutoff-dates.html", error="Invalid async dates")
+	
+	competition.full_profile_cutoff = to_unix_timestamp(request.form.get("full_profile_cutoff"))
+	competition.registration_cutoff = to_unix_timestamp(request.form.get("registration_cutoff"))
+	competition.async_start = async_start
+	competition.async_end = async_end
+
+	db.session.commit()
+	return redirect("/admin/competitions")
 
 
 @contests.route("/admin/add-school-code/<short_name>", methods=["GET", "POST"])
@@ -143,7 +175,11 @@ def add_school_code(competition):
 @check_object_exists(SchoolCode, "/admin/competitions")
 def delete_school_code(code):
 	if request.method == "GET":
-		return render_template("confirm-delete.html", type="school code", text=f"for {code.school_name}")
+		return render_template(
+			"confirm-delete.html",
+			type="school code",
+			text=f"for {code.school_name}"
+		)
 	
 	competition_name = code.competition.short_name
 	handle_objects.delete_school_code(code)
@@ -165,12 +201,22 @@ def add_school(competition):
 	board = SchoolBoard.query.filter_by(name=board_name).first()
 
 	if board is None:
-		return render_template("admin/add-school.html", boards=boards, error="There is no board with that name")
+		return render_template(
+			"admin/add-school.html",
+			boards=boards,
+			error="There is no board with that name"
+		)
 	
-	existing_school = School.query.filter_by(name=school_name, school_board=board, competition_id=competition.id).first()
+	existing_school = School.query \
+		.filter_by(name=school_name, school_board=board, competition_id=competition.id) \
+		.first()
 
 	if existing_school is not None:
-		return render_template("admin/add-school.html", boards=boards, error="There is already a school in that board with that name")
+		return render_template(
+			"admin/add-school.html",
+			boards=boards,
+			error="There is already a school in that board with that name"
+		)
 		
 	handle_objects.add_school(school_name, board.id, competition.id)
 
@@ -203,17 +249,31 @@ def add_competition():
 @check_object_exists(Competition, "/admin/contests")
 def edit_competition(competition):
 	if request.method == "GET":
-		return render_template("admin/add-competition.html", editing=True, name=competition.name, short_name=competition.short_name, competition=competition)
+		return render_template(
+			"admin/add-competition.html",
+			editing=True,
+			name=competition.name,
+			short_name=competition.short_name,
+			competition=competition
+		)
 	
 	name = request.form["name"]
 	short_name = request.form["short_name"]
 
 	if not name or not short_name:
-		return render_template("admin/add-competition.html", error="Invalid name", competition=competition)
+		return render_template(
+			"admin/add-competition.html",
+			error="Invalid name",
+			competition=competition
+		)
 	
 	existing_competition = Competition.query.filter_by(short_name=short_name).first()
 	if existing_competition:
-		return render_template("admin/add-competition.html", error="Competition already exists", competition=competition)
+		return render_template(
+			"admin/add-competition.html",
+			error="Competition already exists",
+			competition=competition
+		)
 
 	handle_objects.edit_competition(competition, name, short_name)
 
@@ -236,19 +296,35 @@ def add_contest(competition):
 	point_multiplier = request.form["point_multiplier"]
 
 	if not start_date or not end_date or start_date >= end_date:
-		return render_template("admin/add-contest.html", error="Invalid dates", contest_types=contest_types)
+		return render_template(
+			"admin/add-contest.html",
+			error="Invalid dates",
+			contest_types=contest_types
+		)
 	
 	ctype_obj = ContestType.query.filter_by(name=contest_type).first()
 	if not ctype_obj:
-		return render_template("admin/add-contest.html", error="Invalid contest type", contest_types=contest_types)
+		return render_template(
+			"admin/add-contest.html",
+			error="Invalid contest type",
+			contest_types=contest_types
+		)
 	
 	if not name:
-		return render_template("admin/add-contest.html", error="Invalid name", contest_types=contest_types)
+		return render_template(
+			"admin/add-contest.html",
+			error="Invalid name",
+			contest_types=contest_types
+		)
 	
 	try:
 		float(point_multiplier)
 	except:
-		return render_template("admin/add-contest.html", error="Invalid point multiplier", contest_types=contest_types)
+		return render_template(
+			"admin/add-contest.html",
+			error="Invalid point multiplier",
+			contest_types=contest_types
+		)
 	
 	handle_objects.add_contest(
 		name=name,
@@ -269,7 +345,14 @@ def edit_contest(contest):
 	contest_types = ContestType.query.all()
 
 	if request.method == "GET":
-		return render_template("admin/add-contest.html", editing=True, name=contest.name, contest_types=contest_types, contest=contest, point_multiplier=contest.point_multiplier)
+		return render_template(
+			"admin/add-contest.html",
+			editing=True,
+			name=contest.name,
+			contest_types=contest_types,
+			contest=contest,
+			point_multiplier=contest.point_multiplier
+		)
 	
 	name = request.form["name"]
 	contest_type = request.form["contest_type"]
@@ -278,16 +361,33 @@ def edit_contest(contest):
 	point_multiplier = request.form["point_multiplier"]
 
 	if not start_date or not end_date or start_date >= end_date:
-		return render_template("admin/add-contest.html", error="Invalid dates", contest_types=contest_types, contest=contest)
+		return render_template(
+			"admin/add-contest.html",
+			error="Invalid dates",
+			contest_types=contest_types,
+			contest=contest
+		)
 	
 	ctype_obj = ContestType.query.filter_by(name=contest_type).first()
 	if not ctype_obj:
-		return render_template("admin/add-contest.html", error="Invalid contest type", contest_types=contest_types, contest=contest)
+		return render_template(
+			"admin/add-contest.html",
+			error="Invalid contest type",
+			contest_types=contest_types,
+			contest=contest
+		)
 	
 	if not name:
-		return render_template("admin/add-contest.html", error="Invalid name", contest_types=contest_types, contest=contest)
+		return render_template(
+			"admin/add-contest.html",
+			error="Invalid name",
+			contest_types=contest_types,
+			contest=contest
+		)
 	
-	handle_objects.edit_contest(contest, name, ctype_obj.id, start_date, end_date, point_multiplier)
+	handle_objects.edit_contest(contest, name, ctype_obj.id, \
+		start_date, end_date, point_multiplier)
+	
 	return redirect(f"/admin/contests/{contest.competition.short_name}")
 
 
@@ -353,7 +453,12 @@ def edit_problem(problem):
 	description = request.form["description"]
 
 	if not problem_name:
-		return render_template("admin/add-problem.html", contest=problem.contest, problem=problem, error="Invalid name")
+		return render_template(
+			"admin/add-problem.html",
+			contest=problem.contest,
+			problem=problem,
+			error="Invalid name"
+		)
 
 	problem.name = problem_name
 	problem.description = description
@@ -396,7 +501,11 @@ def add_test_case_group(problem):
 
 	problem.point_value += int(point_value)
 	
-	group = AbstractTestCaseGroup(point_value=point_value, problem_id=problem.id, is_sample=is_sample)
+	group = AbstractTestCaseGroup(
+		point_value=point_value,
+		problem_id=problem.id,
+		is_sample=is_sample
+	)
 	db.session.add(group)
 	db.session.commit()
 
@@ -408,7 +517,11 @@ def add_test_case_group(problem):
 @check_object_exists(AbstractTestCaseGroup, "/admin/contests")
 def edit_test_case_group(group):
 	if request.method == "GET":
-		return render_template("admin/add-test-case-group.html", problem=group.problem, group=group)
+		return render_template(
+			"admin/add-test-case-group.html",
+			problem=group.problem,
+			group=group
+		)
 	
 	point_value = request.form.get("point_value")
 	is_sample = request.form.get("is_sample") == "on"
@@ -452,8 +565,13 @@ def add_test_case(group):
 	input_file = request.files["inputfile"]
 	output_file = request.files["outputfile"]
 
-	if (not input_data and not input_file.filename) or (not output_data and not output_file.filename):
-		return render_template("admin/add-test-case.html", problem=group.problem, error="Invalid input or output")
+	if (not input_data and not input_file.filename) or \
+		(not output_data and not output_file.filename):
+		return render_template(
+			"admin/add-test-case.html",
+			problem=group.problem,
+			error="Invalid input or output"
+		)
 	
 	input = input_data if not input_file.filename else input_file.stream.read().decode("ascii")
 	output = output_data if not output_file.filename else output_file.stream.read().decode("ascii")
@@ -462,7 +580,12 @@ def add_test_case(group):
 	input = input.replace("\r", "")
 	output = output.replace("\r", "")
 
-	tc = AbstractTestCase(input=input, expected_output=output, explanation=explanation, group_id=group.id)
+	tc = AbstractTestCase(
+		input=input,
+		expected_output=output,
+		explanation=explanation,
+		group_id=group.id
+	)
 	db.session.add(tc)
 	db.session.commit()
 
@@ -474,7 +597,11 @@ def add_test_case(group):
 @check_object_exists(AbstractTestCase, "/admin/contests")
 def edit_test_case(test_case):
 	if request.method == "GET":
-		return render_template("admin/add-test-case.html", problem=test_case.group.problem, test_case=test_case)
+		return render_template(
+			"admin/add-test-case.html",
+			problem=test_case.group.problem,
+			test_case=test_case
+		)
 	
 	input_data = request.form.get("input")
 	output_data = request.form.get("output")
@@ -484,12 +611,19 @@ def edit_test_case(test_case):
 	output_file = request.files["outputfile"]
 	explanation_file = request.files["explanationfile"]
 
-	if (not input_data and not input_file.filename) or (not output_data and not output_file.filename):
-		return render_template("admin/add-test-case.html", problem=test_case.group.problem, test_case=test_case, error="Invalid input or output")
+	if (not input_data and not input_file.filename) or \
+		(not output_data and not output_file.filename):
+		return render_template(
+			"admin/add-test-case.html",
+			problem=test_case.group.problem,
+			test_case=test_case,
+			error="Invalid input or output"
+		)
 
 	input = input_data if not input_file.filename else input_file.stream.read().decode("ascii")
 	output = output_data if not output_file.filename else output_file.stream.read().decode("ascii")
-	explanation = explanation_data if not explanation_file.filename else explanation_file.stream.read().decode("ascii")
+	explanation = explanation_data if not explanation_file.filename else \
+		explanation_file.stream.read().decode("ascii")
 
 	test_case.input = input.replace("\r", "")
 	test_case.expected_output = output.replace("\r", "")

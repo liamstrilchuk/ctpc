@@ -39,7 +39,10 @@ def add_teacher(school):
 	username = request.form["username"]
 
 	if not teacher_name or not username:
-		return render_template("admin/add-teacher.html", error="Username and teacher name must be provided")
+		return render_template(
+			"admin/add-teacher.html",
+			error="Username and teacher name must be provided"
+		)
 	
 	existing_user = User.query.filter_by(username=username).first()
 
@@ -57,7 +60,12 @@ def add_teacher(school):
 	db.session.add(user)
 	db.session.commit()
 
-	return render_template("user-created.html", username=username, password=random_password, admin_created=True)
+	return render_template(
+		"user-created.html",
+		username=username,
+		password=random_password,
+		admin_created=True
+	)
 
 
 @manage.route("/admin/manage/<int:school_id>")
@@ -75,7 +83,12 @@ def manage_school(school):
 @check_object_exists(School, "/admin")
 def delete_school(school):
 	if request.method == "GET":
-		return render_template("confirm-delete.html", type="school", text=school.name, extra_text="This will also delete all teachers and students in this school.")
+		return render_template(
+			"confirm-delete.html",
+			type="school",
+			text=school.name,
+			extra_text="This will also delete all teachers and students in this school."
+		)
 	
 	for team in school.teams:
 		db.session.delete(team)
@@ -144,7 +157,12 @@ def add_user():
 	except:
 		return render_template("admin/add-user.html", error="An error occurred when creating user")
 	
-	return render_template("user-created.html", username=user.username, password=password, admin_created=True)
+	return render_template(
+		"user-created.html",
+		username=user.username,
+		password=password,
+		admin_created=True
+	)
 
 
 @manage.route("/admin/user-management")
@@ -161,7 +179,11 @@ def assign_school(user):
 		return redirect("/admin")
 	
 	if request.method == "GET":
-		return render_template("admin/assign-school.html", username=user.username, schools=School.query.all())
+		return render_template(
+			"admin/assign-school.html",
+			username=user.username,
+			schools=School.query.all()
+		)
 	
 	school = request.form.get("school")
 	obj = School.query.filter_by(id=school).first()
@@ -192,7 +214,10 @@ def view_submissions(user):
 def view_recent_submissions(timeframe):
 	recent = Submission.query \
 		.join(SubmissionStatus) \
-		.filter((Submission.timestamp >= time.time() - timeframe) | (SubmissionStatus.name == "Pending")) \
+		.filter(
+			(Submission.timestamp >= time.time() - timeframe) |
+			(SubmissionStatus.name == "Pending")
+		) \
 		.order_by(Submission.timestamp.desc()) \
 		.all()
 
@@ -252,7 +277,11 @@ def resubmit_pending_submissions():
 @check_object_exists(Submission, "/admin/view-recent-submissions/900")
 def delete_submission(submission):
 	if request.method == "GET":
-		return render_template("confirm-delete.html", type="submission", text=f"id={submission.id} by {submission.user.username}")
+		return render_template(
+			"confirm-delete.html",
+			type="submission",
+			text=f"id={submission.id} by {submission.user.username}"
+		)
 	
 	handle_objects.delete_submission(submission)
 	return redirect("/admin/view-recent-submissions/900")

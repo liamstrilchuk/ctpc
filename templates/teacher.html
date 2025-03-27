@@ -6,10 +6,34 @@
 	{% endif %}
 	<h1>Student management</h1>
 	<div class="admin-controls">
-		<a href="/teacher/create-team">Create team</a>
-		<a href="/teacher/register-student">Register student</a>
+		{% if not past_registration_cutoff %}
+			<a href="/teacher/create-team">Create team</a>
+			<a href="/teacher/register-student">Register student</a>
+		{% endif %}
 		<a href="/teacher-onboarding">Change preferences</a>
 	</div>
+	{% if async_state == "running" and not current_user.school.synchronous %}
+		{% if active_async_time %}
+			<p>You are currently writing the {{ active_async_time.contest.name }}. You started at <span class="unix-timestamp">{{ active_async_time.start_time }}</span> and will end at <span class="unix-timestamp">{{ active_async_time.end_time }}</span> (<a href="/teacher/end-early">end early</a>)</p>
+		{% else %}
+			<ul>
+				{% for contest in available_contests %}
+					<li>
+						{{ contest.contest.name }}
+						(<span class="duration">{{ contest.contest.end_date - contest.contest.start_date }}</span>)
+						{% if contest.complete %}
+							<b style="margin-left: 20px;">Complete</b>
+						{% else %}
+							<b><a style="margin-left: 20px;" href="/teacher/start/{{ contest.contest.id }}">Start now</a></b>
+						{% endif %}
+					</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+	{% endif %}
+	{% if past_registration_cutoff %}
+		<p><b>It is now past the registration deadline. You can no longer register teams or students. If you need to make any changes, please email <a href="mailto:launch@ctpc.ca">launch@ctpc.ca</a>.</b></p>
+	{% endif %}
 	<p>
 		You are a teacher for <b>{{ current_user.school.name }}</b> ({{ current_user.school.school_board.name }}).
 		{% if current_user.school.consider_in_person %}You have requested to be considered for the in-person competition.{% endif %}
@@ -29,9 +53,11 @@
 			{% for student in unassigned %}
 				<li>
 					{{ student.username }} (
-						<a href="/teacher/assign/{{ student.username }}">assign</a> |
-						<a href="/teacher/reset-password/{{ student.username }}">reset password</a> |
-						<a href="/teacher/delete/{{ student.username }}">delete</a>
+						<a href="/teacher/reset-password/{{ student.username }}">reset password</a> 
+						{% if not past_registration_cutoff %}
+							| <a href="/teacher/assign/{{ student.username }}">assign</a>
+							| <a href="/teacher/delete/{{ student.username }}">delete</a>
+						{% endif %}
 					)
 				</li>
 			{% endfor %}
@@ -40,7 +66,7 @@
 
 	{% if teams %}
 		<p>You have {{ teams|length }} team{% if teams|length != 1 %}s{% endif %} registered:</p>
-	{% else %}
+	{% elif not past_registration_cutoff %}
 		<p>You do not currently have any teams registered. Click "create team" above to register a team.</p>
 	{% endif %}
 
@@ -53,7 +79,9 @@
 					{% if remaining_in_person_spots > 0 %}
 						<a href="/teacher/assign-in-person/{{ team.id }}">Register for in-person</a>
 					{% endif %}
-					<a href="/teacher/delete-team/{{ team.id }}">Delete team</a>
+					{% if not past_registration_cutoff %}
+						<a href="/teacher/delete-team/{{ team.id }}">Delete team</a>
+					{% endif %}
 				{% else %}
 					<b>This team is registered for the in-person competition.</b>
 					<a href="/teacher/assign-in-person/{{ team.id }}">Unregister</a>
@@ -64,10 +92,12 @@
 					{% for member in team.members %}
 						<li class="student">
 							{{ member.username }} (
-								<a href="/teacher/assign/{{ member.username }}">reassign</a> |
-								<a href="/teacher/unassign/{{ member.username }}">unassign</a> |
-								<a href="/teacher/reset-password/{{ member.username }}">reset password</a> |
-								<a href="/teacher/delete/{{ member.username }}">delete</a>
+								<a href="/teacher/reset-password/{{ member.username }}">reset password</a>
+								{% if not past_registration_cutoff %}
+									| <a href="/teacher/assign/{{ member.username }}">reassign</a>
+									| <a href="/teacher/unassign/{{ member.username }}">unassign</a>
+									| <a href="/teacher/delete/{{ member.username }}">delete</a>
+								{% endif %}
 							)
 						</li>
 					{% endfor %}

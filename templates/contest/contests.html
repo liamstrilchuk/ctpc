@@ -11,23 +11,40 @@
 	{% if contests %}
 		{% for contest in contests %}
 			<div class="contest">
-				<span class="contest-title">{{ contest.name }}</span>
-				<span>
-					<span class="unix-timestamp">{{ contest.start_date }}</span> to <span class="unix-timestamp">{{ contest.end_date }}</span>
-				</span>
-				{% if contest.start_date > current_time %}
-					<span class="contest-status">Starts in <span class="duration">{{ contest.start_date - current_time }}</span></span>
-					{% if current_user.role.name == "admin" %}
-						<span>As an administrator, you can <a href="/contest/{{ contest.id }}">enter the contest early.</a> You can also view this contest's <a href="/contest/{{ contest.id }}/leaderboard">leaderboard</a>.</span>
-					{% elif current_user.role.name == "tester" %}
-						<span>As an tester, you can <a href="/contest/{{ contest.id }}">enter the contest early.</a></span>
+				<span class="contest-title">{{ contest.contest.name }}</span>
+				{% if not "async_start_time" in contest %}
+					<span>
+						<span class="unix-timestamp">{{ contest.contest.start_date }}</span> to <span class="unix-timestamp">{{ contest.contest.end_date }}</span>
+					</span>
+					{% if contest.contest.start_date > current_time %}
+						<span class="contest-status">Starts in <span class="duration">{{ contest.contest.start_date - current_time }}</span></span>
+						{% if current_user.role.name == "admin" %}
+							<span>As an administrator, you can <a href="/contest/{{ contest.contest.id }}">enter the contest early.</a> You can also view this contest's <a href="/contest/{{ contest.contest.id }}/leaderboard">leaderboard</a>.</span>
+						{% elif current_user.role.name == "tester" %}
+							<span>As an tester, you can <a href="/contest/{{ contest.contest.id }}">enter the contest early.</a></span>
+						{% endif %}
+					{% elif contest.contest.end_date < current_time %}
+						<a class="contest-status" href="/contest/{{ contest.contest.id }}">Complete</a>
+					{% else %}
+						<a class="contest-status" href="/contest/{{ contest.contest.id }}">Enter (ends in <span class="duration">{{ contest.contest.end_date - current_time }}</span>)</a>
+						{% if current_user.role.name == "admin" %}
+							&bull; <a href="/contest/{{ contest.contest.id }}/leaderboard">View Leaderboard</a>
+						{% endif %}
 					{% endif %}
-				{% elif contest.end_date < current_time %}
-					<span class="contest-status">Complete</span>
 				{% else %}
-					<a class="contest-status" href="/contest/{{ contest.id }}">Enter (ends in <span class="duration">{{ contest.end_date - current_time }}</span>)</a>
-					{% if current_user.role.name == "admin" %}
-						&bull; <a href="/contest/{{ contest.id }}/leaderboard">View Leaderboard</a>
+					<span class="unix-timestamp-day">{{ contest.contest.competition.async_start }}</span>
+					{% if not contest.async_start_time %}
+						{% if current_time > contest.contest.competition.async_end %}
+							This contest is now closed.
+						{% elif current_time > contest.contest.competition.async_start %}
+							Your teacher needs to start the contest.
+						{% endif %}
+					{% else %}
+						{% if current_time > contest.async_start_time.start_time and current_time < contest.async_start_time.end_time %}
+							<a class="contest-status" href="/contest/{{ contest.contest.id }}">Enter (ends in <span class="duration">{{ contest.async_start_time.end_time - current_time }}</span>)</a>
+						{% else %}
+							You have completed this contest. <a class="contest-status" href="/contest/{{ contest.contest.id }}">View problems</a>
+						{% endif %}
 					{% endif %}
 				{% endif %}
 			</div>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<a class="back" href="/teacher">&larr; Back to teacher dashboard</a>
+	<h1>Confirm start</h1>
+	<p>Press the button below to start the {{ contest.name }}.</p>
+	<form method="post">
+		<input type="submit" value="Confirm">
+	</form>
+{% endblock %}

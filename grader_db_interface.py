@@ -31,7 +31,8 @@ def check_submissions():
 
 			for tc in tcg.test_cases:
 				if str(tc.id) in response[str(ps.id)]:
-					tc.status_id = TestCaseStatus.query.filter_by(name=response[str(ps.id)][str(tc.id)]["status"]).first().id
+					tc.status_id = TestCaseStatus.query \
+						.filter_by(name=response[str(ps.id)][str(tc.id)]["status"]).first().id
 					tc.output = response[str(ps.id)][str(tc.id)]["output"]
 
 				if not tc.status_id == accepted_status:

@@ -14,10 +14,13 @@ def deploy():
 	migrate()
 	upgrade()
 
-	from models import User, School, SchoolBoard, TestCaseStatus, UserRole, ContestType, SubmissionStatus, LanguageType
+	from models import User, School, SchoolBoard, TestCaseStatus, \
+		UserRole, ContestType, SubmissionStatus, LanguageType
 	from flask_bcrypt import Bcrypt
 
-	test_case_statuses = ["Pending", "Accepted", "Wrong Answer", "Time Limit Exceeded", "Memory Limit Exceeded", "Runtime Error", "Compilation Error", "Failed", "Not Run", "Server Error"]
+	test_case_statuses = [
+		"Pending", "Accepted", "Wrong Answer", "Time Limit Exceeded", "Memory Limit Exceeded",
+		"Runtime Error", "Compilation Error", "Failed", "Not Run", "Server Error"]
 
 	for tcs in test_case_statuses:
 		status = TestCaseStatus(name=tcs)
@@ -50,7 +53,11 @@ def deploy():
 	]
 
 	for language_type in language_types:
-		lt = LanguageType(name=language_type[0], short_name=language_type[1], grader_id=language_type[2])
+		lt = LanguageType(
+			name=language_type[0],
+			short_name=language_type[1],
+			grader_id=language_type[2]
+		)
 		db.session.add(lt)
 
 	db.session.commit()
@@ -58,7 +65,9 @@ def deploy():
 	bcrypt = Bcrypt()
 	user = User(
 		username="admin",
-		password=bcrypt.generate_password_hash(open("admin_password.txt", "r").read().replace("\n", "")),
+		password=bcrypt.generate_password_hash(
+			open("admin_password.txt", "r").read().replace("\n", "")
+		),
 		role_id=UserRole.query.filter_by(name="admin").first().id
 	)
 	db.session.add(user)

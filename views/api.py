@@ -16,7 +16,8 @@ def error(message):
 @login_required
 @check_object_exists(Problem, "/")
 def get_test_cases(problem):
-	if problem.contest.start_date > time.time() and not current_user.role.name in ["admin", "tester"]:
+	if problem.contest.start_date > time.time() \
+		and not current_user.role.name in ["admin", "tester"]:
 		return error("Problem is not available")
 
 	groups = problem.test_case_groups
@@ -42,7 +43,8 @@ def get_test_cases(problem):
 @login_required
 @check_object_exists(Problem, "/")
 def get_problem(problem):
-	if problem.contest.start_date > time.time() and not current_user.role.name in ["admin", "tester"]:
+	if problem.contest.start_date > time.time() \
+		and not current_user.role.name in ["admin", "tester"]:
 		return error("Problem is not available")
 	
 	raw_content = problem.description
@@ -98,5 +100,6 @@ def get_submissions(problem):
 
 	return {
 		"submissions": cleaned_submissions,
-		"last_submission_time": last_submission.timestamp if last_submission is not None else 0
+		"last_submission_time": last_submission.timestamp \
+			if last_submission is not None else 0
 	}

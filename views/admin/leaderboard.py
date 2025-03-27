@@ -33,9 +33,11 @@ def contest_leaderboard_data(contest):
 				"attempted": False
 			} for _ in problems],
 			"total_score": 0,
-			"name": user.username if contest.contest_type.name == "individual" else f"{user.name} ({user.school.name})",
+			"name": user.username if contest.contest_type.name == "individual" \
+				else f"{user.name} ({user.school.name})",
 			"obj": user,
-			"in_person": (user.team is not None and user.team.in_person) if contest.contest_type.name == "individual" else user.in_person
+			"in_person": (user.team is not None and user.team.in_person) \
+				if contest.contest_type.name == "individual" else user.in_person
 		}
 
 	all_submissions = Submission.query \
@@ -46,10 +48,12 @@ def contest_leaderboard_data(contest):
 		.all()
 		
 	for submission in all_submissions:
-		if contest.contest_type.name == "team" and (submission.user.team is None or submission.user.team.id not in user_list):
+		if contest.contest_type.name == "team" and \
+			(submission.user.team is None or submission.user.team.id not in user_list):
 			continue
 
-		list_key = submission.user.username if contest.contest_type.name == "individual" else submission.user.team.id
+		list_key = submission.user.username if contest.contest_type.name == "individual" \
+			else submission.user.team.id
 		problem_index = problem_id_dict[submission.problem_id]
 		user_list[list_key]["problems"][problem_index]["attempted"] = True
 		user_list[list_key]["problems"][problem_index]["score"] = submission.points_earned
@@ -60,7 +64,13 @@ def contest_leaderboard_data(contest):
 			total_score += problem["score"]
 		user_list[user]["total_score"] = total_score
 
-	sorted_users = { k: v for k, v in sorted(user_list.items(), key=lambda item: item[1]["total_score"], reverse=True) }
+	sorted_users = {
+		k: v for k, v in sorted(
+			user_list.items(),
+			key=lambda item: item[1]["total_score"],
+			reverse=True
+		)
+	}
 
 	return problems, sorted_users
 
@@ -123,7 +133,13 @@ def competition_leaderboard(competition):
 				team_data[team["obj"].id]["problems"][i]["score"] = team["total_score"]
 				team_data[team["obj"].id]["total_score"] += team["total_score"]
 
-	sorted_teams = { k: v for k, v in sorted(team_data.items(), key=lambda item: item[1]["total_score"], reverse=True) }
+	sorted_teams = {
+		k: v for k, v in sorted(
+			team_data.items(),
+			key=lambda item: item[1]["total_score"],
+			reverse=True
+		)
+	}
 
 	return render_template(
 		"contest/contest-leaderboard.html",

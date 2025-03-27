@@ -13,6 +13,7 @@
 			<th>Contests</th>
 			<th>Schools registered</th>
 			<th>Actions</th>
+			<th>Cutoff dates</th>
 		</tr>
 		{% for competition in competitions %}
 			<tr>
@@ -24,8 +25,15 @@
 					<a href="/admin/school-codes/{{ competition.short_name }}">School codes</a> &bull;
 					<a href="/admin/schools/{{ competition.short_name }}">Schools</a> &bull;
 					<a href="/admin/contests/{{ competition.short_name }}">Contests</a> &bull;
+					<a href="/admin/cutoff-dates/{{ competition.short_name }}">Cutoff dates</a> &bull;
 					<a href="/admin/edit-competition/{{ competition.id }}">Edit</a> &bull;
 					<a href="/admin/delete-competition/{{ competition.id }}">Delete</a>
+				</td>
+				<td>
+					Registration: <span class="unix-timestamp">{{ competition.registration_cutoff }}</span><br>
+					Full profile: <span class="unix-timestamp">{{ competition.full_profile_cutoff }}</span><br>
+					Async start: <span class="unix-timestamp">{{ competition.async_start }}</span><br>
+					Async end: <span class="unix-timestamp">{{ competition.async_end }}</span>
 				</td>
 			</tr>
 		{% endfor %}

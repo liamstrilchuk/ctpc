@@ -184,7 +184,7 @@ def create_student_profile(user, first, last, email, github, linkedin, resume, t
 	user.completed_onboarding = True
 
 	resume_filename = ""
-	if resume.filename:
+	if resume and resume.filename:
 		resume_filename = f"user_uploads/{user.username}_resume.pdf"
 		resume.save(resume_filename)
 

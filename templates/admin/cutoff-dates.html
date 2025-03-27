@@ -1,0 +1,20 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/competitions">&larr; Back to competitions</a>
+	<h1>Change cutoff dates</h1>
+	<form method="post">
+		<label for="full_profile_cutoff">Full profile cutoff</label>
+		<input type="datetime-local" name="full_profile_cutoff">
+		<label for="registration_cutoff">Registration cutoff</label>
+		<input type="datetime-local" name="registration_cutoff">
+		<label for="async_start">Asynchronous competition start</label>
+		<input type="datetime-local" name="async_start">
+		<label for="async_end">Asynchronous competition end</label>
+		<input type="datetime-local" name="async_end">
+		<input type="submit">
+		{% if error %}
+			<p>{{ error }}</p>
+		{% endif %}
+	</form>
+{% endblock %}

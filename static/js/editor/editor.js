@@ -180,6 +180,15 @@ function selectTestCases(container, testCases) {
 
 	for (let i = 0; i < testCases.length; i++) {
 		const testCase = testCases[i];
+		const explanationSection = testCase.explanation ? `
+			<div class="test-case-explanation">
+				<div class="test-case-section-header">
+					Explanation
+				</div>
+				<pre class="test-case-section-content">${testCase.explanation}</pre>
+			</div>
+		` : "";
+
 		testCaseContent += `
 			<div class="test-case">
 				<div class="test-case-header">
@@ -200,12 +209,7 @@ function selectTestCases(container, testCases) {
 						<pre class="test-case-section-content">${testCase.expected_output}</pre>
 					</div>
 				</div>
-				<div class="test-case-explanation">
-					<div class="test-case-section-header">
-						Explanation
-					</div>
-					<pre class="test-case-section-content">${testCase.explanation}</pre>
-				</div>
+				${explanationSection}
 			</div>
 		`;
 	}

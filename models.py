@@ -58,6 +58,10 @@ class Competition(db.Model):
 	contests = db.relationship("Contest", backref="competition", lazy=True)
 	schools = db.relationship("School", backref="competition", lazy=True)
 	school_codes = db.relationship("SchoolCode", backref="competition", lazy=True)
+	full_profile_cutoff = sa.Column(sa.Integer)
+	registration_cutoff = sa.Column(sa.Integer)
+	async_start = sa.Column(sa.Integer)
+	async_end = sa.Column(sa.Integer)
 	
 	def __repr__(self):
 		return f"<Competition {self.name}>"
@@ -71,6 +75,7 @@ class School(db.Model):
 	school_board_id = sa.Column(sa.Integer, sa.ForeignKey("school_boards.id"), nullable=False)
 	teams = db.relationship("Team", backref="school", lazy=True)
 	members = db.relationship("User", backref="school", lazy=True)
+	async_start_times = db.relationship("AsyncStartTime", backref="school", lazy=True)
 	competition_id = sa.Column(sa.Integer, sa.ForeignKey("competitions.id"), nullable=True)
 	consider_in_person = sa.Column(sa.Boolean, default=False)
 	synchronous = sa.Column(sa.Boolean, default=False)
@@ -78,6 +83,19 @@ class School(db.Model):
 	
 	def __repr__(self):
 		return f"<School {self.name}>"
+	
+
+class AsyncStartTime(db.Model):
+	__tablename__ = "async_start_times"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	school_id = sa.Column(sa.Integer, sa.ForeignKey("schools.id"), nullable=False)
+	contest_id = sa.Column(sa.Integer, sa.ForeignKey("contests.id"), nullable=False)
+	start_time = sa.Column(sa.Integer, nullable=False)
+	end_time = sa.Column(sa.Integer, nullable=False)
+
+	def __repr__(self):
+		return f"<AsyncStartTime {self.id}>"
 	
 
 class SchoolCode(db.Model):
@@ -151,6 +169,7 @@ class Contest(db.Model):
 	competition_id = sa.Column(sa.Integer, sa.ForeignKey("competitions.id"), nullable=True)
 	point_multiplier = sa.Column(sa.Numeric, default=1)
 	hide_until_start = sa.Column(sa.Boolean, default=False)
+	async_start_times = db.relationship("AsyncStartTime", backref="contest", lazy=True)
 	
 	def __repr__(self):
 		return f"<Contest {self.name}>"

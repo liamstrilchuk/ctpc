@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Are you sure you want to end the contest early?</h1>
+	<p>You are currently writing the {{ act.contest.name }}. It is scheduled to end at <span class="unix-timestamp">{{ act.end_time }}</span>.</p>
+	<form method="post">
+		<input type="submit" value="Confirm">
+	</form>
+{% endblock %}

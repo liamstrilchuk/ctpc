@@ -24,7 +24,9 @@ STATUSES = {
 	"Wrong Answer": ["Wrong Answer"],
 	"Time Limit Exceeded": ["Time Limit Exceeded"],
 	"Compilation Error": ["Compilation Error"],
-	"Runtime Error": ["Runtime Error (SIGSEGV)", "Runtime Error (SIGXFSZ)", "Runtime Error (SIGFPE)", "Runtime Error (SIGABRT)", "Runtime Error (NZEC)", "Runtime Error (Other)"],
+	"Runtime Error": [
+		"Runtime Error (SIGSEGV)", "Runtime Error (SIGXFSZ)", "Runtime Error (SIGFPE)",
+		"Runtime Error (SIGABRT)", "Runtime Error (NZEC)", "Runtime Error (Other)"],
 	"Server Error": ["Internal Error", "Exec Format Error"]
 }
 
@@ -47,7 +49,8 @@ def check_submissions():
 	test_cases_by_grader = { k: [] for k in GRADER_URLS }
 
 	for token in pending_testcases:
-		test_cases_by_grader[GRADER_URLS[pending_testcases[token].grader]].append(pending_testcases[token])
+		test_cases_by_grader[GRADER_URLS[pending_testcases[token].grader]] \
+			.append(pending_testcases[token])
 
 	fetch_url = "/submissions/batch?fields=stdout,time,memory,stderr,token,compile_output,message,status&base64_encoded=true&tokens="
 
@@ -129,7 +132,8 @@ async def create_submission(request: Request):
 	if not "code" in data or not type(data["code"]) == str or len(data["code"]) == 0:
 		return { "error": "No code provided" }
 
-	if not "testcases" in data or not type(data["testcases"]) == list or len(data["testcases"]) == 0:
+	if not "testcases" in data or not type(data["testcases"]) == list \
+		or len(data["testcases"]) == 0:
 		return { "error": "No testcases provided" }
 	
 	if not "language" in data or not type(data["language"]) == int:
@@ -141,7 +145,11 @@ async def create_submission(request: Request):
 	if not "run_all" in data or not type(data["run_all"]) == bool:
 		return { "error": "run_all not specified" }
 	
-	submission = Submission(code=data["code"], language_id=data["language"], id=data["submission_id"])
+	submission = Submission(
+		code=data["code"],
+		language_id=data["language"],
+		id=data["submission_id"]
+	)
 	run_immediately = []
 	
 	for tcg in data["testcases"]:
@@ -151,7 +159,12 @@ async def create_submission(request: Request):
 			if not "input" in tc or not "expected_output" in tc or not "id" in tc:
 				return { "error": "Test case does not have expected fields" }
 			
-			test_case = TestCase(submission, input=tc["input"], expected_output=tc["expected_output"], id=tc["id"])
+			test_case = TestCase(
+				submission,
+				input=tc["input"],
+				expected_output=tc["expected_output"],
+				id=tc["id"]
+			)
 			submission.add_test_case(test_case)
 
 			if prev_tc is not None and not data["run_all"]:
