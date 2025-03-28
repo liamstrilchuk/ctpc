@@ -2,6 +2,7 @@ let buttonElements, loadingIcons = [];
 let isSubmitting = false, submissionId, testCaseResults = [];
 let previousSubmissions = [], submissionType, submissionCooldown = new Date();
 let editor;
+let testCases;
 const problemId = location.href.split("/").reverse()[0];
 
 const aceModes = {
@@ -24,9 +25,10 @@ window.addEventListener("load", async function() {
 	const problem = (await rawContent.json());
 	const contentElem = document.querySelector("#editor-controls-content");
 
-	const testCases = (await (await fetch("/api/test-cases/" + problemId)).json()).test_cases;
+	testCases = (await (await fetch("/api/test-cases/" + problemId)).json()).test_cases;
 	const lastPracticeSubmission = (await (await fetch("/last-practice-submission/" + problemId)).json());
 	testCaseResults = lastPracticeSubmission.test_cases;
+	testCaseResults.splice(testCases.length);
 	editor.setValue(lastPracticeSubmission.code, 1);
 
 	const submissionData = (await (await fetch("/api/submissions/" + problemId)).json());
@@ -133,6 +135,9 @@ function setTestCaseStatusHTML(index, container) {
 	`;
 
 	if (testCaseResults.length === 0 && !(isSubmitting && submissionType === "sample")) {}
+	else if (testCaseResults.length <= index && !isSubmitting) {
+		return;
+	}
 
 	else if ((testCaseResults.length <= index && isSubmitting && submissionType === "sample") || testCaseResults[index].status === "Pending") {
 		container.children[0].style.background = "transparent";
@@ -151,7 +156,7 @@ function setTestCaseStatusHTML(index, container) {
 		}
 
 		if ("output" in testCaseResults[index]) {
-			const contentsContainer = container.parentElement.parentElement.children[1];
+			const contentsContainer = container.parentElement.parentElement.parentElement.children[1];
 
 			if (contentsContainer.children.length > 2) {
 				contentsContainer.children[2].remove();
@@ -192,8 +197,13 @@ function selectTestCases(container, testCases) {
 		testCaseContent += `
 			<div class="test-case">
 				<div class="test-case-header">
-					<div>Sample Test Case #${i + 1}</div>
-					<div class="test-case-status"></div>
+					<div>
+						<div>${"custom" in testCase ? "Custom" : "Sample"} Test Case #${i + 1}</div>
+						<div class="test-case-status"></div>
+					</div>
+					<div>
+						${"custom" in testCase ? `<span class="fa fa-trash custom-delete"></span>` : ""}
+					</div>
 				</div>
 				<div class="test-case-contents-container">
 					<div class="test-case-section">
@@ -215,6 +225,71 @@ function selectTestCases(container, testCases) {
 	}
 
 	container.innerHTML = testCaseContent;
+	container.innerHTML += `
+		<div class="custom-testcase-container"></div>
+		<button class="custom-testcase-button"><span class="fa fa-plus"></span>Create custom test case</button>
+	`;
+
+	const customTestcaseButton = document.querySelector(".custom-testcase-button");
+
+	[...document.getElementsByClassName("custom-delete")].forEach(elem => {
+		elem.addEventListener("click", () => {
+			const index = [...document.getElementsByClassName("test-case")]
+				.indexOf(elem.parentElement.parentElement.parentElement);
+
+			testCases.splice(index, 1);
+			testCaseResults.splice(index, 1);
+			selectTestCases(container, testCases);
+		});
+	});
+
+	customTestcaseButton.disabled = testCases.length >= 10;
+	customTestcaseButton.addEventListener("click", () => {
+		[...document.getElementsByClassName("custom-testcase")].forEach(elem => elem.remove());
+		const customTestcaseContainer = document.querySelector(".custom-testcase-container");
+
+		customTestcaseContainer.innerHTML += `
+			<div class="custom-testcase test-case">
+				<div class="test-case-header">
+					<div>Create custom test case</div>
+				</div>
+				<div class="test-case-contents-container">
+					<div class="test-case-section">
+						<div class="test-case-section-header">
+							Input
+						</div>
+						<pre class="test-case-section-content" contenteditable="true" id="testcase-input">input...</pre>
+					</div>
+					<div class="test-case-section">
+						<div class="test-case-section-header">
+							Expected output
+						</div>
+						<pre class="test-case-section-content" contenteditable="true" id="testcase-output">output...</pre>
+					</div>
+				</div>
+				<div class="test-case-section custom-testcase-buttons">
+					<button style="color: rgb(255, 198, 198);" id="testcase-cancel">Cancel</button>
+					<button style="color: rgb(214, 255, 198);" id="testcase-add">Add</button>
+				</div>
+			</div>
+		`;
+
+		document.getElementById("testcase-input").focus();
+		document.getElementById("testcase-cancel").addEventListener("click", () => {
+			customTestcaseContainer.innerHTML = "";
+		});
+		document.getElementById("testcase-add").addEventListener("click", () => {
+			const input = document.getElementById("testcase-input").innerText;
+			const expectedOutput = document.getElementById("testcase-output").innerText;
+			testCases.push({
+				input: input,
+				expected_output: expectedOutput,
+				custom: true
+			});
+			customTestcaseContainer.innerHTML = "";
+			selectTestCases(container, testCases);
+		});
+	});
 
 	[...document.querySelectorAll(".test-case-status")].forEach((elem, index) => {
 		setTestCaseStatusHTML(index, elem);

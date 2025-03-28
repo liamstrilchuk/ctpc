@@ -17,10 +17,12 @@
 					<div class="test-case-data">
 						<pre>{{ tc.expected_output }}</pre>
 					</div>
-					<div>Explanation</div>
-					<div class="test-case-data">
-						<pre>{{ tc.explanation|safe }}</pre>
-					</div>
+					{% if tc.explanation %}
+						<div>Explanation</div>
+						<div class="test-case-data">
+							<pre>{{ tc.explanation|safe }}</pre>
+						</div>
+					{% endif %}
 				</div>
 			{% endfor %}
 		{% endfor %}

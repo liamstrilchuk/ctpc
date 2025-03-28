@@ -179,6 +179,9 @@ select {
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
 	font-weight: bold;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .test-case-contents-container {
@@ -316,4 +319,56 @@ a {
 .not-submitted {
 	text-align: center;
 	padding: 30px 10px;
+}
+
+.custom-testcase-button {
+	background: #3d4450;
+	color: white;
+	padding: 10px 20px;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	border-radius: 5px;
+	font-size: 1em;
+	margin-bottom: 20px;
+}
+
+.custom-testcase-button:disabled {
+	cursor: not-allowed;
+}
+
+.custom-testcase-button:not(:disabled):hover {
+	background: #454c58;
+}
+
+.custom-testcase-button span {
+	margin-right: 10px;
+}
+
+.custom-testcase-container pre {
+	outline: none !important;
+}
+
+.custom-testcase-buttons {
+	width: 100%;
+	display: flex;
+	justify-content: flex-end;
+	padding: 0 15px 15px 15px;
+}
+
+.custom-testcase-buttons button {
+	padding: 7px;
+	width: 100px;
+	margin-left: 5px;
+	background: #323842;
+	outline: none;
+	border: none;
+	cursor: pointer;
+	border-radius: 5px;
+	font-size: 0.9em;
+}
+
+.custom-delete {
+	font-size: 1.2em;
+	cursor: pointer;
 }
