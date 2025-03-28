@@ -167,7 +167,7 @@ function setTestCaseStatusHTML(index, container) {
 					contentsContainer.innerHTML += `
 						<div class="test-case-section your-output-section">
 							<div class="test-case-section-header">Your output</div>
-							<pre class="test-case-section-content">${atob(testCaseResults[index]["output"])}</pre>
+							<pre class="test-case-section-content">${atob(testCaseResults[index]["output"]).trimEnd()}</pre>
 						</div>
 					`;
 				}

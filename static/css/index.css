@@ -369,6 +369,10 @@ textarea {
 
 code {
 	white-space: pre-wrap;
+	font-size: 1.1em;
+	padding: 3px 6px;
+	background: #3f4550;
+	border-radius: 3px;
 }
 
 .text-highlight {
