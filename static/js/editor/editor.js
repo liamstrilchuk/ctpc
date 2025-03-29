@@ -371,7 +371,6 @@ async function runSampleTestCases(container, testcases) {
 	if (isSubmitting) {
 		return;
 	}
-	selectTestCases(container, testcases);
 	isSubmitting = true;
 	submissionType = "sample";
 
@@ -390,6 +389,13 @@ async function runSampleTestCases(container, testcases) {
 		})
 	});
 	const data = await response.json();
+
+	if ("error" in data) {
+		openErrorBox("Could not submit practice submission", data["error"]);
+		return;
+	}
+
+	selectTestCases(container, testcases);
 	submissionId = data.id;
 
 	const loadingIcon = createLoadingIcon(30, "#555", "#fff", 0.7);
@@ -422,7 +428,15 @@ async function submitSolution(container) {
 		method: "POST"
 	});
 
-	submissionId = (await response.json()).id;
+	const data = await response.json();
+
+	if ("error" in data) {
+		openErrorBox("Could not submit solution", data["error"]);
+		isSubmitting = false;
+		return;
+	}
+
+	submissionId = data.id;
 
 	previousSubmissions = (await (await fetch("/api/submissions/" + problemId)).json())["submissions"];
 
@@ -433,6 +447,33 @@ async function submitSolution(container) {
 	submissionCooldown = new Date(previousSubmissions[0].time * 1000 + 60000);
 
 	selectSubmissions(container);
+}
+
+function openErrorBox(title, error) {
+	[...document.getElementsByClassName("error-box")].forEach(elem => elem.remove());
+
+	const box = document.createElement("div");
+	box.classList.add("error-box");
+	document.body.appendChild(box);
+
+	box.innerHTML = `
+		<div class="error-box-title">
+			<div>${title}</div>
+			<div>
+				<span class="fa fa-close error-box-close"></span>
+			</div>
+		</div>
+		<div class="error-box-content">
+			${error}<br><br>
+			<button class="error-box-close custom-testcase-button">Close</button>
+		</div>
+	`;
+
+	[...document.getElementsByClassName("error-box-close")].forEach(elem => {
+		elem.addEventListener("click", () => {
+			[...document.getElementsByClassName("error-box")].forEach(elem => elem.remove());
+		});
+	});
 }
 
 function renderLoadingIcons() {

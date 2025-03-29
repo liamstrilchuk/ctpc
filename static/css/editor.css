@@ -211,6 +211,7 @@ select {
 .test-case-explanation {
 	width: 100%;
 	padding-bottom: 10px;
+	overflow: auto;
 }
 
 .your-output-section {
@@ -371,4 +372,49 @@ a {
 .custom-delete {
 	font-size: 1.2em;
 	cursor: pointer;
+}
+
+.error-box {
+	position: fixed;
+	width: 500px;
+	height: 200px;
+	top: calc(50% - 100px);
+	left: calc(50% - 250px);
+	z-index: 100;
+	background: #484f5c;
+	color: white;
+	border-radius: 5px;
+}
+
+.error-box-title, .error-box-content {
+	padding: 10px 30px;
+}
+
+.error-box .fa-close {
+	font-size: 1.35em;
+	cursor: pointer;
+	padding: 5px 10px;
+	border-radius: 5px;
+}
+
+.error-box .fa-close:hover {
+	background: #444a57;
+}
+
+.error-box-title {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: bold;
+	background: #3a404b;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+button.error-box-close {
+	background: #3a404b;
+}
+
+button.error-box-close:hover {
+	background: rgb(65, 71, 84) !important;
 }

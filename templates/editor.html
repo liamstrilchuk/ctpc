@@ -47,10 +47,10 @@
 						<div id="select-submissions"><span class="fa fa-file-contract editor-icon"></span> Submissions</div>
 					</div>
 					<div class="controls-top-section">
-						<div class="editor-icon-small-container" title="Run sample test cases" id="run-sample-test-cases">
+						<div class="editor-icon-small-container" title="Run sample test cases" id="run-sample-test-cases" {% if not can_submit %}style="display: none;"{% endif %}>
 							<span class="fa fa-play editor-icon editor-icon-small"></span>
 						</div>
-						<div class="editor-icon-small-container" title="Submit solution" id="submit-solution">
+						<div class="editor-icon-small-container" title="Submit solution" id="submit-solution" {% if not can_submit %}style="display: none;"{% endif %}>
 							<span class="fa fa-arrow-right editor-icon editor-icon-small"></span>
 						</div>
 					</div>

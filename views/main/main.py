@@ -172,8 +172,12 @@ def problem_view(problem):
 @login_required
 @check_object_exists(Problem, "/competitions")
 def submit(problem):
+	return_id = "return_id" in request.form
+
 	if not can_access_contest(problem.contest, submit=True):
-		return redirect("/competitions")
+		return redirect("/competitions") if not return_id else {
+			"error": "Contest is over"
+		}
 	
 	last_user_submission = Submission.query \
 		.filter_by(user_id=current_user.id) \
@@ -182,11 +186,17 @@ def submit(problem):
 		.first()
 	
 	if last_user_submission and time() - last_user_submission.timestamp < 60:
-		return redirect(f"/problem/{problem.id}")
+		return redirect(f"/problem/{problem.id}") if not return_id else {
+			"error": "You can only submit once per minute"
+		}
 	
 	language_id = request.form["language"]
 	code = request.form["code"]
-	return_id = "return_id" in request.form
+
+	if len(code) == 0:
+		return redirect(f"/problem/{problem.id}") if not return_id else {
+			"error": "You cannot submit a blank file"
+		}
 
 	language = LanguageType.query.filter_by(short_name=language_id).first()
 
@@ -253,15 +263,21 @@ def submit(problem):
 @check_object_exists(Problem, "/competitions")
 def submit_practice(problem):
 	if not can_access_contest(problem.contest, submit=True):
-		return redirect("/competitions")
+		return { "error": "Contest is over" }
 	
 	data = request.get_json()
 	try:
 		language = LanguageType.query.filter_by(short_name=data["language"]).first()
 		code = data["code"]
+
+		if len(code) == 0:
+			return { "error": "You cannot submit a blank file" }
+		
 		test_cases = data["test_cases"]
+
 		if not type(test_cases) == list or len(test_cases) > 10:
 			raise Exception()
+		
 		send_to_grader = []
 
 		for tc in test_cases:
@@ -313,10 +329,10 @@ def submit_practice(problem):
 			"run_all": True
 		}
 
-		response = requests.post("http://127.0.0.1:8000/create-submission", json=json_to_grader)
+		requests.post("http://127.0.0.1:8000/create-submission", json=json_to_grader)
 	except Exception as e:
 		print(e)
-		return { "id": None }
+		return { "error": "An error occurred when submitting" }
 
 	return { "id": submission.id }
 
@@ -527,7 +543,12 @@ def editor(problem):
 	if not can_access_contest(problem.contest):
 		return redirect("/competitions")
 
-	return render_template("editor.html", problem=problem, languages=LanguageType.query.all())
+	return render_template(
+		"editor.html",
+		problem=problem,
+		languages=LanguageType.query.all(),
+		can_submit=can_access_contest(problem.contest, submit=True)
+	)
 
 
 @main.route("/student-onboarding", methods=["GET", "POST"])
