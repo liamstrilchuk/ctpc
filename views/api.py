@@ -4,6 +4,7 @@ import time, markdown
 
 from models import Problem, Submission
 from util import check_object_exists
+from views.main.main import can_access_contest, get_user_contest_data
 
 api = Blueprint("api", __name__)
 
@@ -43,12 +44,26 @@ def get_test_cases(problem):
 @login_required
 @check_object_exists(Problem, "/")
 def get_problem(problem):
-	if problem.contest.start_date > time.time() \
-		and not current_user.role.name in ["admin", "tester"]:
+	if not can_access_contest(problem.contest):
 		return error("Problem is not available")
 	
 	raw_content = problem.description
 	return { "content": markdown.markdown(raw_content), "title": problem.name }
+
+
+@api.route("/api/contest/<int:problem_id>")
+@login_required
+@check_object_exists(Problem, "")
+def get_contest(problem):
+	if not can_access_contest(problem.contest):
+		return error("Contest is not available")
+	
+	problem_dict, _ = get_user_contest_data(problem.contest)
+
+	return {
+		"contest_name": problem.contest.name,
+		"problems": list(problem_dict.values())
+	}
 
 
 @api.route("/api/submissions/<int:problem_id>")

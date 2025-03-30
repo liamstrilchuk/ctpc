@@ -418,3 +418,23 @@ button.error-box-close {
 button.error-box-close:hover {
 	background: rgb(65, 71, 84) !important;
 }
+
+tr {
+	background: #353a4a !important;
+}
+
+th {
+	background: #40475e !important;
+}
+
+.table-container {
+	overflow: auto;
+}
+
+.table-container table {
+	width: max-content;
+}
+
+.table-container a:hover {
+	text-decoration: underline;
+}

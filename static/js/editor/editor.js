@@ -38,6 +38,7 @@ window.addEventListener("load", async function() {
 		selectProblem: document.getElementById("select-problem"),
 		selectTestCases: document.getElementById("select-test-cases"),
 		selectSubmissions: document.getElementById("select-submissions"),
+		selectContest: document.getElementById("select-contest"),
 		selectSettings: document.getElementById("select-settings"),
 		runSampleTestCases: document.getElementById("run-sample-test-cases"),
 		submitSolution: document.getElementById("submit-solution"),
@@ -74,6 +75,10 @@ window.addEventListener("load", async function() {
 	buttonElements.selectSubmissions.addEventListener("click", () => {
 		selectSubmissions(contentElem);
 	});
+
+	buttonElements.selectContest.addEventListener("click", () => {
+		selectContest(contentElem);
+	})
 
 	buttonElements.runSampleTestCases.addEventListener("click", () => {
 		runSampleTestCases(contentElem, testCases);
@@ -119,8 +124,58 @@ function selectProblem(container, problem) {
 	select(buttonElements.selectProblem);
 	unselect(buttonElements.selectTestCases);
 	unselect(buttonElements.selectSubmissions);
+	unselect(buttonElements.selectContest);
 
 	container.innerHTML = `<h1>${problem.title}</h1>` + problem.content;
+}
+
+async function selectContest(container) {
+	select(buttonElements.selectContest);
+	unselect(buttonElements.selectProblem);
+	unselect(buttonElements.selectSubmissions);
+	unselect(buttonElements.selectTestCases);
+
+	const response = await fetch(`/api/contest/${problemId}`);
+	const problemData = await response.json();
+	let tableContents = "";
+
+	for (const problem of problemData.problems) {
+		let statusHTML = `<span style="color: rgb(183, 184, 199);">Not attempted</span>`;
+
+		if (problem.points_earned === problem.point_value) {
+			statusHTML = `<span style="color: rgb(62, 143, 42);">Complete</span>`;
+		} else if (problem.points_earned > 0) {
+			statusHTML = `<span style="color: rgb(151, 153, 40);">Partially complete</span>`;
+		} else if (problem.has_submission) {
+			statusHTML = `<span style="color: rgb(183, 184, 199);">Attempted</span>`;
+		}
+
+		tableContents += `
+			<tr>
+				<td><a href="/editor/${problem.id}">${problem.title}</a></td>
+				<td>${statusHTML}</td>
+				<td>${problem.points_earned}/${problem.point_value}</td>
+			</tr>
+		`;
+	}
+
+	container.innerHTML = `
+		<h1>${problemData.contest_name}</h1>
+		<div class="table-container">
+			<table>
+				<tr>
+					<th>Problem name</th>
+					<th>Status</th>
+					<th>Points earned</th>
+				</tr>
+				${tableContents}
+				<tr>
+					<th colspan="2">Total</th>
+					<th>${problemData.problems.reduce((a, i) => i.points_earned + a, 0)}/${problemData.problems.reduce((a, i) => i.point_value + a, 0)}</th>
+				</tr>
+			</table>
+		</div>
+	`;
 }
 
 function getDateString(time) {
@@ -180,6 +235,7 @@ function selectTestCases(container, testCases) {
 	select(buttonElements.selectTestCases);
 	unselect(buttonElements.selectProblem);
 	unselect(buttonElements.selectSubmissions);
+	unselect(buttonElements.selectContest);
 
 	let testCaseContent = "";
 
@@ -300,6 +356,7 @@ function selectSubmissions(container) {
 	select(buttonElements.selectSubmissions);
 	unselect(buttonElements.selectProblem);
 	unselect(buttonElements.selectTestCases);
+	unselect(buttonElements.selectContest);
 
 	container.innerHTML = "";
 

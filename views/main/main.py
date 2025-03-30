@@ -95,13 +95,7 @@ def contests_view(competition):
 	)
 
 
-@main.route("/contest/<int:contest_id>")
-@login_required
-@check_object_exists(Contest, "/competitions")
-def contest_view(contest):
-	if not can_access_contest(contest):
-		return redirect("/competitions")
-
+def get_user_contest_data(contest):
 	if contest.contest_type_id == ContestType.query.filter_by(name="individual").first().id \
 		or not current_user.team:
 		user_submissions = Submission.query \
@@ -122,7 +116,10 @@ def contest_view(contest):
 	problem_dict = {
 		problem.id: {
 			"points_earned": 0,
-			"has_submission": False
+			"point_value": problem.point_value,
+			"has_submission": False,
+			"title": problem.name,
+			"id": problem.id
 		} for problem in contest.problems
 	}
 
@@ -135,6 +132,18 @@ def contest_view(contest):
 
 		problem_dict[sub.problem.id]["has_submission"] = True
 		problem_dict[sub.problem.id]["points_earned"] = sub.points_earned
+
+	return problem_dict, user_submissions
+
+
+@main.route("/contest/<int:contest_id>")
+@login_required
+@check_object_exists(Contest, "/competitions")
+def contest_view(contest):
+	if not can_access_contest(contest):
+		return redirect("/competitions")
+
+	problem_dict, user_submissions = get_user_contest_data(contest)
 
 	return render_template(
 		"contest/contest.html",
