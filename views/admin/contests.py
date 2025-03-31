@@ -700,7 +700,7 @@ def add_topic():
 @check_object_exists(Topic, "/admin/problem-topics")
 def edit_topic(topic):
 	if request.method == "GET":
-		return render_template("admin/add-problem-topic.html", topic=topic)
+		return render_template("admin/add-topic.html", topic=topic)
 	
 	name = request.form.get("name")
 	bg_color = request.form.get("bg_color")
