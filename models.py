@@ -186,6 +186,7 @@ class Problem(db.Model):
 	show_test_cases = sa.Column(sa.Boolean, default=False)
 	point_value = sa.Column(sa.Integer, default=0)
 	submissions = db.relationship("Submission", backref="problem", lazy=True)
+	topics = db.relationship("ProblemTopic", backref="problem", lazy=True)
 	
 	def __repr__(self):
 		return f"<Problem {self.name}>"
@@ -296,3 +297,27 @@ class LanguageType(db.Model):
 	
 	def __repr__(self):
 		return f"<LanguageType {self.name}>"
+	
+
+class Topic(db.Model):
+	__tablename__ = "topics"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	name = sa.Column(sa.String(100), nullable=False)
+	bg_color = sa.Column(sa.String(50), nullable=False)
+	text_color = sa.Column(sa.String(50), nullable=False)
+	problem_topics = db.relationship("ProblemTopic", backref="topic", lazy=True)
+
+	def __repr__(self):
+		return f"<Topic {self.name}>"
+	
+
+class ProblemTopic(db.Model):
+	__tablename__ = "problem_topics"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	topic_id = sa.Column(sa.Integer, sa.ForeignKey("topics.id"), nullable=False)
+	problem_id = sa.Column(sa.Integer, sa.ForeignKey("problems.id"), nullable=False)
+
+	def __repr__(self):
+		return f"<ProblemTopic {self.id}>"

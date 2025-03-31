@@ -120,6 +120,25 @@ def add_abstract_test_case(input, output, explanation, group_id):
 	)
 	db.session.add(atc)
 	db.session.commit()
+ 
+
+def add_topic(name, bg_color, text_color):
+	topic = Topic(
+		name=name,
+		bg_color=bg_color,
+		text_color=text_color
+	)
+	db.session.add(topic)
+	db.session.commit()
+
+
+def add_problem_topic(topic_id, problem_id):
+	pt = ProblemTopic(
+		topic_id=topic_id,
+		problem_id=problem_id
+	)
+	db.session.add(pt)
+	db.session.commit()
 
 
 def edit_contest(contest, name, contest_type_id, start_date, end_date, point_multiplier):
@@ -211,6 +230,14 @@ def delete_team(team):
 		student.team_id = None
 
 	db.session.delete(team)
+	db.session.commit()
+
+
+def delete_topic(topic):
+	for pt in topic.problem_topics:
+		db.session.delete(pt)
+
+	db.session.delete(topic)
 	db.session.commit()
 
 

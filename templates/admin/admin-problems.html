@@ -11,6 +11,7 @@
 		<table>
 			<tr>
 				<th>Problem name</th>
+				<th>Topics</th>
 				<th>Actions</th>
 				<th>Test cases</th>
 				<th>Point value</th>
@@ -18,6 +19,15 @@
 			{% for problem in contest.problems %}
 				<tr class="admin-contest">
 					<td><a href="/problem/{{ problem.id }}">{{ problem.name }}</a></td>
+					<td>
+						{% for topic in problem.topics %}
+							<span class="problem-topic" style="color: {{ topic.topic.text_color }}; background: {{ topic.topic.bg_color }};">
+								{{ topic.topic.name }}
+								<a href="/admin/delete-problem-topic/{{ topic.id }}">x</a>
+							</span>
+						{% endfor %}
+						<a href="/admin/add-problem-topic/{{ problem.id }}">Add</a>
+					</td>
 					<td>
 						<a href="/admin/edit-problem/{{ problem.id }}">Edit</a> &bull;
 						<a href="/admin/problems/{{ problem.id }}">Test cases</a> &bull;
@@ -28,7 +38,7 @@
 				</tr>
 			{% endfor %}
 			<tr>
-				<th colspan="3">Total</th>
+				<th colspan="4">Total</th>
 				<th>{{ contest.problems|sum(attribute="point_value") }}</th>
 			</tr>
 		</table>

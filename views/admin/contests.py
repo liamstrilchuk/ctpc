@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, request
 
 from models import AbstractTestCase, AbstractTestCaseGroup, Competition, Contest, \
-	ContestType, Problem, School, SchoolBoard, SchoolCode, Submission, db
+	ContestType, Problem, ProblemTopic, School, SchoolBoard, SchoolCode, Submission, Topic, db
 from util import admin_required, to_unix_timestamp, check_object_exists
 import handle_objects
 
@@ -671,3 +671,87 @@ def delete_test_case(test_case):
 	handle_objects.delete_test_case(test_case)
 
 	return redirect(f"/admin/problems/{problem_id}")
+
+
+@contests.route("/admin/problem-topics")
+@admin_required
+def view_problem_topics():
+	topics = Topic.query.all()
+	return render_template("admin/problem-topics.html", topics=topics)
+
+
+@contests.route("/admin/add-topic", methods=["GET", "POST"])
+@admin_required
+def add_topic():
+	if request.method == "GET":
+		return render_template("admin/add-topic.html")
+	
+	name = request.form.get("name")
+	bg_color = request.form.get("bg_color")
+	text_color = request.form.get("text_color")
+	
+	handle_objects.add_topic(name, bg_color, text_color)
+	
+	return redirect("/admin/problem-topics")
+
+
+@contests.route("/admin/edit-topic/<int:topic_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(Topic, "/admin/problem-topics")
+def edit_topic(topic):
+	if request.method == "GET":
+		return render_template("admin/add-problem-topic.html", topic=topic)
+	
+	name = request.form.get("name")
+	bg_color = request.form.get("bg_color")
+	text_color = request.form.get("text_color")
+
+	topic.name = name
+	topic.bg_color = bg_color
+	topic.text_color = text_color
+
+	db.session.commit()
+	return redirect("/admin/problem-topics")
+
+
+@contests.route("/admin/delete-topic/<int:topic_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(Topic, "/admin/problem-topics")
+def delete_topic(topic):
+	if request.method == "GET":
+		return render_template("confirm-delete.html", type="topic", text=f"with id={topic.id}")
+	
+	handle_objects.delete_topic(topic)
+	return redirect("/admin/problem-topics")
+
+
+@contests.route("/admin/add-problem-topic/<int:problem_id>", methods=["GET", "POST"])
+@admin_required
+@check_object_exists(Problem, "/admin")
+def add_problem_topic(problem):
+	if request.method == "GET":
+		topics = Topic.query.all()
+		not_included = [i for i in topics if not i in problem.topics]
+
+		return render_template("admin/add-problem-topic.html", topics=not_included, problem=problem)
+	
+	topic_id = request.form.get("topic")
+	existing = ProblemTopic.query.filter_by(topic_id=topic_id, problem_id=problem.id).first()
+
+	if existing is not None:
+		return redirect(f"/admin/edit-problems/{problem.contest.id}")
+	
+	handle_objects.add_problem_topic(topic_id, problem.id)
+
+	return redirect(f"/admin/edit-problems/{problem.contest.id}")
+
+
+@contests.route("/admin/delete-problem-topic/<int:problem_topic_id>")
+@admin_required
+@check_object_exists(ProblemTopic, "/admin")
+def delete_problem_topic(problem_topic):
+	contest_id = problem_topic.problem.contest.id
+	db.session.delete(problem_topic)
+	db.session.commit()
+
+	return redirect(f"/admin/edit-problems/{contest_id}")

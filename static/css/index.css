@@ -398,3 +398,15 @@ code {
 #adminContainer table {
 	width: max-content;
 }
+
+.problem-topic {
+	padding: 3px 7px;
+	border-radius: 5px;
+	font-size: 0.9em;
+	margin-right: 10px;
+}
+
+.problem-topic a {
+	color: inherit;
+	margin-left: 10px;
+}

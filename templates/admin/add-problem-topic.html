@@ -1,0 +1,15 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a href="/admin/edit-problems/{{ problem.contest.id }}" class="back">&larr; Back to problems</a>
+	<h1>Add topic for {{ problem.name }}</h1>
+	<form method="post">
+		<label for="topic">Topic</label>
+		<select name="topic">
+			{% for topic in topics %}
+				<option value="{{ topic.id }}">{{ topic.name }}</option>
+			{% endfor %}
+		</select>
+		<input type="submit">
+	</form>
+{% endblock %}

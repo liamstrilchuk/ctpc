@@ -10,6 +10,7 @@
 		<tr>
 			<th>#</th>
 			<th>Problem</th>
+			<th>Topics</th>
 			<th>Status</th>
 			<th>Points earned</th>
 		</tr>
@@ -17,6 +18,14 @@
 			<tr>
 				<td>{{ loop.index }}</td>
 				<td><a href="/problem/{{ problem.id }}">{{ problem.name }}</a></td>
+				<td>
+					{% for topic in problem.topics %}
+						<span
+							class="problem-topic"
+							style="color: {{ topic.topic.text_color }}; background: {{ topic.topic.bg_color }};"
+						>{{ topic.topic.name }}</span>
+					{% endfor %}
+				</td>
 				<td>
 					{% if not problem_dict[problem.id]["has_submission"] %}
 						Not attempted
@@ -32,7 +41,7 @@
 			</tr>
 		{% endfor %}
 		<tr>
-			<td colspan="3"><b>Total</b></td>
+			<td colspan="4"><b>Total</b></td>
 			<td><b>{{ problem_dict.values() | sum(attribute="points_earned") }}/{{ contest.problems | sum(attribute="point_value") }}</b></td>
 		</tr>
 	</table>

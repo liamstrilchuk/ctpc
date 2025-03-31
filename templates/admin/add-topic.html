@@ -1,0 +1,15 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+	<a class="back" href="/admin/problem-topics">&larr; Back to problem topics</a>
+	<h1>Add problem topic</h1>
+	<form method="post">
+		<label for="name">Topic name</label>
+		<input name="name" {% if topic %}value="{{ topic.name }}"{% endif %}>
+		<label for="text_color">Text color</label>
+		<input type="color" name="text_color" {% if topic %}value="{{ topic.text_color }}"{% endif %}>
+		<label for="bg_color">Background color</label>
+		<input type="color" name="bg_color" {% if topic %}value="{{ topic.bg_color }}"{% endif %}>
+		<input type="submit">
+	</form>
+{% endblock %}
