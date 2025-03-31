@@ -181,10 +181,8 @@ def problem_view(problem):
 @login_required
 @check_object_exists(Problem, "/competitions")
 def submit(problem):
-	return_id = "return_id" in request.form
-
 	if not can_access_contest(problem.contest, submit=True):
-		return redirect("/competitions") if not return_id else {
+		return {
 			"error": "Contest is over"
 		}
 	
@@ -195,7 +193,7 @@ def submit(problem):
 		.first()
 	
 	if last_user_submission and time() - last_user_submission.timestamp < 60:
-		return redirect(f"/problem/{problem.id}") if not return_id else {
+		return {
 			"error": "You can only submit once per minute"
 		}
 	
@@ -203,7 +201,7 @@ def submit(problem):
 	code = request.form["code"]
 
 	if len(code) == 0:
-		return redirect(f"/problem/{problem.id}") if not return_id else {
+		return {
 			"error": "You cannot submit a blank file"
 		}
 
@@ -264,7 +262,7 @@ def submit(problem):
 
 	requests.post("http://127.0.0.1:8000/create-submission", json=json_to_grader)
 
-	return redirect(f"/submission/{submission.id}") if not return_id else { "id": submission.id }
+	return { "id": submission.id }
 
 
 @main.route("/submit-practice/<int:problem_id>", methods=["POST"])

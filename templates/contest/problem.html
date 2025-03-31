@@ -28,18 +28,4 @@
 		{% endfor %}
 	{% endif %}
 	<a class="open-in-editor" href="/editor/{{ problem.id }}">Open problem in editor</a>
-	{% if can_submit %}
-		<h2>Submit solution</h2>
-		<form method="post" action="/submit/{{ problem.id }}">
-			<label for="code">Code</label>
-			<textarea id="code" name="code" placeholder="Enter your code here"></textarea>
-			<label for="language">Language</label>
-			<select name="language">
-				{% for lang in languages %}
-					<option value="{{ lang.short_name }}">{{ lang.name }}</option>
-				{% endfor %}
-			</select>
-			<input type="submit" value="Submit">
-		</form>
-	{% endif %}
 {% endblock %}
