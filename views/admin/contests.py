@@ -338,6 +338,46 @@ def add_contest(competition):
 	return redirect("/admin/competitions")
 
 
+@contests.route("/admin/duplicate-contest/<int:contest_id>")
+@admin_required
+@check_object_exists(Contest, "/admin/contests")
+def duplicate_contest(contest):
+	new_contest = handle_objects.add_contest(
+		name=f"{contest.name} (Duplicated)",
+		contest_type_id=contest.contest_type_id,
+		start_date=contest.start_date,
+		end_date=contest.end_date,
+		competition_id=contest.competition.id,
+		point_multiplier=0
+	)
+
+	for problem in contest.problems:
+		new_problem = handle_objects.add_problem(
+			problem.name,
+			problem.description,
+			new_contest.id
+		)
+
+		for atcg in problem.test_case_groups:
+			new_atcg = handle_objects.add_abstract_test_case_group(
+				atcg.point_value,
+				new_problem.id,
+				atcg.is_sample
+			)
+			new_problem.point_value += new_atcg.point_value
+			db.session.commit()
+
+			for atc in atcg.test_cases:
+				handle_objects.add_abstract_test_case(
+					atc.input,
+					atc.expected_output,
+					atc.explanation,
+					new_atcg.id
+				)
+
+	return redirect(f"/admin/contests/{contest.competition.short_name}")
+
+
 @contests.route("/admin/edit-contest/<int:contest_id>", methods=["GET", "POST"])
 @admin_required
 @check_object_exists(Contest, "/admin/contests")
@@ -435,9 +475,7 @@ def create_problem(contest):
 	if not problem_name:
 		return render_template("admin/add-problem.html", contest=contest, error="Invalid name")
 	
-	problem = Problem(name=problem_name, description=description, contest_id=contest.id)
-	db.session.add(problem)
-	db.session.commit()
+	handle_objects.add_problem(problem_name, description, contest.id)
 
 	return redirect(f"/admin/edit-problems/{contest.id}")
 
@@ -501,13 +539,7 @@ def add_test_case_group(problem):
 
 	problem.point_value += int(point_value)
 	
-	group = AbstractTestCaseGroup(
-		point_value=point_value,
-		problem_id=problem.id,
-		is_sample=is_sample
-	)
-	db.session.add(group)
-	db.session.commit()
+	handle_objects.add_abstract_test_case_group(point_value, problem.id, is_sample)
 
 	return redirect(f"/admin/problems/{problem.id}")
 
@@ -580,14 +612,7 @@ def add_test_case(group):
 	input = input.replace("\r", "")
 	output = output.replace("\r", "")
 
-	tc = AbstractTestCase(
-		input=input,
-		expected_output=output,
-		explanation=explanation,
-		group_id=group.id
-	)
-	db.session.add(tc)
-	db.session.commit()
+	handle_objects.add_abstract_test_case(input, output, explanation, group.id)
 
 	return redirect(f"/admin/problems/{group.problem.id}")
 

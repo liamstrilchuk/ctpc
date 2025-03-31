@@ -31,6 +31,11 @@ window.addEventListener("load", async function() {
 	testCaseResults.splice(testCases.length);
 	editor.setValue(lastPracticeSubmission.code, 1);
 
+	const saved = getSavedLocalCode();
+	if (saved && saved.timestamp / 1000 > lastPracticeSubmission.timestamp) {
+		editor.setValue(saved.code);
+	}
+
 	const submissionData = (await (await fetch("/api/submissions/" + problemId)).json());
 	previousSubmissions = submissionData["submissions"];
 
@@ -110,7 +115,27 @@ window.addEventListener("load", async function() {
 	buttonElements.languageSelector.addEventListener("change", () => {
 		editor.session.setMode(aceModes[buttonElements.languageSelector.value]);
 	});
+
+	window.setInterval(() => {
+		const allCode = JSON.parse(localStorage.getItem("editor-code")) || {};
+		allCode[problemId] = {
+			code: editor.getValue(),
+			timestamp: new Date().getTime()
+		};
+		
+		localStorage.setItem("editor-code", JSON.stringify(allCode));
+	}, 5000);
 });
+
+function getSavedLocalCode() {
+	const items = JSON.parse(localStorage.getItem("editor-code")) || {};
+
+	if (Object.keys(items).includes(problemId)) {
+		return items[problemId];
+	}
+
+	return null;
+}
 
 function unselect(button) {
 	button.classList.remove("selected");

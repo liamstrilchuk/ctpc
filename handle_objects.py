@@ -84,6 +84,43 @@ def add_contest(name, contest_type_id, start_date, end_date, point_multiplier, c
 	db.session.add(contest)
 	db.session.commit()
 
+	return contest
+
+
+def add_problem(name, desc, contest_id):
+	problem = Problem(
+		name=name,
+		description=desc,
+		contest_id=contest_id
+	)
+	db.session.add(problem)
+	db.session.commit()
+
+	return problem
+
+
+def add_abstract_test_case_group(point_value, problem_id, is_sample):
+	group = AbstractTestCaseGroup(
+		point_value=point_value,
+		problem_id=problem_id,
+		is_sample=is_sample
+	)
+	db.session.add(group)
+	db.session.commit()
+
+	return group
+
+
+def add_abstract_test_case(input, output, explanation, group_id):
+	atc = AbstractTestCase(
+		input=input,
+		expected_output=output,
+		explanation=explanation,
+		group_id=group_id
+	)
+	db.session.add(atc)
+	db.session.commit()
+
 
 def edit_contest(contest, name, contest_type_id, start_date, end_date, point_multiplier):
 	contest.name = name

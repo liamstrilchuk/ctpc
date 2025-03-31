@@ -399,7 +399,8 @@ def last_practice_submission(problem):
 		return {
 			"test_cases": test_case_data,
 			"code": last_submission.code,
-			"language": last_submission.language.short_name
+			"language": last_submission.language.short_name,
+			"timestamp": last_submission.timestamp
 		}
 	else:
 		return {
