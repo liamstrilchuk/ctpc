@@ -150,7 +150,9 @@ def contest_view(contest):
 		contest=contest,
 		current_time=time(),
 		user_submissions=user_submissions.order_by(Submission.timestamp.desc()).all(),
-		problem_dict=problem_dict
+		problem_dict=problem_dict,
+		show_topics=contest.point_multiplier == 0 or not can_access_contest(contest, submit=True) \
+			or current_user.role.name in ["admin", "tester"]
 	)
 
 

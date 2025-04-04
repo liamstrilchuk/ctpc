@@ -187,6 +187,9 @@ def delete_abstract_test_case_group(atcg):
 
 
 def delete_problem(problem):
+	for topic in problem.topics:
+		db.session.delete(topic)
+
 	for sub in problem.submissions:
 		delete_submission(sub)
 

@@ -10,7 +10,9 @@
 		<tr>
 			<th>#</th>
 			<th>Problem</th>
-			<th>Topics</th>
+			{% if show_topics %}
+				<th>Topics</th>
+			{% endif %}
 			<th>Status</th>
 			<th>Points earned</th>
 		</tr>
@@ -18,14 +20,16 @@
 			<tr>
 				<td>{{ loop.index }}</td>
 				<td><a href="/problem/{{ problem.id }}">{{ problem.name }}</a></td>
-				<td>
-					{% for topic in problem.topics %}
-						<span
-							class="problem-topic"
-							style="color: {{ topic.topic.text_color }}; background: {{ topic.topic.bg_color }};"
-						>{{ topic.topic.name }}</span>
-					{% endfor %}
-				</td>
+				{% if show_topics %}
+					<td>
+						{% for topic in problem.topics %}
+							<span
+								class="problem-topic"
+								style="color: {{ topic.topic.text_color }}; background: {{ topic.topic.bg_color }};"
+							>{{ topic.topic.name }}</span>
+						{% endfor %}
+					</td>
+				{% endif %}
 				<td>
 					{% if not problem_dict[problem.id]["has_submission"] %}
 						Not attempted

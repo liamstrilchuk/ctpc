@@ -375,6 +375,12 @@ def duplicate_contest(contest):
 					new_atcg.id
 				)
 
+		for topic in problem.topics:
+			handle_objects.add_problem_topic(
+				topic.topic_id,
+				new_problem.id
+			)
+
 	return redirect(f"/admin/contests/{contest.competition.short_name}")
 
 
