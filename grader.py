@@ -103,6 +103,7 @@ def check_submissions():
 
 def run_test_cases(submission, test_cases):
 	global current_grader
+	test_case_grader = current_grader
 
 	to_submit = { "submissions": [] }
 
@@ -114,11 +115,11 @@ def run_test_cases(submission, test_cases):
 			"stdin": test_case.input
 		})
 
-	response = requests.post(GRADER_URLS[current_grader] + "/submissions/batch", json=to_submit)
+	response = requests.post(GRADER_URLS[test_case_grader] + "/submissions/batch", json=to_submit)
 	response = response.json()
 
 	for i in range(len(response)):
-		test_cases[i].grader = current_grader
+		test_cases[i].grader = test_case_grader
 		test_cases[i].grader_token = response[i]["token"]
 		pending_testcases[response[i]["token"]] = test_cases[i]
 

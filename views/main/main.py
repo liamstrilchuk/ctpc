@@ -194,7 +194,8 @@ def submit(problem):
 		.order_by(Submission.timestamp.desc()) \
 		.first()
 	
-	if last_user_submission and time() - last_user_submission.timestamp < 60:
+	if last_user_submission and time() - last_user_submission.timestamp < 60 \
+		and not current_user.role.name == "admin":
 		return {
 			"error": "You can only submit once per minute"
 		}
