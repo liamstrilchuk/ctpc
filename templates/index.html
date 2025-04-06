@@ -38,6 +38,16 @@
 				<span class="fa fa-close"></span>
 			</div>
 		</div>
+		{% if current_user.is_authenticated %}
+			<div class="overlay-box">
+				{% if current_user.role.name == "teacher" %}
+					<a href="/teacher">View your teacher dashboard &rarr;</a>
+				{% elif current_user.role.name in ["student", "tester", "admin"] %}
+					<a href="/contest/2" class="view-sample-problems">Check out the sample problems &rarr;</a>
+					<a href="/competitions/2025">View the 2025 competition &rarr;</a>
+				{% endif %}
+			</div>
+		{% endif %}
 		<div id="background">
 			<div class="img-container">
 				<img src="/static/images/homepage/sky_small.png">

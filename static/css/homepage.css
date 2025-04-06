@@ -338,6 +338,29 @@ img {
 	font-size: 1.2em;
 }
 
+.overlay-box {
+	background: #ebc456;
+	position: fixed;
+	height: 40px;
+	width: 100%;
+	left: 0;
+	top: calc(100% - 40px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.overlay-box a {
+	color: black;
+	font-size: 1.2em;
+	margin: 20px;
+	text-decoration: none;
+}
+
+.overlay-box a:hover {
+	text-decoration: underline;
+}
+
 @media screen and (min-width: 2300px) {
 	#subplanet {
 		top: 350px;
@@ -551,6 +574,10 @@ img {
 
 	#numbers {
 		top: 2300px;
+	}
+
+	.view-sample-problems {
+		display: none;
 	}
 }
 
