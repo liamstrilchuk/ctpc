@@ -12,6 +12,7 @@
 		<textarea id="output" name="output">{% if test_case %}{{ test_case.expected_output }}{% endif %}</textarea>
 		<label for="outputfile">Or upload a file instead:</label>
 		<input type="file" name="outputfile">
+		<label for="explanation">Explanation</label>
 		<textarea id="explanation" name="explanation">{% if test_case %}{{ test_case.explanation }}{% endif %}</textarea>
 		<label for="outputfile">Or upload a file instead:</label>
 		<input type="file" name="explanationfile">

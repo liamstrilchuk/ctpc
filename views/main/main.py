@@ -275,6 +275,13 @@ def submit_practice(problem):
 	if not can_access_contest(problem.contest, submit=True):
 		return { "error": "Contest is over" }
 	
+	recent_practice_submissions = Submission.query \
+		.filter(Submission.timestamp > time() - 600, Submission.is_practice == True) \
+		.all()
+	
+	if len(recent_practice_submissions) >= 15:
+		return { "error": "Too many practice submissions", "ratelimit": "" }
+	
 	data = request.get_json()
 	try:
 		language = LanguageType.query.filter_by(short_name=data["language"]).first()

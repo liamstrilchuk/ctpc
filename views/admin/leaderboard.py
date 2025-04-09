@@ -94,7 +94,11 @@ def contest_leaderboard(contest):
 @admin_required
 @check_object_exists(Competition, "/competitions", key_name="short_name")
 def competition_leaderboard(competition):
-	contests = competition.contests
+	contests = Contest.query.filter(
+		Contest.point_multiplier > 0,
+		Contest.competition_id == competition.id
+	).all()
+
 	teams = Team.query \
 		.join(School, School.id == Team.school_id) \
 		.join(Competition, Competition.id == School.competition_id) \
@@ -123,7 +127,7 @@ def competition_leaderboard(competition):
 					continue
 
 				team_data[user["obj"].team.id]["problems"][i]["score"] += user["total_score"]
-				team_data[user["obj"].team.id]["total_score"] += user["total_score"]
+				team_data[user["obj"].team.id]["total_score"] += user["total_score"] * contest.point_multiplier
 		else:
 			for x in user_data:
 				team = user_data[x]
@@ -131,7 +135,7 @@ def competition_leaderboard(competition):
 					continue
 
 				team_data[team["obj"].id]["problems"][i]["score"] = team["total_score"]
-				team_data[team["obj"].id]["total_score"] += team["total_score"]
+				team_data[team["obj"].id]["total_score"] += team["total_score"] * contest.point_multiplier
 
 	sorted_teams = {
 		k: v for k, v in sorted(

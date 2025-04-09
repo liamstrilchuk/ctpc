@@ -111,7 +111,8 @@ def teacher_view():
 		past_registration_cutoff=past_registration_cutoff,
 		async_state=async_state,
 		active_async_time=get_active_async_time(),
-		available_contests=available_contests
+		available_contests=available_contests,
+		current_time=time()
 	)
 
 
@@ -120,6 +121,17 @@ def teacher_view():
 @check_object_exists(Contest, "/teacher")
 def start_async_contest(contest):
 	if current_user.school.synchronous:
+		return redirect("/teacher")
+	
+	if time() < contest.competition.async_start or time() > contest.competition.asnyc_end:
+		return redirect("/teacher")
+	
+	existing_act = AsyncStartTime.query.filter_by(
+		school_id=current_user.school.id,
+		contest_id=contest.id
+	).first()
+
+	if existing_act is not None:
 		return redirect("/teacher")
 	
 	act = get_active_async_time()
@@ -186,6 +198,9 @@ def teacher_onboarding():
 	
 	if current_user.school is None:
 		return redirect("/")
+	
+	if time() > current_user.school.competition.async_start:
+		return redirect("/teacher")
 	
 	if request.method == "GET":
 		return render_template("teacher-onboard.html")
