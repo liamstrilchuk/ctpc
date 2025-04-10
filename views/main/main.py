@@ -276,6 +276,7 @@ def submit_practice(problem):
 		return { "error": "Contest is over" }
 	
 	recent_practice_submissions = Submission.query \
+		.filter(Submission.user_id == current_user.id) \
 		.filter(Submission.timestamp > time() - 600, Submission.is_practice == True) \
 		.all()
 	

@@ -123,7 +123,7 @@ def start_async_contest(contest):
 	if current_user.school.synchronous:
 		return redirect("/teacher")
 	
-	if time() < contest.competition.async_start or time() > contest.competition.asnyc_end:
+	if time() < contest.competition.async_start or time() > contest.competition.async_end:
 		return redirect("/teacher")
 	
 	existing_act = AsyncStartTime.query.filter_by(
@@ -199,7 +199,8 @@ def teacher_onboarding():
 	if current_user.school is None:
 		return redirect("/")
 	
-	if time() > current_user.school.competition.async_start:
+	if current_user.school.competition.async_start is not None \
+		and time() > current_user.school.competition.async_start:
 		return redirect("/teacher")
 	
 	if request.method == "GET":

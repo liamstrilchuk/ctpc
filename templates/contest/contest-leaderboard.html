@@ -41,7 +41,7 @@
 							</td>
 						{% endif %}
 					{% endfor %}
-					<td><b>{{ sorted_users[user]["total_score"] }}</b></td>
+					<td><b>{{ sorted_users[user]["total_score"]|round }}</b></td>
 				</tr>
 			{% endfor %}
 		</table>

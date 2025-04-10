@@ -17,8 +17,7 @@ def error(message):
 @login_required
 @check_object_exists(Problem, "/")
 def get_test_cases(problem):
-	if problem.contest.start_date > time.time() \
-		and not current_user.role.name in ["admin", "tester"]:
+	if not can_access_contest(problem.contest):
 		return error("Problem is not available")
 
 	groups = problem.test_case_groups

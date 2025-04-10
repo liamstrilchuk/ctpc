@@ -10,7 +10,7 @@
 			<a href="/teacher/create-team">Create team</a>
 			<a href="/teacher/register-student">Register student</a>
 		{% endif %}
-		{% if current_time < current_user.school.competition.async_start %}
+		{% if not current_user.school.competition.async_start or current_time < current_user.school.competition.async_start %}
 			<a href="/teacher-onboarding">Change preferences</a>
 		{% endif %}
 	</div>

@@ -45,7 +45,7 @@
 			</tr>
 		{% endfor %}
 		<tr>
-			<td colspan="4"><b>Total</b></td>
+			<td colspan="{% if show_topics %}4{% else %}3{% endif %}"><b>Total</b></td>
 			<td><b>{{ problem_dict.values() | sum(attribute="points_earned") }}/{{ contest.problems | sum(attribute="point_value") }}</b></td>
 		</tr>
 	</table>

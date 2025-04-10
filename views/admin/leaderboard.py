@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 
-from models import Competition, Contest, Submission, User, Problem, Team, School
+from models import Competition, Contest, Submission, User, Problem, Team, School, UserRole
 from util import admin_required, check_object_exists
 
 leaderboard = Blueprint("leaderboard", __name__, template_folder="templates")
@@ -14,7 +14,9 @@ def contest_leaderboard_data(contest):
 		submitting_users = User.query \
 			.join(Submission, Submission.user_id == User.id) \
 			.join(Problem, Problem.id == Submission.problem_id) \
+			.join(UserRole, UserRole.id == User.role_id) \
 			.filter(Problem.contest_id == contest.id) \
+			.filter(UserRole.name == "student") \
 			.all()
 	else:
 		submitting_users = Team.query \
@@ -54,6 +56,10 @@ def contest_leaderboard_data(contest):
 
 		list_key = submission.user.username if contest.contest_type.name == "individual" \
 			else submission.user.team.id
+		
+		if not list_key in user_list:
+			continue
+	
 		problem_index = problem_id_dict[submission.problem_id]
 		user_list[list_key]["problems"][problem_index]["attempted"] = True
 		user_list[list_key]["problems"][problem_index]["score"] = submission.points_earned

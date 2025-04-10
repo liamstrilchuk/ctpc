@@ -473,12 +473,14 @@ async function runSampleTestCases(container, testcases) {
 	const data = await response.json();
 
 	if ("ratelimit" in data) {
+		isSubmitting = false;
 		openErrorBox(
 			"Could not submit practice submission",
 			"Please slow down! You can only submit practice submissions 15 times over 10 minutes."
 		);
 		return;
 	} else if ("error" in data) {
+		isSubmitting = false;
 		openErrorBox("Could not submit practice submission", data["error"]);
 		return;
 	}
