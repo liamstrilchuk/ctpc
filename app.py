@@ -14,6 +14,7 @@ def setup_app():
 	app = Flask(__name__)
 	app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 	app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
+	app.config["MAX_CONTENT_LENGTH"] = 100 * 1024**2
 	app.secret_key = os.environ["SECRET_KEY"]
 
 	app.jinja_env.auto_reload = True
