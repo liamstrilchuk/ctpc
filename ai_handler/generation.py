@@ -49,10 +49,6 @@ def initialize_solutions(problem, problem_description, sol_count, scale_count, s
         for i in range(sol_count):
             code = generate_ai_solution(problem_description, lang.name)
 
-            f = open("temp/sol" + str(i) + ".txt", 'w')
-            f.write(code)
-            print("Solution " + str(i + 1) + " added (" + str(lang.short_name) + ")")
-
             ai_solution = AISolution(problem_id=problem.id, language_id=lang.grader_id, code=code)
             db.session.add(ai_solution)
 
@@ -64,10 +60,6 @@ def initialize_solutions(problem, problem_description, sol_count, scale_count, s
 
         for i in range(scale_count):
             code = generate_ai_solution(problem_description, lang.name)
-
-            f = open("temp/scale" + str(i) + ".txt", 'w')
-            f.write(code)
-            print("Test " + str(i + 1) + " added (" + str(lang.short_name) + ")")
 
             score = compare_to_ai_solutions(code, problem.id, lang)
             unscaled.append(score)

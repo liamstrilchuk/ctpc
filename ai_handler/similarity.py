@@ -12,7 +12,7 @@ def tokenize_code(code, lang_alias):
         tokens = [token for _, token in lex(code, lexer)]
         return ' '.join(tokens)
     except Exception:
-        return code  # fallback to raw code
+        return code
 
 def compare_to_ai_solutions(user_code, problem_id, lang):
     """
@@ -37,7 +37,7 @@ def compare_to_ai_solutions(user_code, problem_id, lang):
 
     scores = []
     for tokenized_ai in tokenized_ai_list:
-        all_docs = tokenized_ai_list + [tokenized_user, tokenized_ai]  # maintain shared vocab
+        all_docs = tokenized_ai_list + [tokenized_user, tokenized_ai]
         vectorizer = TfidfVectorizer(tokenizer=str.split, lowercase=False)
         tfidf_matrix = vectorizer.fit_transform(all_docs)
 
@@ -56,11 +56,6 @@ def compare_to_ai_solutions(user_code, problem_id, lang):
     raw_score = (best_score * 0.5 + avg_score * 0.5)
 
     scaled_score = raw_score * scale_factor.value
-    final_score = min(scaled_score * 100, 100)  # cap at 100
-
-    # Debug prints (optional)
-    print(f"BEST:  {best_score * 100:.2f}")
-    print(f"AVG:   {avg_score * 100:.2f}")
-    print(f"SCORE: {final_score:.2f}")
+    final_score = min(scaled_score * 100, 100)
 
     return round(final_score, 2)
