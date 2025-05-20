@@ -1,0 +1,58 @@
+```javascript
+function findShortestTitle(input) {
+    const lines = input.trim().split('\n');
+    const [K, Rn, Pn, Sn, P, S] = lines[0].split(' ').map(Number);
+
+    const roots = [], prefixes = [], suffixes = [];
+    const rootScores = [], prefixScores = [], suffixScores = [];
+
+    for (let i = 1; i <= Rn; i++) {
+        const [word, score] = lines[i].split(' ');
+        roots.push(word);
+        rootScores.push(Number(score));
+    }
+    
+    for (let i = Rn + 1; i <= Rn + Pn; i++) {
+        const [word, score] = lines[i].split(' ');
+        prefixes.push(word);
+        prefixScores.push(Number(score));
+    }
+    
+    for (let i = Rn + Pn + 1; i <= Rn + Pn + Sn; i++) {
+        const [word, score] = lines[i].split(' ');
+        suffixes.push(word);
+        suffixScores.push(Number(score));
+    }
+
+    let minLength = Infinity;
+
+    function dfs(rootIndex, prefixCount, suffixCount, currentScore, currentLength, usedPrefixes, usedSuffixes) {
+        if (currentScore === K) {
+            minLength = Math.min(minLength, currentLength);
+            return;
+        }
+        if (currentScore > K || prefixCount > P || suffixCount > S) return;
+
+        for (let i = 0; i < Pn; i++) {
+            if (!usedPrefixes[i]) {
+                usedPrefixes[i] = true;
+                dfs(rootIndex, prefixCount + 1, suffixCount, currentScore + prefixScores[i], currentLength + prefixes[i].length, usedPrefixes, usedSuffixes);
+                usedPrefixes[i] = false;
+            }
+        }
+        for (let i = 0; i < Sn; i++) {
+            if (!usedSuffixes[i]) {
+                usedSuffixes[i] = true;
+                dfs(rootIndex, prefixCount, suffixCount + 1, currentScore + suffixScores[i], currentLength + suffixes[i].length, usedPrefixes, usedSuffixes);
+                usedSuffixes[i] = false;
+            }
+        }
+    }
+
+    for (let i = 0; i < Rn; i++) {
+        dfs(i, 0, 0, rootScores[i], roots[i].length, Array(Pn).fill(false), Array(Sn).fill(false));
+    }
+
+    return minLength;
+}
+```

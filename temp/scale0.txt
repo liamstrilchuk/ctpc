@@ -1,0 +1,83 @@
+```javascript
+function findShortestTitle(input) {
+    let lines = input.split('\n').filter(line => line.trim() !== '');
+    let [K, Rn, Pn, Sn, P, S] = lines[0].split(' ').map(Number);
+    let roots = [], prefixes = [], suffixes = [];
+    
+    let index = 1;
+    for (let i = 0; i < Rn; i++) {
+        let [word, score] = lines[index++].split(' ');
+        roots.push({ word, score: Number(score) });
+    }
+    for (let i = 0; i < Pn; i++) {
+        let [word, score] = lines[index++].split(' ');
+        prefixes.push({ word, score: Number(score) });
+    }
+    for (let i = 0; i < Sn; i++) {
+        let [word, score] = lines[index++].split(' ');
+        suffixes.push({ word, score: Number(score) });
+    }
+
+    roots.sort((a, b) => a.word.length - b.word.length);
+    prefixes.sort((a, b) => a.word.length - b.word.length);
+    suffixes.sort((a, b) => a.word.length - b.word.length);
+
+    let minLength = Infinity;
+
+    for (let root of roots) {
+        let target = K - root.score;
+        if (target < 0) continue;
+        
+        let prefixCombos = [];
+        for (let i = 0; i < (1 << Pn); i++) {
+            let score = 0, length = 0, count = 0;
+            let valid = true;
+            for (let j = 0; j < Pn; j++) {
+                if (i & (1 << j)) {
+                    score += prefixes[j].score;
+                    length += prefixes[j].word.length;
+                    count++;
+                    if (count > P) {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+            if (valid) {
+                prefixCombos.push({ score, length });
+            }
+        }
+
+        let suffixCombos = [];
+        for (let i = 0; i < (1 << Sn); i++) {
+            let score = 0, length = 0, count = 0;
+            let valid = true;
+            for (let j = 0; j < Sn; j++) {
+                if (i & (1 << j)) {
+                    score += suffixes[j].score;
+                    length += suffixes[j].word.length;
+                    count++;
+                    if (count > S) {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+            if (valid) {
+                suffixCombos.push({ score, length });
+            }
+        }
+
+        for (let prefix of prefixCombos) {
+            for (let suffix of suffixCombos) {
+                if (prefix.score + suffix.score === target) {
+                    let totalLength = root.word.length + prefix.length + suffix.length;
+                    minLength = Math.min(minLength, totalLength);
+                }
+            }
+        }
+    }
+
+    return minLength;
+}
+```

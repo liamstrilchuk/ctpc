@@ -1,0 +1,28 @@
+```python
+def shortest_title_length(K, Rn, Pn, Sn, P, S, root_data, prefix_data, suffix_data):
+    from itertools import combinations
+
+    roots = [(rd.split()[0], int(rd.split()[1])) for rd in root_data]
+    prefixes = [(pd.split()[0], int(pd.split()[1])) for pd in prefix_data]
+    suffixes = [(sd.split()[0], int(sd.split()[1])) for sd in suffix_data]
+
+    min_length = float('inf')
+
+    for root, root_score in roots:
+        for p_count in range(min(P, Pn) + 1):
+            for s_count in range(min(S, Sn) + 1):
+                for prefix_comb in combinations(prefixes, p_count):
+                    for suffix_comb in combinations(suffixes, s_count):
+                        total_score = root_score + sum(p[1] for p in prefix_comb) + sum(s[1] for s in suffix_comb)
+                        if total_score == K:
+                            length = len(root) + sum(len(p[0]) for p in prefix_comb) + sum(len(s[0]) for s in suffix_comb)
+                            min_length = min(min_length, length)
+    return min_length
+
+# Example usage:
+# K, Rn, Pn, Sn, P, S = 10, 3, 3, 3, 2, 2
+# root_data = ["root1 5", "root2 3", "root3 2"]
+# prefix_data = ["pre1 2", "pre2 3", "pre3 1"]
+# suffix_data = ["suf1 2", "suf2 3", "suf3 1"]
+# print(shortest_title_length(K, Rn, Pn, Sn, P, S, root_data, prefix_data, suffix_data))
+```

@@ -1,5 +1,20 @@
 {% extends "admin/adminbase.html" %}
 
+{% macro score_color(score) %}
+	{% if score < 50 %}
+		background-color: rgb(0, 180, 0);
+	{% else %}
+		{% if score < 75 %}
+			{% set r = (180 * ((score - 50) / 25)) | int %}
+			{% set g = 180 | int %}
+		{% else %}
+			{% set r = 180 | int %}
+			{% set g = (180 * ((100 - score) / 25)) | int %}
+		{% endif %}
+		background-color: rgb({{ r }}, {{ g }}, 0);
+	{% endif %}
+{% endmacro %}
+
 {% block content %}
 	<a class="back" href="/admin">&larr; Back to admin</a>
 	<h1>View recent or pending submissions (last {{ (timeframe / 60)|round(1) }} minutes)</h1>
@@ -19,6 +34,7 @@
 			<th>Points earned</th>
 			<th>Status</th>
 			<th>Tools</th>
+			<th>AI score</th>
 		</tr>
 		{% for sub in submissions %}
 			<tr>
@@ -28,10 +44,11 @@
 				<td>{% if sub.is_practice %}Practice{% else %}{{ sub.points_earned }}/{{ sub.problem.point_value }}{% endif %}</td>
 				<td>{{ sub.status.name }}</td>
 				<td><a href="/submission/{{ sub.id }}">View</a> &bull; <a href="/admin/delete-submission/{{ sub.id }}">Delete</a></td>
+				<td class="ai-score" style="{{ score_color(sub.ai_score) }}">{{ sub.ai_score }}</td>
 			</tr>
 		{% else %}
 			<tr>
-				<td colspan="6">
+				<td colspan="7">
 					There are no pending or recent submissions.
 				</td>
 			</tr>

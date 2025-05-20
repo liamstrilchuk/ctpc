@@ -185,11 +185,30 @@ class Problem(db.Model):
 	description = sa.Column(sa.Text)
 	show_test_cases = sa.Column(sa.Boolean, default=False)
 	point_value = sa.Column(sa.Integer, default=0)
+	scale_factors = db.relationship("ScaleFactor", backref="problem", lazy=True)
 	submissions = db.relationship("Submission", backref="problem", lazy=True)
 	topics = db.relationship("ProblemTopic", backref="problem", lazy=True)
+	ai_solutions = db.relationship("AISolution", back_populates="problem", lazy=True)
 	
 	def __repr__(self):
 		return f"<Problem {self.name}>"
+	
+class ScaleFactor(db.Model):
+	__tablename__ = "scale_factors"
+	
+	id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+	value = sa.Column(sa.Integer, default=1)
+	problem_id = sa.Column(sa.Integer, sa.ForeignKey("problems.id"), nullable=False)
+	language_id = language_id = sa.Column(sa.Integer, sa.ForeignKey("language_types.id"), nullable=False)
+
+class AISolution(db.Model):
+	__tablename__ = "ai_solutions"
+	
+	id = sa.Column(sa.Integer, primary_key=True)
+	problem_id = sa.Column(sa.Integer, sa.ForeignKey("problems.id"), nullable=False)
+	language_id = sa.Column(sa.Integer, sa.ForeignKey("language_types.id"), nullable=False)
+	code = sa.Column(sa.Text, nullable=False)
+	problem = db.relationship("Problem", back_populates="ai_solutions")
 	
 
 class Submission(db.Model):
@@ -205,6 +224,7 @@ class Submission(db.Model):
 	status_id = sa.Column(sa.Integer, sa.ForeignKey("submission_statuses.id"), nullable=False)
 	points_earned = sa.Column(sa.Integer, default=0)
 	is_practice = sa.Column(sa.Boolean, default=False)
+	ai_score = sa.Column(sa.Float, default=0)
 	
 	def __repr__(self):
 		return f"<Submission {self.id}>"

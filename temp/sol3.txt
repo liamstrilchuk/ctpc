@@ -1,0 +1,30 @@
+```python
+def shortest_title_length(K, Rn, Pn, Sn, P, S, root_words, prefixes, suffixes):
+    from itertools import combinations
+
+    roots = [(w.split()[0], int(w.split()[1])) for w in root_words]
+    pres = [(w.split()[0], int(w.split()[1])) for w in prefixes]
+    sufs = [(w.split()[0], int(w.split()[1])) for w in suffixes]
+
+    min_length = float('inf')
+
+    for root, root_score in roots:
+        for p_comb in combinations(pres, min(P, len(pres))):
+            for s_comb in combinations(sufs, min(S, len(sufs))):
+                p_score = sum(p[1] for p in p_comb)
+                s_score = sum(s[1] for s in s_comb)
+                total_score = root_score + p_score + s_score
+
+                if total_score == K:
+                    title_length = len(root) + sum(len(p[0]) for p in p_comb) + sum(len(s[0]) for s in s_comb)
+                    min_length = min(min_length, title_length)
+
+    return min_length
+
+# Example usage
+# K, Rn, Pn, Sn, P, S = 10, 2, 2, 2, 1, 1
+# root_words = ["root1 5", "root2 3"]
+# prefixes = ["pre1 2", "pre2 1"]
+# suffixes = ["suf1 2", "suf2 1"]
+# print(shortest_title_length(K, Rn, Pn, Sn, P, S, root_words, prefixes, suffixes))
+```

@@ -2,13 +2,15 @@ from flask import Blueprint, render_template, request, redirect
 from flask_login import current_user
 import time, json, requests
 
-from models import SubmissionStatus, User, School, SchoolBoard, UserRole, Submission, db
+from models import SubmissionStatus, User, School, SchoolBoard, UserRole, Problem, Submission, db
 from util import admin_required, generate_random_password, check_object_exists
 from setup import bcrypt
 import handle_objects
 
-manage = Blueprint("manage", __name__, template_folder="templates")
+from ai_handler.generation import initialize_solutions
+from utils.ai_counts import SOL_COUNT, SCALE_COUNT, TARGET
 
+manage = Blueprint("manage", __name__, template_folder="templates")
 
 @manage.route("/admin/add-board", methods=["GET", "POST"])
 @admin_required
@@ -280,8 +282,21 @@ def delete_submission(submission):
 		return render_template(
 			"confirm-delete.html",
 			type="submission",
-			text=f"id={submission.id} by {submission.user.username}"
 		)
 	
 	handle_objects.delete_submission(submission)
 	return redirect("/admin/view-recent-submissions/900")
+
+@manage.route("/admin/ai-loader", methods=["GET", "POST"])
+@admin_required
+def get_ai_page():
+	if request.method == "GET":
+		return render_template("/admin/ai-loader.html", problems=Problem.query.all())
+	
+	pid = request.form.get("selector")
+	problem = Problem.query.filter_by(id=pid).first()
+
+	initialize_solutions(problem, problem.description, SOL_COUNT, SCALE_COUNT, TARGET)
+
+	return redirect("/admin")
+

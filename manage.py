@@ -1,6 +1,8 @@
 def deploy():
 	from app import setup_app, db
 	from flask_migrate import upgrade, migrate, init, stamp
+
+	from utils.languages import language_types
 	
 	app = setup_app()
 	app.app_context().push()
@@ -43,14 +45,6 @@ def deploy():
 	for contest_type in contest_types:
 		ct = ContestType(name=contest_type)
 		db.session.add(ct)
-
-	language_types = [
-		("Python (3.8.1)", "py", 71),
-		("C++ (GCC 9.2.0)", "cpp", 54),
-		("Java (OpenJDK 13.0.1)", "java", 62),
-		("C (GCC 9.2.0)", "c", 50),
-		("JavaScript (Node.js 12.14.0)", "js", 63)
-	]
 
 	for language_type in language_types:
 		lt = LanguageType(
