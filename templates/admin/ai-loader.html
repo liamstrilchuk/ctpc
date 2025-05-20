@@ -1,0 +1,15 @@
+{% extends "admin/adminbase.html" %}
+
+{% block content %}
+    <a href="/admin" class="back">&larr; Back to admin</a>
+    <h1>Add AI solutions</h1>
+    <form method="post">
+        <label for="problems">Problem</label>
+        <select name="selector">
+            {% for problem in problems %}
+                <option value="{{ problem.id }}">{{ problem.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit">
+    </form>
+{% endblock %}

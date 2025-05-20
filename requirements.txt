@@ -5,3 +5,9 @@ flask_migrate
 flask_bcrypt
 markdown
 requests
+sqlalchemy
+python-dotenv
+scikit-learn
+openai>=1.0.0
+pygments
+numpy

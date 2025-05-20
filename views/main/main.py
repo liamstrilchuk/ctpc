@@ -9,6 +9,8 @@ from models import AbstractTestCaseGroup, AsyncStartTime, Competition, Contest, 
 from util import check_object_exists, logout_required
 import handle_objects
 
+from ai_handler.similarity import compare_to_ai_solutions
+
 main = Blueprint("main", __name__, template_folder="templates")
 
 
@@ -220,7 +222,8 @@ def submit(problem):
 		code=code,
 		timestamp=int(time()),
 		status_id=SubmissionStatus.query.filter_by(name="Pending").first().id,
-		is_practice=False
+		is_practice=False,
+		ai_score=compare_to_ai_solutions(code, problem.id, language)
 	)
 	
 	db.session.add(submission)
@@ -315,7 +318,8 @@ def submit_practice(problem):
 			code=code,
 			timestamp=int(time()),
 			status_id=SubmissionStatus.query.filter_by(name="Pending").first().id,
-			is_practice=True
+			is_practice=True,
+			ai_score=compare_to_ai_solutions(code, problem.id, language)
 		)
 
 		db.session.add(submission)
