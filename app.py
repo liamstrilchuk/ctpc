@@ -9,6 +9,7 @@ from setup import bcrypt, login_manager
 from views.admin.admin import admin
 from views.api import api
 from views.views import views
+from views.public.public import public
 
 from tournament.routes import tournament_bp
 
@@ -46,6 +47,7 @@ app = setup_app()
 app.register_blueprint(views)
 app.register_blueprint(api)
 app.register_blueprint(admin)
+app.register_blueprint(public)
 app.register_blueprint(tournament_bp)
 
 @login_manager.user_loader

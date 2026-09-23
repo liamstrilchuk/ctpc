@@ -20,6 +20,9 @@
 			<a href="/competitions/2025"><b>Enter 2025 Competition</b></a>
 			<a href="#about">About the competition</a>
 			<a href="#faq">Frequently asked questions</a>
+			<a href="/about" class="navbar-link-spacing">About CTPC</a>
+			<a href="/timeline">Timeline</a>
+			<a href="/platform">See the platform</a>
 			{% if current_user.is_authenticated %}
 				<a class="navbar-link-spacing">Logged in as <b>{{ current_user.username }}</b></a>
 				{% if current_user.role.name == "admin" %}

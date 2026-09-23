@@ -1,0 +1,111 @@
+{% extends "public/layout.html" %}
+{% set active_page = "platform" %}
+
+{% block title %}Our Coding Platform — CTPC{% endblock %}
+{% block meta_description %}See how CTPC's competition platform worked, and try a small illustrative demo of the participant experience.{% endblock %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/platform-demo.css') }}">
+{% endblock %}
+
+{% block content %}
+	<section class="pub-hero">
+		<div class="pub-hero-planets" aria-hidden="true"></div>
+		<div class="pub-hero-content">
+			<h1>Our Coding Platform</h1>
+			<p>A look at what competing in a CTPC coding competition felt like &mdash; plus a small, self-contained demo you can try right now.</p>
+		</div>
+	</section>
+
+	<div class="pub-main">
+		<section aria-labelledby="walkthrough-heading">
+			<h2 id="walkthrough-heading">The participant journey</h2>
+			<p>Here's how our custom competition platform worked for past CTPC events. These are real features of the platform &mdash; not the demo below.</p>
+
+			<div class="pub-card" style="margin-bottom: 16px;">
+				<h3 style="margin-top: 0;">1. Registering</h3>
+				<p style="margin-bottom: 0;">Students could register individually, or join through their school once a teacher registered using a school code. Teams were formed within a school for the team portion of the competition.</p>
+			</div>
+
+			<div class="pub-card" style="margin-bottom: 16px;">
+				<h3 style="margin-top: 0;">2. Reading a problem</h3>
+				<p style="margin-bottom: 0;">Each problem had a written description along with sample inputs and expected outputs, so participants could check their understanding before submitting.</p>
+			</div>
+
+			<div class="pub-card" style="margin-bottom: 16px;">
+				<h3 style="margin-top: 0;">3. Writing and testing code</h3>
+				<p style="margin-bottom: 0;">Participants wrote code directly in the browser, in Python, C++, Java, C, or JavaScript, with syntax highlighting. Before submitting for real, they could run practice submissions against the sample test cases to check their solution.</p>
+			</div>
+
+			<div class="pub-card" style="margin-bottom: 16px;">
+				<h3 style="margin-top: 0;">4. Submitting and getting graded</h3>
+				<p style="margin-bottom: 0;">Each submission was automatically checked against the problem's test cases and given a result, such as Accepted, Wrong Answer, Time Limit Exceeded, or Runtime Error.</p>
+			</div>
+
+			<div class="pub-card">
+				<h3 style="margin-top: 0;">5. Teams and the leaderboard</h3>
+				<p style="margin-bottom: 0;">In the team portion, a team's combined results counted toward its standing, and a live leaderboard showed how teams and individuals were doing across the contest. Our 2025 format ran a one-hour individual round and a two-hour team round, with in-person and virtual participants competing the same day.</p>
+			</div>
+		</section>
+
+		<section aria-labelledby="demo-heading" style="margin-top: 64px;">
+			<h2 id="demo-heading">Try a sample submission</h2>
+			<p class="pub-notice" role="note">
+				<span class="fa fa-circle-info" aria-hidden="true"></span>
+				This is an illustrative demo, not the live competition platform. The problem is fictional, no code is actually run, no account is needed, and nothing here is sent to a server.
+			</p>
+
+			<div class="pub-card" style="margin-top: 20px;">
+				<h3 style="margin-top: 0;">Rocket Fuel Check <span class="pub-tag">Sample problem</span></h3>
+				<p>Given two integers on one line, print their sum.</p>
+				<div class="demo-io">
+					<div>
+						<div class="demo-io-label">Sample input</div>
+						<pre>3 5</pre>
+					</div>
+					<div>
+						<div class="demo-io-label">Expected output</div>
+						<pre>8</pre>
+					</div>
+				</div>
+
+				<div class="demo-solution-buttons" role="group" aria-label="Choose a sample solution">
+					<button type="button" class="pub-button pub-button-secondary" data-solution="correct">Correct solution</button>
+					<button type="button" class="pub-button pub-button-secondary" data-solution="offbyone">Off-by-one bug</button>
+					<button type="button" class="pub-button pub-button-secondary" data-solution="infinite">Infinite loop</button>
+				</div>
+
+				<div id="demo-editor" aria-label="Sample code editor (Python)"></div>
+
+				<div style="margin-top: 16px;">
+					<button type="button" class="pub-button pub-button-primary" id="demo-submit">Submit&nbsp;&nbsp;&rarr;</button>
+				</div>
+
+				<div id="demo-result" class="demo-result" role="status" aria-live="polite" hidden></div>
+			</div>
+
+			<div class="pub-card" style="margin-top: 24px;">
+				<h3 style="margin-top: 0;">Illustrative leaderboard <span class="pub-tag">Fictional example</span></h3>
+				<p style="margin-top: -6px; color: var(--pub-text-muted); font-size: 0.9em;">These teams and scores are made up, just to show what a leaderboard looked like.</p>
+				<table class="demo-leaderboard">
+					<thead>
+						<tr><th>Rank</th><th>Team</th><th>Points</th></tr>
+					</thead>
+					<tbody>
+						<tr><td>1</td><td>Team Nebula</td><td>142</td></tr>
+						<tr><td>2</td><td>Team Comet</td><td>128</td></tr>
+						<tr><td>3</td><td>Team Orbit</td><td>119</td></tr>
+						<tr><td>4</td><td>Team Quasar</td><td>103</td></tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+	<script src="{{ url_for('static', filename='js/editor/ace.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor/theme-one_dark.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/editor/mode-python.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/platform-demo.js') }}"></script>
+{% endblock %}

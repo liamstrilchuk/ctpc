@@ -1,0 +1,33 @@
+{% extends "public/layout.html" %}
+{% set active_page = "contact" %}
+
+{% block title %}Contact Us — CTPC{% endblock %}
+{% block meta_description %}Get in touch with CTPC — for students, schools, volunteers, and sponsors.{% endblock %}
+
+{% block content %}
+	<section class="pub-hero">
+		<div class="pub-hero-planets" aria-hidden="true"></div>
+		<div class="pub-hero-content">
+			<h1>Contact Us</h1>
+			<p>We'd love to hear from you &mdash; whether you're a student, a school, a volunteer, or a potential sponsor.</p>
+		</div>
+	</section>
+
+	<div class="pub-main">
+		<section class="pub-card" aria-labelledby="get-in-touch">
+			<h2 id="get-in-touch">Get in touch</h2>
+			<p>Curious about competing, want to bring CTPC to your school, interested in volunteering, or thinking about sponsoring us? However you'd like to connect, send us an email and we'll get back to you.</p>
+			<p style="font-size: 1.3em; margin-top: 24px;">
+				<a href="mailto:nikki.rana@uwaterloo.ca" class="pub-button pub-button-primary">
+					<span class="fa fa-envelope" aria-hidden="true"></span>&nbsp;&nbsp;nikki.rana@uwaterloo.ca
+				</a>
+			</p>
+			<ul style="color: var(--pub-text-muted); line-height: 1.8em; margin-top: 28px;">
+				<li><strong>Students</strong> &mdash; questions about competing or getting involved</li>
+				<li><strong>Schools</strong> &mdash; interested in bringing CTPC events to your students</li>
+				<li><strong>Volunteers</strong> &mdash; want to help run or support an event</li>
+				<li><strong>Sponsors</strong> &mdash; interested in partnering with us</li>
+			</ul>
+		</section>
+	</div>
+{% endblock %}

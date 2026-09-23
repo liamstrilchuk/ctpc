@@ -1,0 +1,64 @@
+{#
+	Timeline entries are loaded from data/timeline.json. To add a new entry, add an object with:
+	  date          (required, "YYYY-MM-DD", used for sorting)
+	  date_display  (required, human-readable date shown on the page)
+	  event_name    (required)
+	  location      (optional)
+	  caption       (required, a short, meaningful description of the event)
+	  image         (optional, path under /static/images/timeline/..., or null if no photo yet)
+	  image_alt     (required if image is set — describe what's actually in the photo)
+	  stats         (optional list of {"label": ..., "value": ...} — only include verified numbers)
+	Never set "image" to a placeholder/stock photo — leave it null until a real photo is available.
+#}
+{% extends "public/layout.html" %}
+{% set active_page = "timeline" %}
+
+{% block title %}Timeline — CTPC{% endblock %}
+{% block meta_description %}A history of CTPC events and milestones.{% endblock %}
+
+{% block content %}
+	<section class="pub-hero">
+		<div class="pub-hero-planets" aria-hidden="true"></div>
+		<div class="pub-hero-content">
+			<h1>Our Timeline</h1>
+			<p>A look back at the events and milestones that got us here. More photos and past events are on their way.</p>
+		</div>
+	</section>
+
+	<div class="pub-main">
+		{% if entries %}
+			<section aria-label="Event timeline">
+				{% for entry in entries %}
+					<div class="pub-card" style="margin-bottom: 24px;">
+						<span class="pub-tag">{{ entry.date_display }}</span>
+						<h2 style="margin-top: 12px;">{{ entry.event_name }}</h2>
+						{% if entry.location %}
+							<p style="margin-top: -10px; color: var(--pub-text-muted); font-size: 0.95em;"><span class="fa fa-location-dot" aria-hidden="true"></span> {{ entry.location }}</p>
+						{% endif %}
+
+						{% if entry.image %}
+							<img src="{{ url_for('static', filename=entry.image) }}" alt="{{ entry.image_alt }}" style="width: 100%; border-radius: 8px; margin-bottom: 16px;">
+						{% else %}
+							<p class="pub-notice">Photo coming soon</p>
+						{% endif %}
+
+						<p>{{ entry.caption }}</p>
+
+						{% if entry.stats %}
+							<div style="display: flex; gap: 24px; flex-wrap: wrap; margin-top: 16px;">
+								{% for stat in entry.stats %}
+									<div>
+										<div style="font-size: 1.6em; font-weight: 700;">{{ stat.value }}</div>
+										<div style="color: var(--pub-text-muted); font-size: 0.9em;">{{ stat.label }}</div>
+									</div>
+								{% endfor %}
+							</div>
+						{% endif %}
+					</div>
+				{% endfor %}
+			</section>
+		{% else %}
+			<p class="pub-notice">Our timeline is just getting started &mdash; check back soon as we add more events.</p>
+		{% endif %}
+	</div>
+{% endblock %}

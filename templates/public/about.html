@@ -1,0 +1,38 @@
+{% extends "public/layout.html" %}
+{% set active_page = "about" %}
+
+{% block title %}About Us — CTPC{% endblock %}
+{% block meta_description %}CTPC is the parent organization behind the Canadian Team Programming Competition and events like #Launch. Learn about our mission and how to get involved.{% endblock %}
+
+{% block content %}
+	<section class="pub-hero">
+		<div class="pub-hero-planets" aria-hidden="true"></div>
+		<div class="pub-hero-content">
+			<h1>About CTPC</h1>
+			<p>We're a student-led organization making coding and building opportunities accessible, welcoming, and exciting.</p>
+		</div>
+	</section>
+
+	<div class="pub-main">
+		<section aria-labelledby="who-we-are">
+			<h2 id="who-we-are">Who we are</h2>
+			<p>CTPC (the Canadian Team Programming Competition organization) is a national, student-led organization. We started by running the Canadian Team Programming Competition itself, and have since grown into the parent organization behind a number of events for students &mdash; including <strong>#Launch</strong>.</p>
+		</section>
+
+		<section aria-labelledby="our-mission">
+			<h2 id="our-mission">Our mission</h2>
+			<p>Our mission is to make coding and building opportunities accessible, welcoming, and exciting for students &mdash; including those who are completely new to tech. We believe you shouldn't need years of experience or a head start to feel like you belong in this space.</p>
+		</section>
+
+		<section aria-labelledby="what-we-run">
+			<h2 id="what-we-run">What we run</h2>
+			<p>We started with programming competitions, and we've grown from there. Today we run different kinds of events where students can solve problems, meet peers, and build confidence &mdash; from the Canadian Team Programming Competition to <strong>#Launch</strong>, our newer event built around hands-on building rather than a traditional contest format.</p>
+			<p>Our biggest event to date, the CTPC competition, brought together participants from across Canada &mdash; you can see it on our <a href="/timeline">timeline</a>.</p>
+		</section>
+
+		<section aria-labelledby="get-involved">
+			<h2 id="get-involved">Get involved</h2>
+			<p>Students can <a href="/competitions/2025">enter the current competition</a> or explore what participating felt like on our <a href="/platform">platform showcase</a>. Schools, volunteers, and sponsors interested in partnering with us can reach out through our <a href="/contact">contact page</a> &mdash; we'd love to hear from you.</p>
+		</section>
+	</div>
+{% endblock %}
